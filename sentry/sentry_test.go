@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"testing"
 
+	"encoding/json"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,13 +56,10 @@ func assertQuery(t *testing.T, expected map[string]string, req *http.Request) {
 	assert.Equal(t, expectedValues, queryValues)
 }
 
-// assertPostForm tests that the Request has the expected key values pairs url
-// encoded in its Body
-func assertPostForm(t *testing.T, expected map[string]string, req *http.Request) {
-	req.ParseForm() // parses request Body to put url.Values in r.Form/r.PostForm
-	expectedValues := url.Values{}
-	for key, value := range expected {
-		expectedValues.Add(key, value)
-	}
-	assert.Equal(t, expectedValues, req.Form)
+// assertPostJSON tests that the Request has the expected JSON in its Body
+func assertPostJSON(t *testing.T, expected interface{}, req *http.Request) {
+	var actual interface{}
+	err := json.NewDecoder(req.Body).Decode(&actual)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }

@@ -16,20 +16,21 @@ func TestOrganizationService_List(t *testing.T) {
 
 	mux.HandleFunc("/api/0/organizations/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
+		assertQuery(t, map[string]string{"cursor": "1500300636142:0:1"}, r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `[
-  {
-    "name": "The Interstellar Jurisdiction",
-    "slug": "the-interstellar-jurisdiction",
-    "avatar": {
-      "avatarUuid": null,
-      "avatarType": "letter_avatar"
-    },
-    "dateCreated": "2017-07-17T14:10:36.141Z",
-    "id": "2",
-    "isEarlyAdopter": false
-  }
-]`)
+			{
+				"name": "The Interstellar Jurisdiction",
+				"slug": "the-interstellar-jurisdiction",
+				"avatar": {
+					"avatarUuid": null,
+					"avatarType": "letter_avatar"
+				},
+				"dateCreated": "2017-07-17T14:10:36.141Z",
+				"id": "2",
+				"isEarlyAdopter": false
+			}
+		]`)
 	})
 
 	client := NewClient(httpClient, nil, "")
@@ -53,4 +54,37 @@ func TestOrganizationService_List(t *testing.T) {
 		},
 	}
 	assert.Equal(t, expected, organizations)
+}
+
+func TestOrganizationService_Create(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/organizations/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "POST", r)
+		assertPostJSON(t, map[string]interface{}{
+			"name": "The Interstellar Jurisdiction",
+			"slug": "the-interstellar-jurisdiction",
+		}, r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"name": "The Interstellar Jurisdiction",
+			"slug": "the-interstellar-jurisdiction",
+			"id": "2"
+		}`)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	params := &CreateOrganizationParams{
+		Name: "The Interstellar Jurisdiction",
+		Slug: "the-interstellar-jurisdiction",
+	}
+	organization, _, err := client.Organizations.Create(params)
+	assert.NoError(t, err)
+	expected := &Organization{
+		ID:   "2",
+		Name: "The Interstellar Jurisdiction",
+		Slug: "the-interstellar-jurisdiction",
+	}
+	assert.Equal(t, expected, organization)
 }
