@@ -2,23 +2,37 @@ package sentry
 
 import (
 	"net/http"
+	"net/url"
+
+	"path"
 
 	"github.com/dghubble/sling"
 )
 
+const (
+	DefaultBaseURL = "https://sentry.io/api/"
+	APIVersion     = "0"
+)
+
 type Client struct {
 	sling         *sling.Sling
-	Organizations *OrganizationsService
+	Organizations *OrganizationService
 }
 
 // NewClient returns a new Sentry API client.
 // If a nil httpClient is given, the http.DefaultClient will be used.
-func NewClient(httpClient *http.Client, token string) *Client {
+// If a nil baseURL is given, the DefaultBaseURL will be used.
+func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 
-	base := sling.New().Base("https://sentry.io/api/0/").Client(httpClient)
+	if baseURL == nil {
+		baseURL, _ = url.Parse(DefaultBaseURL)
+	}
+	baseURL.Path = path.Join(baseURL.Path, APIVersion) + "/"
+
+	base := sling.New().Base(baseURL.String()).Client(httpClient)
 
 	if token != "" {
 		base.Add("Authorization", "Bearer "+token)
@@ -26,7 +40,7 @@ func NewClient(httpClient *http.Client, token string) *Client {
 
 	c := &Client{
 		sling:         base,
-		Organizations: newOrganizationsService(base.New()),
+		Organizations: newOrganizationService(base.New()),
 	}
 	return c
 }
