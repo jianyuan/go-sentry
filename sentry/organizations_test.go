@@ -88,3 +88,36 @@ func TestOrganizationService_Create(t *testing.T) {
 	}
 	assert.Equal(t, expected, organization)
 }
+
+func TestOrganizationService_Update(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/organizations/badly-misnamed/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "PUT", r)
+		assertPostJSON(t, map[string]interface{}{
+			"name": "Impeccably Designated",
+			"slug": "impeccably-designated",
+		}, r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"name": "Impeccably Designated",
+			"slug": "impeccably-designated",
+			"id": "2"
+		}`)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	params := &UpdateOrganizationParams{
+		Name: "Impeccably Designated",
+		Slug: "impeccably-designated",
+	}
+	organization, _, err := client.Organizations.Update("badly-misnamed", params)
+	assert.NoError(t, err)
+	expected := &Organization{
+		ID:   "2",
+		Name: "Impeccably Designated",
+		Slug: "impeccably-designated",
+	}
+	assert.Equal(t, expected, organization)
+}
