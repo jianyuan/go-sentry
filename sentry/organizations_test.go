@@ -121,3 +121,16 @@ func TestOrganizationService_Update(t *testing.T) {
 	}
 	assert.Equal(t, expected, organization)
 }
+
+func TestOrganizationService_Delete(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.Organizations.Delete("the-interstellar-jurisdiction")
+	assert.NoError(t, err)
+}
