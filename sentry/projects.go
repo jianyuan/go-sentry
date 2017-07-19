@@ -48,3 +48,12 @@ func (s *ProjectService) List() ([]Project, *http.Response, error) {
 	resp, err := s.sling.New().Get("").Receive(projects, apiError)
 	return *projects, resp, relevantError(err, *apiError)
 }
+
+// Get details on an individual project.
+// https://docs.sentry.io/api/projects/get-project-details/
+func (s *ProjectService) Get(organizationSlug string, slug string) (*Project, *http.Response, error) {
+	project := new(Project)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Get(organizationSlug+"/"+slug+"/").Receive(project, apiError)
+	return project, resp, relevantError(err, *apiError)
+}
