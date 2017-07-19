@@ -9,8 +9,14 @@ import (
 
 // OrganizationAvatar represents a Sentry organization's avatar.
 type OrganizationAvatar struct {
-	UUID *string `json:"avatarUuid,omitempty"`
-	Type string  `json:"avatarType,omitempty"`
+	UUID *string `json:"avatarUuid"`
+	Type string  `json:"avatarType"`
+}
+
+// OrganizationQuota represents a Sentry organization's quota.
+type OrganizationQuota struct {
+	MaxRate      int `json:"maxRate"`
+	ProjectLimit int `json:"projectLimit"`
 }
 
 // Organization represents a Sentry organization.
@@ -21,15 +27,9 @@ type Organization struct {
 	DateCreated    time.Time `json:"dateCreated"`
 	IsEarlyAdopter bool      `json:"isEarlyAdopter"`
 
-	Avatar *OrganizationAvatar `json:"avatar,omitempty"`
+	Avatar *OrganizationAvatar `json:"avatar"`
+	Quota  *OrganizationQuota  `json:"quota"`
 
-	// TODO:
-	// Teams []Team `json:"teams"`
-
-	Quota struct {
-		MaxRate      int `json:"maxRate"`
-		ProjectLimit int `json:"projectLimit"`
-	} `json:"quota"`
 	Access                []string `json:"access"`
 	Features              []string `json:"features"`
 	PendingAccessRequests int      `json:"pendingAccessRequests"`
