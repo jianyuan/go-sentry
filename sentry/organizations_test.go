@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"time"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,14 +36,12 @@ func TestOrganizationService_List(t *testing.T) {
 		Cursor: "1500300636142:0:1",
 	})
 	assert.NoError(t, err)
-
-	expectedDateCreated, _ := time.Parse(time.RFC3339, "2017-07-17T14:10:36.141Z")
 	expected := []Organization{
 		{
 			ID:             "2",
 			Slug:           "the-interstellar-jurisdiction",
 			Name:           "The Interstellar Jurisdiction",
-			DateCreated:    expectedDateCreated,
+			DateCreated:    mustParseTime("2017-07-17T14:10:36.141Z"),
 			IsEarlyAdopter: false,
 			Avatar: &OrganizationAvatar{
 				UUID: nil,

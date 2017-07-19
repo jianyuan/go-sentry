@@ -1,10 +1,12 @@
 package sentry
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"encoding/json"
 
@@ -62,4 +64,12 @@ func assertPostJSON(t *testing.T, expected interface{}, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&actual)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
+}
+
+func mustParseTime(value string) time.Time {
+	t, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		panic(fmt.Sprintf("mustParseTime: %s", err))
+	}
+	return t
 }

@@ -30,6 +30,15 @@ func newTeamService(sling *sling.Sling) *TeamService {
 	}
 }
 
+// List returns a list of teams bound to an organization.
+// https://docs.sentry.io/api/teams/get-organization-teams/
+func (s *TeamService) List(organizationSlug string) ([]Team, *http.Response, error) {
+	teams := new([]Team)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Get(organizationSlug+"/teams/").Receive(teams, apiError)
+	return *teams, resp, relevantError(err, *apiError)
+}
+
 // CreateTeamParams are the parameters for TeamService.Create.
 type CreateTeamParams struct {
 	Name string `json:"name,omitempty"`
