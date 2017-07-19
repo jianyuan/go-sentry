@@ -213,3 +213,42 @@ func TestTeamService_Get(t *testing.T) {
 	}
 	assert.Equal(t, expected, team)
 }
+
+func TestUpdateService_Update(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/the-obese-philosophers/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "PUT", r)
+		assertPostJSON(t, map[string]interface{}{
+			"name": "The Inflated Philosophers",
+		}, r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"slug": "the-obese-philosophers",
+			"name": "The Inflated Philosophers",
+			"hasAccess": true,
+			"isPending": false,
+			"dateCreated": "2017-07-18T19:30:14.736Z",
+			"isMember": false,
+			"id": "4"
+		}`)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	params := &UpdateTeamParams{
+		Name: "The Inflated Philosophers",
+	}
+	team, _, err := client.Teams.Update("the-interstellar-jurisdiction", "the-obese-philosophers", params)
+	assert.NoError(t, err)
+	expected := &Team{
+		ID:          "4",
+		Slug:        "the-obese-philosophers",
+		Name:        "The Inflated Philosophers",
+		DateCreated: mustParseTime("2017-07-18T19:30:14.736Z"),
+		HasAccess:   true,
+		IsPending:   false,
+		IsMember:    false,
+	}
+	assert.Equal(t, expected, team)
+}

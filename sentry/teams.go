@@ -62,3 +62,21 @@ func (s *TeamService) Get(organizationSlug string, teamSlug string) (*Team, *htt
 	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+teamSlug+"/").Receive(team, apiError)
 	return team, resp, relevantError(err, *apiError)
 }
+
+// UpdateTeamParams are the parameters for TeamService.Update.
+type UpdateTeamParams struct {
+	Name string `json:"name,omitempty"`
+	Slug string `json:"slug,omitempty"`
+}
+
+// Update settings for a given team.
+// https://docs.sentry.io/api/teams/put-team-details/
+func (s *TeamService) Update(organizationSlug string, teamSlug string, params *UpdateTeamParams) (*Team, *http.Response, error) {
+	if params == nil {
+		params = &UpdateTeamParams{}
+	}
+	team := new(Team)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Put("teams/"+organizationSlug+"/"+teamSlug+"/").BodyJSON(params).Receive(team, apiError)
+	return team, resp, relevantError(err, *apiError)
+}
