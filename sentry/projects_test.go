@@ -283,7 +283,9 @@ func TestProjectService_Get(t *testing.T) {
 			"rate-limits",
 			"releases",
 		},
-		Status: "active",
+		Status:          "active",
+		DigestsMinDelay: 300,
+		DigestsMaxDelay: 1800,
 		Team: Team{
 			ID:          "2",
 			Slug:        "powerful-abolitionist",
@@ -360,6 +362,82 @@ func TestProjectService_Create(t *testing.T) {
 			"rate-limits",
 		},
 		Status: "active",
+	}
+	assert.Equal(t, expected, project)
+}
+
+func TestProjectService_Update(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/plain-proxy/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "PUT", r)
+		assertPostJSON(t, map[string]interface{}{
+			"name": "Plane Proxy",
+			"slug": "plane-proxy",
+			"options": map[string]interface{}{
+				"sentry:origins": "http://example.com\nhttp://example.invalid",
+			},
+		}, r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"status": "active",
+			"digestsMinDelay": 300,
+			"options": {
+				"sentry:origins": "http://example.com\nhttp://example.invalid",
+				"sentry:resolve_age": 0
+			},
+			"defaultEnvironment": null,
+			"features": [
+				"data-forwarding",
+				"rate-limits",
+				"releases"
+			],
+			"subjectPrefix": null,
+			"color": "#bf803f",
+			"slug": "plane-proxy",
+			"isPublic": false,
+			"dateCreated": "2017-07-18T19:30:09.751Z",
+			"platforms": [],
+			"callSign": "PLANE-PROXY",
+			"firstEvent": null,
+			"digestsMaxDelay": 1800,
+			"processingIssues": 0,
+			"isBookmarked": false,
+			"callSignReviewed": false,
+			"id": "5",
+			"subjectTemplate": "[$project] ${tag:level}: $title",
+			"name": "Plane Proxy"
+		}`)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	params := &UpdateProjectParams{
+		Name: "Plane Proxy",
+		Slug: "plane-proxy",
+		Options: map[string]interface{}{
+			"sentry:origins": "http://example.com\nhttp://example.invalid",
+		},
+	}
+	project, _, err := client.Projects.Update("the-interstellar-jurisdiction", "plain-proxy", params)
+	assert.NoError(t, err)
+	expected := &Project{
+		ID:           "5",
+		Slug:         "plane-proxy",
+		Name:         "Plane Proxy",
+		DateCreated:  mustParseTime("2017-07-18T19:30:09.751Z"),
+		IsPublic:     false,
+		IsBookmarked: false,
+		CallSign:     "PLANE-PROXY",
+		Color:        "#bf803f",
+		Features: []string{
+			"data-forwarding",
+			"rate-limits",
+			"releases",
+		},
+		Status:          "active",
+		DigestsMinDelay: 300,
+		DigestsMaxDelay: 1800,
 	}
 	assert.Equal(t, expected, project)
 }

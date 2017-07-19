@@ -24,16 +24,16 @@ type Project struct {
 	Features     []string `json:"features"`
 	Status       string   `json:"status"`
 
-	// latestRelease
-	// options
-	// digestsMinDelay
-	// digestsMaxDelay
-	// subjectPrefix
-	// subjectTemplate
-	// plugins
-	// platforms
-	// processingIssues
-	// defaultEnvironment
+	// TODO: latestRelease
+	// TODO: options
+	DigestsMinDelay int `json:"digestsMinDelay"`
+	DigestsMaxDelay int `json:"digestsMaxDelay"`
+	// TODO: subjectPrefix
+	// TODO: subjectTemplate
+	// TODO: plugins
+	// TODO: platforms
+	// TODO: processingIssues
+	// TODO: defaultEnvironment
 
 	Team         Team         `json:"team"`
 	Organization Organization `json:"organization"`
@@ -69,7 +69,7 @@ func (s *ProjectService) Get(organizationSlug string, slug string) (*Project, *h
 	return project, resp, relevantError(err, *apiError)
 }
 
-// CreateProjectParams are the parameters for TeamService.Create.
+// CreateProjectParams are the parameters for ProjectService.Create.
 type CreateProjectParams struct {
 	Name string `json:"name,omitempty"`
 	Slug string `json:"slug,omitempty"`
@@ -81,5 +81,27 @@ func (s *ProjectService) Create(organizationSlug string, teamSlug string, params
 	project := new(Project)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Post("teams/"+organizationSlug+"/"+teamSlug+"/projects/").BodyJSON(params).Receive(project, apiError)
+	return project, resp, relevantError(err, *apiError)
+}
+
+// UpdateProjectParams are the parameters for ProjectService.Update.
+type UpdateProjectParams struct {
+	Name            string                 `json:"name,omitempty"`
+	Slug            string                 `json:"slug,omitempty"`
+	IsBookmarked    *bool                  `json:"isBookmarked,omitempty"`
+	DigestsMinDelay *int                   `json:"digestsMinDelay,omitempty"`
+	DigestsMaxDelay *int                   `json:"digestsMaxDelay,omitempty"`
+	Options         map[string]interface{} `json:"options,omitempty"`
+}
+
+// Update various attributes and configurable settings for a given project.
+// https://docs.sentry.io/api/projects/put-project-details/
+func (s *ProjectService) Update(organizationSlug string, slug string, params *UpdateProjectParams) (*Project, *http.Response, error) {
+	if params == nil {
+		params = &UpdateProjectParams{}
+	}
+	project := new(Project)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(project, apiError)
 	return project, resp, relevantError(err, *apiError)
 }
