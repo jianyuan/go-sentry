@@ -441,3 +441,17 @@ func TestProjectService_Update(t *testing.T) {
 	}
 	assert.Equal(t, expected, project)
 }
+
+func TestProjectService_Delete(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/plain-proxy/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.Projects.Delete("the-interstellar-jurisdiction", "plain-proxy")
+	assert.NoError(t, err)
+
+}

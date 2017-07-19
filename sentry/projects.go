@@ -105,3 +105,11 @@ func (s *ProjectService) Update(organizationSlug string, slug string, params *Up
 	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(project, apiError)
 	return project, resp, relevantError(err, *apiError)
 }
+
+// Delete a project.
+// https://docs.sentry.io/api/projects/delete-project-details/
+func (s *ProjectService) Delete(organizationSlug string, slug string) (*http.Response, error) {
+	apiError := new(APIError)
+	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)
+	return resp, relevantError(err, *apiError)
+}
