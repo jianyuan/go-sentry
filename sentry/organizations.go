@@ -15,24 +15,53 @@ type OrganizationAvatar struct {
 
 // OrganizationQuota represents a Sentry organization's quota.
 type OrganizationQuota struct {
-	MaxRate      int `json:"maxRate"`
-	ProjectLimit int `json:"projectLimit"`
+	MaxRate         int `json:"maxRate"`
+	MaxRateInterval int `json:"maxRateInterval"`
+	AccountLimit    int `json:"accountLimit"`
+	ProjectLimit    int `json:"projectLimit"`
+}
+
+// OrganizationAvailableRole represents a Sentry organization's available role.
+type OrganizationAvailableRole struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // Organization represents a Sentry organization.
+// Taken from https://github.com/getsentry/sentry/blob/cc81fff31d4f2c9cede14ce9c479d6f4f78c5e5b/src/sentry/api/endpoints/organization_details.py#L66.
 type Organization struct {
-	ID             string    `json:"id"`
-	Slug           string    `json:"slug"`
-	Name           string    `json:"name"`
-	DateCreated    time.Time `json:"dateCreated"`
-	IsEarlyAdopter bool      `json:"isEarlyAdopter"`
+	ID   string `json:"id"`
+	Slug string `json:"slug"`
+	Name string `json:"name"`
 
-	Avatar *OrganizationAvatar `json:"avatar"`
-	Quota  *OrganizationQuota  `json:"quota"`
+	DateCreated time.Time `json:"dateCreated"`
+
+	Quota OrganizationQuota `json:"quota"`
 
 	Access                []string `json:"access"`
 	Features              []string `json:"features"`
 	PendingAccessRequests int      `json:"pendingAccessRequests"`
+
+	IsDefault        bool                        `json:"isDefault"`
+	DefaultRole      string                      `json:"defaultRole"`
+	AvailableRoles   []OrganizationAvailableRole `json:"availableRoles"`
+	AccountRateLimit int                         `json:"accountRateLimit"`
+	ProjectRateLimit int                         `json:"projectRateLimit"`
+
+	Avatar OrganizationAvatar `json:"avatar"`
+
+	OpenMembership       bool     `json:"openMembership"`
+	AllowSharedIssues    bool     `json:"allowSharedIssues"`
+	EnhancedPrivacy      bool     `json:"enhancedPrivacy"`
+	DataScrubber         bool     `json:"dataScrubber"`
+	DataScrubberDefaults bool     `json:"dataScrubberDefaults"`
+	SensitiveFields      []string `json:"sensitiveFields"`
+	SafeFields           []string `json:"safeFields"`
+	ScrubIPAddresses     bool     `json:"scrubIPAddresses"`
+	IsEarlyAdopter       bool     `json:"isEarlyAdopter"`
+
+	// TODO: teams
+	// TODO: onboardingTasks
 }
 
 // OrganizationService provides methods for accessing Sentry organization API endpoints.
