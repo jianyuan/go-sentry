@@ -26,7 +26,7 @@ type TeamService struct {
 
 func newTeamService(sling *sling.Sling) *TeamService {
 	return &TeamService{
-		sling: sling.Path("organizations/"),
+		sling: sling,
 	}
 }
 
@@ -35,7 +35,7 @@ func newTeamService(sling *sling.Sling) *TeamService {
 func (s *TeamService) List(organizationSlug string) ([]Team, *http.Response, error) {
 	teams := new([]Team)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Get(organizationSlug+"/teams/").Receive(teams, apiError)
+	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/teams/").Receive(teams, apiError)
 	return *teams, resp, relevantError(err, *apiError)
 }
 
@@ -50,6 +50,15 @@ type CreateTeamParams struct {
 func (s *TeamService) Create(organizationSlug string, params *CreateTeamParams) (*Team, *http.Response, error) {
 	team := new(Team)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Post(organizationSlug+"/teams/").BodyJSON(params).Receive(team, apiError)
+	resp, err := s.sling.New().Post("organizations/"+organizationSlug+"/teams/").BodyJSON(params).Receive(team, apiError)
+	return team, resp, relevantError(err, *apiError)
+}
+
+// Get details on an individual team of an organization.
+// https://docs.sentry.io/api/teams/get-team-details/
+func (s *TeamService) Get(organizationSlug string, teamSlug string) (*Team, *http.Response, error) {
+	team := new(Team)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+teamSlug+"/").Receive(team, apiError)
 	return team, resp, relevantError(err, *apiError)
 }

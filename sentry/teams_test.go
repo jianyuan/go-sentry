@@ -168,3 +168,48 @@ func TestTeamService_Create(t *testing.T) {
 	}
 	assert.Equal(t, expected, team)
 }
+
+func TestTeamService_Get(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"slug": "powerful-abolitionist",
+			"name": "Powerful Abolitionist",
+			"hasAccess": true,
+			"isPending": false,
+			"dateCreated": "2017-07-18T19:29:24.743Z",
+			"isMember": false,
+			"organization": {
+				"name": "The Interstellar Jurisdiction",
+				"slug": "the-interstellar-jurisdiction",
+				"avatar": {
+					"avatarUuid": null,
+					"avatarType": "letter_avatar"
+				},
+				"dateCreated": "2017-07-18T19:29:24.565Z",
+				"id": "2",
+				"isEarlyAdopter": false
+			},
+			"id": "2"
+		}`)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	team, _, err := client.Teams.Get("the-interstellar-jurisdiction", "powerful-abolitionist")
+	assert.NoError(t, err)
+
+	expected := &Team{
+		ID:          "2",
+		Slug:        "powerful-abolitionist",
+		Name:        "Powerful Abolitionist",
+		DateCreated: mustParseTime("2017-07-18T19:29:24.743Z"),
+		HasAccess:   true,
+		IsPending:   false,
+		IsMember:    false,
+	}
+	assert.Equal(t, expected, team)
+}
