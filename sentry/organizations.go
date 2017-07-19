@@ -96,21 +96,21 @@ type CreateOrganizationParams struct {
 	Slug string `json:"slug,omitempty"`
 }
 
-// Create a new Sentry organization.
-// https://docs.sentry.io/api/organizations/post-organization-index/
-func (s *OrganizationService) Create(params *CreateOrganizationParams) (*Organization, *http.Response, error) {
-	org := new(Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("").BodyJSON(params).Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
-}
-
 // Get a Sentry organization.
 // https://docs.sentry.io/api/organizations/get-organization-details/
 func (s *OrganizationService) Get(slug string) (*Organization, *http.Response, error) {
 	org := new(Organization)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Get(slug+"/").Receive(org, apiError)
+	return org, resp, relevantError(err, *apiError)
+}
+
+// Create a new Sentry organization.
+// https://docs.sentry.io/api/organizations/post-organization-index/
+func (s *OrganizationService) Create(params *CreateOrganizationParams) (*Organization, *http.Response, error) {
+	org := new(Organization)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Post("").BodyJSON(params).Receive(org, apiError)
 	return org, resp, relevantError(err, *apiError)
 }
 

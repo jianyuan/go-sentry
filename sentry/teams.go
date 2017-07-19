@@ -39,6 +39,15 @@ func (s *TeamService) List(organizationSlug string) ([]Team, *http.Response, err
 	return *teams, resp, relevantError(err, *apiError)
 }
 
+// Get details on an individual team of an organization.
+// https://docs.sentry.io/api/teams/get-team-details/
+func (s *TeamService) Get(organizationSlug string, slug string) (*Team, *http.Response, error) {
+	team := new(Team)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+slug+"/").Receive(team, apiError)
+	return team, resp, relevantError(err, *apiError)
+}
+
 // CreateTeamParams are the parameters for TeamService.Create.
 type CreateTeamParams struct {
 	Name string `json:"name,omitempty"`
@@ -51,15 +60,6 @@ func (s *TeamService) Create(organizationSlug string, params *CreateTeamParams) 
 	team := new(Team)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Post("organizations/"+organizationSlug+"/teams/").BodyJSON(params).Receive(team, apiError)
-	return team, resp, relevantError(err, *apiError)
-}
-
-// Get details on an individual team of an organization.
-// https://docs.sentry.io/api/teams/get-team-details/
-func (s *TeamService) Get(organizationSlug string, slug string) (*Team, *http.Response, error) {
-	team := new(Team)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+slug+"/").Receive(team, apiError)
 	return team, resp, relevantError(err, *apiError)
 }
 
