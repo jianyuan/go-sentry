@@ -28,7 +28,7 @@ type OrganizationAvailableRole struct {
 }
 
 // Organization represents a Sentry organization.
-// Taken from https://github.com/getsentry/sentry/blob/cc81fff31d4f2c9cede14ce9c479d6f4f78c5e5b/src/sentry/api/endpoints/organization_details.py#L66.
+// Based on https://github.com/getsentry/sentry/blob/cc81fff31d4f2c9cede14ce9c479d6f4f78c5e5b/src/sentry/api/endpoints/organization_details.py#L66.
 type Organization struct {
 	ID   string `json:"id"`
 	Slug string `json:"slug"`
@@ -81,7 +81,7 @@ type ListOrganizationParams struct {
 	Cursor string `url:"cursor,omitempty"`
 }
 
-// List returns a list of organizations available to the authenticated session.
+// List organizations available to the authenticated session.
 // https://docs.sentry.io/api/organizations/get-organization-index/
 func (s *OrganizationService) List(params *ListOrganizationParams) ([]Organization, *http.Response, error) {
 	organizations := new([]Organization)

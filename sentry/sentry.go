@@ -18,6 +18,7 @@ type Client struct {
 	sling         *sling.Sling
 	Organizations *OrganizationService
 	Teams         *TeamService
+	Projects      *ProjectService
 }
 
 // NewClient returns a new Sentry API client.
@@ -43,6 +44,7 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 		sling:         base,
 		Organizations: newOrganizationService(base.New()),
 		Teams:         newTeamService(base.New()),
+		Projects:      newProjectService(base.New()),
 	}
 	return c
 }
