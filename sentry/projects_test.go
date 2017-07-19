@@ -118,6 +118,16 @@ func TestProjectService_List(t *testing.T) {
 	projects, _, err := client.Projects.List()
 	assert.NoError(t, err)
 
+	expectedOrganization := Organization{
+		ID:          "2",
+		Slug:        "the-interstellar-jurisdiction",
+		Name:        "The Interstellar Jurisdiction",
+		DateCreated: mustParseTime("2017-07-18T19:29:24.565Z"),
+		Avatar: OrganizationAvatar{
+			Type: "letter_avatar",
+		},
+		IsEarlyAdopter: false,
+	}
 	expected := []Project{
 		{
 			ID:           "4",
@@ -132,7 +142,8 @@ func TestProjectService_List(t *testing.T) {
 				"data-forwarding",
 				"rate-limits",
 			},
-			Status: "active",
+			Status:       "active",
+			Organization: expectedOrganization,
 		},
 		{
 			ID:           "3",
@@ -148,7 +159,8 @@ func TestProjectService_List(t *testing.T) {
 				"rate-limits",
 				"releases",
 			},
-			Status: "active",
+			Status:       "active",
+			Organization: expectedOrganization,
 		},
 		{
 			ID:           "2",
@@ -164,7 +176,8 @@ func TestProjectService_List(t *testing.T) {
 				"rate-limits",
 				"releases",
 			},
-			Status: "active",
+			Status:       "active",
+			Organization: expectedOrganization,
 		},
 	}
 	assert.Equal(t, expected, projects)

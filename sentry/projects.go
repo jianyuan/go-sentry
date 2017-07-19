@@ -23,6 +23,9 @@ type Project struct {
 	Color        string   `json:"color"`
 	Features     []string `json:"features"`
 	Status       string   `json:"status"`
+
+	Team         Team         `json:"team"`
+	Organization Organization `json:"organization"`
 }
 
 // ProjectService provides methods for accessing Sentry project API endpoints.
