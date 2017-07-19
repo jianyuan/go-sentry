@@ -214,7 +214,7 @@ func TestTeamService_Get(t *testing.T) {
 	assert.Equal(t, expected, team)
 }
 
-func TestUpdateService_Update(t *testing.T) {
+func TestTeamService_Update(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
@@ -251,4 +251,18 @@ func TestUpdateService_Update(t *testing.T) {
 		IsMember:    false,
 	}
 	assert.Equal(t, expected, team)
+}
+
+func TestTeamService_Delete(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/the-obese-philosophers/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.Teams.Delete("the-interstellar-jurisdiction", "the-obese-philosophers")
+	assert.NoError(t, err)
+
 }

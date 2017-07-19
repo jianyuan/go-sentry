@@ -56,10 +56,10 @@ func (s *TeamService) Create(organizationSlug string, params *CreateTeamParams) 
 
 // Get details on an individual team of an organization.
 // https://docs.sentry.io/api/teams/get-team-details/
-func (s *TeamService) Get(organizationSlug string, teamSlug string) (*Team, *http.Response, error) {
+func (s *TeamService) Get(organizationSlug string, slug string) (*Team, *http.Response, error) {
 	team := new(Team)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+teamSlug+"/").Receive(team, apiError)
+	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+slug+"/").Receive(team, apiError)
 	return team, resp, relevantError(err, *apiError)
 }
 
@@ -71,12 +71,20 @@ type UpdateTeamParams struct {
 
 // Update settings for a given team.
 // https://docs.sentry.io/api/teams/put-team-details/
-func (s *TeamService) Update(organizationSlug string, teamSlug string, params *UpdateTeamParams) (*Team, *http.Response, error) {
+func (s *TeamService) Update(organizationSlug string, slug string, params *UpdateTeamParams) (*Team, *http.Response, error) {
 	if params == nil {
 		params = &UpdateTeamParams{}
 	}
 	team := new(Team)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Put("teams/"+organizationSlug+"/"+teamSlug+"/").BodyJSON(params).Receive(team, apiError)
+	resp, err := s.sling.New().Put("teams/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(team, apiError)
 	return team, resp, relevantError(err, *apiError)
+}
+
+// Delete a team.
+// https://docs.sentry.io/api/teams/delete-team-details/
+func (s *TeamService) Delete(organizationSlug string, slug string) (*http.Response, error) {
+	apiError := new(APIError)
+	resp, err := s.sling.New().Delete("teams/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)
+	return resp, relevantError(err, *apiError)
 }
