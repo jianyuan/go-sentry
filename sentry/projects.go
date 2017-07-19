@@ -24,6 +24,17 @@ type Project struct {
 	Features     []string `json:"features"`
 	Status       string   `json:"status"`
 
+	// latestRelease
+	// options
+	// digestsMinDelay
+	// digestsMaxDelay
+	// subjectPrefix
+	// subjectTemplate
+	// plugins
+	// platforms
+	// processingIssues
+	// defaultEnvironment
+
 	Team         Team         `json:"team"`
 	Organization Organization `json:"organization"`
 }
@@ -36,7 +47,7 @@ type ProjectService struct {
 
 func newProjectService(sling *sling.Sling) *ProjectService {
 	return &ProjectService{
-		sling: sling.Path("projects/"),
+		sling: sling,
 	}
 }
 
@@ -45,7 +56,7 @@ func newProjectService(sling *sling.Sling) *ProjectService {
 func (s *ProjectService) List() ([]Project, *http.Response, error) {
 	projects := new([]Project)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Get("").Receive(projects, apiError)
+	resp, err := s.sling.New().Get("projects/").Receive(projects, apiError)
 	return *projects, resp, relevantError(err, *apiError)
 }
 
@@ -54,6 +65,21 @@ func (s *ProjectService) List() ([]Project, *http.Response, error) {
 func (s *ProjectService) Get(organizationSlug string, slug string) (*Project, *http.Response, error) {
 	project := new(Project)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Get(organizationSlug+"/"+slug+"/").Receive(project, apiError)
+	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+slug+"/").Receive(project, apiError)
+	return project, resp, relevantError(err, *apiError)
+}
+
+// CreateProjectParams are the parameters for TeamService.Create.
+type CreateProjectParams struct {
+	Name string `json:"name,omitempty"`
+	Slug string `json:"slug,omitempty"`
+}
+
+// Create a new project bound to a team.
+// https://docs.sentry.io/api/teams/post-team-project-index/
+func (s *ProjectService) Create(organizationSlug string, teamSlug string, params *CreateProjectParams) (*Project, *http.Response, error) {
+	project := new(Project)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Post("teams/"+organizationSlug+"/"+teamSlug+"/projects/").BodyJSON(params).Receive(project, apiError)
 	return project, resp, relevantError(err, *apiError)
 }

@@ -191,79 +191,79 @@ func TestProjectService_Get(t *testing.T) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
-    	"subjectPrefix": null,
-    	"defaultEnvironment": null,
-    	"features": [
-    		"data-forwarding",
-    		"rate-limits",
-    		"releases"
-    	],
-    	"color": "#3fbf7f",
-    	"platforms": [],
-    	"plugins": [
-    		{
-    			"status": "unknown",
-    			"assets": [],
-    			"isTestable": true,
-    			"contexts": [],
-    			"doc": "",
-    			"enabled": false,
-    			"name": "WebHooks",
-    			"canDisable": true,
-    			"type": "notification",
-    			"id": "webhooks",
-    			"metadata": {}
-    		}
-    	],
-    	"callSignReviewed": false,
-    	"id": "2",
-    	"digestsMinDelay": 300,
-    	"firstEvent": null,
-    	"digestsMaxDelay": 1800,
-    	"processingIssues": 0,
-    	"status": "active",
-    	"isPublic": false,
-    	"dateCreated": "2017-07-18T19:29:24.793Z",
-    	"subjectTemplate": "[$project] ${tag:level}: $title",
-    	"slug": "pump-station",
-    	"name": "Pump Station",
-    	"isBookmarked": false,
-    	"callSign": "PUMP-STATION",
-    	"team": {
-    		"slug": "powerful-abolitionist",
-    		"name": "Powerful Abolitionist",
-    		"hasAccess": true,
-    		"isPending": false,
-    		"dateCreated": "2017-07-18T19:29:24.743Z",
-    		"isMember": false,
-    		"id": "2"
-    	},
-    	"organization": {
-    		"name": "The Interstellar Jurisdiction",
-    		"slug": "the-interstellar-jurisdiction",
-    		"avatar": {
-    			"avatarUuid": null,
-    			"avatarType": "letter_avatar"
-    		},
-    		"dateCreated": "2017-07-18T19:29:24.565Z",
-    		"id": "2",
-    		"isEarlyAdopter": false
-    	},
-    	"options": {
-    		"sentry:csp_ignored_sources_defaults": true,
-    		"sentry:scrub_defaults": true,
-    		"sentry:origins": "*",
-    		"sentry:resolve_age": 0,
-    		"sentry:sensitive_fields": [],
-    		"sentry:scrub_data": true,
-    		"sentry:reprocessing_active": false,
-    		"sentry:csp_ignored_sources": "",
-    		"filters:blacklisted_ips": "",
-    		"sentry:safe_fields": [],
-    		"feedback:branding": true,
-    		"sentry:default_environment": null
-    	}
-    }`)
+			"subjectPrefix": null,
+			"defaultEnvironment": null,
+			"features": [
+				"data-forwarding",
+				"rate-limits",
+				"releases"
+			],
+			"color": "#3fbf7f",
+			"platforms": [],
+			"plugins": [
+				{
+					"status": "unknown",
+					"assets": [],
+					"isTestable": true,
+					"contexts": [],
+					"doc": "",
+					"enabled": false,
+					"name": "WebHooks",
+					"canDisable": true,
+					"type": "notification",
+					"id": "webhooks",
+					"metadata": {}
+				}
+			],
+			"callSignReviewed": false,
+			"id": "2",
+			"digestsMinDelay": 300,
+			"firstEvent": null,
+			"digestsMaxDelay": 1800,
+			"processingIssues": 0,
+			"status": "active",
+			"isPublic": false,
+			"dateCreated": "2017-07-18T19:29:24.793Z",
+			"subjectTemplate": "[$project] ${tag:level}: $title",
+			"slug": "pump-station",
+			"name": "Pump Station",
+			"isBookmarked": false,
+			"callSign": "PUMP-STATION",
+			"team": {
+				"slug": "powerful-abolitionist",
+				"name": "Powerful Abolitionist",
+				"hasAccess": true,
+				"isPending": false,
+				"dateCreated": "2017-07-18T19:29:24.743Z",
+				"isMember": false,
+				"id": "2"
+			},
+			"organization": {
+				"name": "The Interstellar Jurisdiction",
+				"slug": "the-interstellar-jurisdiction",
+				"avatar": {
+					"avatarUuid": null,
+					"avatarType": "letter_avatar"
+				},
+				"dateCreated": "2017-07-18T19:29:24.565Z",
+				"id": "2",
+				"isEarlyAdopter": false
+			},
+			"options": {
+				"sentry:csp_ignored_sources_defaults": true,
+				"sentry:scrub_defaults": true,
+				"sentry:origins": "*",
+				"sentry:resolve_age": 0,
+				"sentry:sensitive_fields": [],
+				"sentry:scrub_data": true,
+				"sentry:reprocessing_active": false,
+				"sentry:csp_ignored_sources": "",
+				"filters:blacklisted_ips": "",
+				"sentry:safe_fields": [],
+				"feedback:branding": true,
+				"sentry:default_environment": null
+			}
+		}`)
 	})
 
 	client := NewClient(httpClient, nil, "")
@@ -303,6 +303,63 @@ func TestProjectService_Get(t *testing.T) {
 			},
 			IsEarlyAdopter: false,
 		},
+	}
+	assert.Equal(t, expected, project)
+}
+
+func TestProjectService_Create(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/powerful-abolitionist/projects/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "POST", r)
+		assertPostJSON(t, map[string]interface{}{
+			"name": "The Spoiled Yoghurt",
+		}, r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"status": "active",
+			"slug": "the-spoiled-yoghurt",
+			"defaultEnvironment": null,
+			"features": [
+				"data-forwarding",
+				"rate-limits"
+			],
+			"color": "#bf6e3f",
+			"isPublic": false,
+			"dateCreated": "2017-07-18T19:29:44.996Z",
+			"platforms": [],
+			"callSign": "THE-SPOILED-YOGHURT",
+			"firstEvent": null,
+			"processingIssues": 0,
+			"isBookmarked": false,
+			"callSignReviewed": false,
+			"id": "4",
+			"name": "The Spoiled Yoghurt"
+		}`)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	params := &CreateProjectParams{
+		Name: "The Spoiled Yoghurt",
+	}
+	project, _, err := client.Projects.Create("the-interstellar-jurisdiction", "powerful-abolitionist", params)
+	assert.NoError(t, err)
+
+	expected := &Project{
+		ID:           "4",
+		Slug:         "the-spoiled-yoghurt",
+		Name:         "The Spoiled Yoghurt",
+		DateCreated:  mustParseTime("2017-07-18T19:29:44.996Z"),
+		IsPublic:     false,
+		IsBookmarked: false,
+		CallSign:     "THE-SPOILED-YOGHURT",
+		Color:        "#bf6e3f",
+		Features: []string{
+			"data-forwarding",
+			"rate-limits",
+		},
+		Status: "active",
 	}
 	assert.Equal(t, expected, project)
 }
