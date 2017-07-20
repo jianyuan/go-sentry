@@ -283,9 +283,24 @@ func TestProjectService_Get(t *testing.T) {
 			"rate-limits",
 			"releases",
 		},
-		Status:          "active",
+		Status: "active",
+		Options: map[string]interface{}{
+			"sentry:csp_ignored_sources_defaults": true,
+			"sentry:scrub_defaults":               true,
+			"sentry:origins":                      "*",
+			"sentry:resolve_age":                  float64(0),
+			"sentry:sensitive_fields":             []interface{}{},
+			"sentry:scrub_data":                   true,
+			"sentry:reprocessing_active":          false,
+			"sentry:csp_ignored_sources":          "",
+			"filters:blacklisted_ips":             "",
+			"sentry:safe_fields":                  []interface{}{},
+			"feedback:branding":                   true,
+			"sentry:default_environment":          nil,
+		},
 		DigestsMinDelay: 300,
 		DigestsMaxDelay: 1800,
+		SubjectTemplate: "[$project] ${tag:level}: $title",
 		Team: Team{
 			ID:          "2",
 			Slug:        "powerful-abolitionist",
@@ -435,9 +450,14 @@ func TestProjectService_Update(t *testing.T) {
 			"rate-limits",
 			"releases",
 		},
-		Status:          "active",
+		Status: "active",
+		Options: map[string]interface{}{
+			"sentry:origins":     "http://example.com\nhttp://example.invalid",
+			"sentry:resolve_age": float64(0),
+		},
 		DigestsMinDelay: 300,
 		DigestsMaxDelay: 1800,
+		SubjectTemplate: "[$project] ${tag:level}: $title",
 	}
 	assert.Equal(t, expected, project)
 }

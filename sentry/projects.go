@@ -25,14 +25,14 @@ type Project struct {
 	Status       string   `json:"status"`
 
 	// TODO: latestRelease
-	// TODO: options
-	DigestsMinDelay int `json:"digestsMinDelay"`
-	DigestsMaxDelay int `json:"digestsMaxDelay"`
-	// TODO: subjectPrefix
-	// TODO: subjectTemplate
+	Options         map[string]interface{} `json:"options"`
+	DigestsMinDelay int                    `json:"digestsMinDelay"`
+	DigestsMaxDelay int                    `json:"digestsMaxDelay"`
+	SubjectPrefix   string                 `json:"subjectPrefix"`
+	SubjectTemplate string                 `json:"subjectTemplate"`
 	// TODO: plugins
 	// TODO: platforms
-	// TODO: processingIssues
+	ProcessingIssues int `json:"processingIssues"`
 	// TODO: defaultEnvironment
 
 	Team         Team         `json:"team"`
