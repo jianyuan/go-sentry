@@ -159,3 +159,17 @@ func TestProjectKeyService_Update(t *testing.T) {
 	}
 	assert.Equal(t, expected, projectKey)
 }
+
+func TestProjectKeyService_Delete(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/befdbf32724c4ae0a3d286717b1f8127/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.ProjectKeys.Delete("the-interstellar-jurisdiction", "pump-station", "befdbf32724c4ae0a3d286717b1f8127")
+	assert.NoError(t, err)
+
+}
