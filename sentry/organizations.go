@@ -123,9 +123,6 @@ type UpdateOrganizationParams struct {
 // Update a Sentry organization.
 // https://docs.sentry.io/api/organizations/put-organization-details/
 func (s *OrganizationService) Update(slug string, params *UpdateOrganizationParams) (*Organization, *http.Response, error) {
-	if params == nil {
-		params = &UpdateOrganizationParams{}
-	}
 	org := new(Organization)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Put(slug+"/").BodyJSON(params).Receive(org, apiError)

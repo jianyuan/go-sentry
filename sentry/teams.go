@@ -72,9 +72,6 @@ type UpdateTeamParams struct {
 // Update settings for a given team.
 // https://docs.sentry.io/api/teams/put-team-details/
 func (s *TeamService) Update(organizationSlug string, slug string, params *UpdateTeamParams) (*Team, *http.Response, error) {
-	if params == nil {
-		params = &UpdateTeamParams{}
-	}
 	team := new(Team)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Put("teams/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(team, apiError)

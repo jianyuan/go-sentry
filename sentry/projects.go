@@ -97,9 +97,6 @@ type UpdateProjectParams struct {
 // Update various attributes and configurable settings for a given project.
 // https://docs.sentry.io/api/projects/put-project-details/
 func (s *ProjectService) Update(organizationSlug string, slug string, params *UpdateProjectParams) (*Project, *http.Response, error) {
-	if params == nil {
-		params = &UpdateProjectParams{}
-	}
 	project := new(Project)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(project, apiError)
