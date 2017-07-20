@@ -69,3 +69,17 @@ func (s *ProjectKeyService) Create(organizationSlug string, projectSlug string, 
 	resp, err := s.sling.New().Post("projects/"+organizationSlug+"/"+projectSlug+"/keys/").BodyJSON(params).Receive(projectKey, apiError)
 	return projectKey, resp, relevantError(err, *apiError)
 }
+
+// UpdateProjectKeyParams are the parameters for ProjectKeyService.Update.
+type UpdateProjectKeyParams struct {
+	Name string `json:"name,omitempty"`
+}
+
+// Update a client key.
+// https://docs.sentry.io/api/projects/put-project-key-details/
+func (s *ProjectKeyService) Update(organizationSlug string, projectSlug string, keyID string, params *UpdateProjectKeyParams) (*ProjectKey, *http.Response, error) {
+	projectKey := new(ProjectKey)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+projectSlug+"/keys/"+keyID+"/").BodyJSON(params).Receive(projectKey, apiError)
+	return projectKey, resp, relevantError(err, *apiError)
+}
