@@ -15,101 +15,124 @@ func TestProjectService_List(t *testing.T) {
 	mux.HandleFunc("/api/0/projects/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `[
-			{
-				"status": "active",
-				"slug": "the-spoiled-yoghurt",
-				"defaultEnvironment": null,
+		fmt.Fprint(w, `[{
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"color": "#bf6e3f",
+				"dateCreated": "2018-09-20T15:48:07.592Z",
 				"features": [
 					"data-forwarding",
 					"rate-limits"
 				],
-				"color": "#bf6e3f",
-				"isPublic": false,
-				"dateCreated": "2017-07-18T19:29:44.996Z",
-				"platforms": [],
-				"callSign": "THE-SPOILED-YOGHURT",
 				"firstEvent": null,
-				"processingIssues": 0,
-				"organization": {
-					"name": "The Interstellar Jurisdiction",
-					"slug": "the-interstellar-jurisdiction",
-					"avatar": {
-						"avatarUuid": null,
-						"avatarType": "letter_avatar"
-					},
-					"dateCreated": "2017-07-18T19:29:24.565Z",
-					"id": "2",
-					"isEarlyAdopter": false
-				},
-				"isBookmarked": false,
-				"callSignReviewed": false,
+				"hasAccess": true,
 				"id": "4",
-				"name": "The Spoiled Yoghurt"
+				"isBookmarked": false,
+				"isInternal": false,
+				"isMember": false,
+				"isPublic": false,
+				"name": "The Spoiled Yoghurt",
+				"organization": {
+					"avatar": {
+						"avatarType": "letter_avatar",
+						"avatarUuid": null
+					},
+					"dateCreated": "2018-09-20T15:47:52.908Z",
+					"id": "2",
+					"isEarlyAdopter": false,
+					"name": "The Interstellar Jurisdiction",
+					"require2FA": false,
+					"slug": "the-interstellar-jurisdiction",
+					"status": {
+						"id": "active",
+						"name": "active"
+					}
+				},
+				"platform": null,
+				"slug": "the-spoiled-yoghurt",
+				"status": "active"
 			},
 			{
-				"status": "active",
-				"slug": "prime-mover",
-				"defaultEnvironment": null,
-				"features": [
-					"data-forwarding",
-					"rate-limits",
-					"releases"
-				],
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
 				"color": "#bf5b3f",
-				"isPublic": false,
-				"dateCreated": "2017-07-18T19:29:30.063Z",
-				"platforms": [],
-				"callSign": "PRIME-MOVER",
-				"firstEvent": null,
-				"processingIssues": 0,
-				"organization": {
-					"name": "The Interstellar Jurisdiction",
-					"slug": "the-interstellar-jurisdiction",
-					"avatar": {
-						"avatarUuid": null,
-						"avatarType": "letter_avatar"
-					},
-					"dateCreated": "2017-07-18T19:29:24.565Z",
-					"id": "2",
-					"isEarlyAdopter": false
-				},
-				"isBookmarked": false,
-				"callSignReviewed": false,
-				"id": "3",
-				"name": "Prime Mover"
-			},
-			{
-				"status": "active",
-				"slug": "pump-station",
-				"defaultEnvironment": null,
+				"dateCreated": "2018-09-20T15:47:56.723Z",
 				"features": [
 					"data-forwarding",
 					"rate-limits",
 					"releases"
 				],
-				"color": "#3fbf7f",
-				"isPublic": false,
-				"dateCreated": "2017-07-18T19:29:24.793Z",
-				"platforms": [],
-				"callSign": "PUMP-STATION",
 				"firstEvent": null,
-				"processingIssues": 0,
-				"organization": {
-					"name": "The Interstellar Jurisdiction",
-					"slug": "the-interstellar-jurisdiction",
-					"avatar": {
-						"avatarUuid": null,
-						"avatarType": "letter_avatar"
-					},
-					"dateCreated": "2017-07-18T19:29:24.565Z",
-					"id": "2",
-					"isEarlyAdopter": false
-				},
+				"hasAccess": true,
+				"id": "3",
 				"isBookmarked": false,
-				"callSignReviewed": false,
+				"isInternal": false,
+				"isMember": false,
+				"isPublic": false,
+				"name": "Prime Mover",
+				"organization": {
+					"avatar": {
+						"avatarType": "letter_avatar",
+						"avatarUuid": null
+					},
+					"dateCreated": "2018-09-20T15:47:52.908Z",
+					"id": "2",
+					"isEarlyAdopter": false,
+					"name": "The Interstellar Jurisdiction",
+					"require2FA": false,
+					"slug": "the-interstellar-jurisdiction",
+					"status": {
+						"id": "active",
+						"name": "active"
+					}
+				},
+				"platform": null,
+				"slug": "prime-mover",
+				"status": "active"
+			},
+			{
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"color": "#3fbf7f",
+				"dateCreated": "2018-09-20T15:47:52.926Z",
+				"features": [
+					"data-forwarding",
+					"rate-limits",
+					"releases"
+				],
+				"firstEvent": null,
+				"hasAccess": true,
 				"id": "2",
-				"name": "Pump Station"
+				"isBookmarked": false,
+				"isInternal": false,
+				"isMember": false,
+				"isPublic": false,
+				"name": "Pump Station",
+				"organization": {
+					"avatar": {
+						"avatarType": "letter_avatar",
+						"avatarUuid": null
+					},
+					"dateCreated": "2018-09-20T15:47:52.908Z",
+					"id": "2",
+					"isEarlyAdopter": false,
+					"name": "The Interstellar Jurisdiction",
+					"require2FA": false,
+					"slug": "the-interstellar-jurisdiction",
+					"status": {
+						"id": "active",
+						"name": "active"
+					}
+				},
+				"platform": null,
+				"slug": "pump-station",
+				"status": "active"
 			}
 		]`)
 	})
@@ -119,64 +142,74 @@ func TestProjectService_List(t *testing.T) {
 	assert.NoError(t, err)
 
 	expectedOrganization := Organization{
-		ID:          "2",
-		Slug:        "the-interstellar-jurisdiction",
+		ID:   "2",
+		Slug: "the-interstellar-jurisdiction",
+		Status: OrganizationStatus{
+			ID:   "active",
+			Name: "active",
+		},
 		Name:        "The Interstellar Jurisdiction",
-		DateCreated: mustParseTime("2017-07-18T19:29:24.565Z"),
+		DateCreated: mustParseTime("2018-09-20T15:47:52.908Z"),
 		Avatar: Avatar{
 			Type: "letter_avatar",
 		},
-		IsEarlyAdopter: false,
 	}
 	expected := []Project{
 		{
-			ID:           "4",
-			Slug:         "the-spoiled-yoghurt",
-			Name:         "The Spoiled Yoghurt",
-			DateCreated:  mustParseTime("2017-07-18T19:29:44.996Z"),
-			IsPublic:     false,
-			IsBookmarked: false,
-			CallSign:     "THE-SPOILED-YOGHURT",
-			Color:        "#bf6e3f",
+			ID:          "4",
+			Slug:        "the-spoiled-yoghurt",
+			Name:        "The Spoiled Yoghurt",
+			Color:       "#bf6e3f",
+			DateCreated: mustParseTime("2018-09-20T15:48:07.592Z"),
 			Features: []string{
 				"data-forwarding",
 				"rate-limits",
 			},
-			Status:       "active",
+			Status:    "active",
+			HasAccess: true,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+			},
 			Organization: expectedOrganization,
 		},
 		{
 			ID:           "3",
 			Slug:         "prime-mover",
 			Name:         "Prime Mover",
-			DateCreated:  mustParseTime("2017-07-18T19:29:30.063Z"),
+			DateCreated:  mustParseTime("2018-09-20T15:47:56.723Z"),
 			IsPublic:     false,
 			IsBookmarked: false,
-			CallSign:     "PRIME-MOVER",
 			Color:        "#bf5b3f",
 			Features: []string{
 				"data-forwarding",
 				"rate-limits",
 				"releases",
 			},
-			Status:       "active",
+			Status:    "active",
+			HasAccess: true,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+			},
 			Organization: expectedOrganization,
 		},
 		{
 			ID:           "2",
 			Slug:         "pump-station",
 			Name:         "Pump Station",
-			DateCreated:  mustParseTime("2017-07-18T19:29:24.793Z"),
+			DateCreated:  mustParseTime("2018-09-20T15:47:52.926Z"),
 			IsPublic:     false,
 			IsBookmarked: false,
-			CallSign:     "PUMP-STATION",
 			Color:        "#3fbf7f",
 			Features: []string{
 				"data-forwarding",
 				"rate-limits",
 				"releases",
 			},
-			Status:       "active",
+			Status:    "active",
+			HasAccess: true,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+			},
 			Organization: expectedOrganization,
 		},
 	}
@@ -191,78 +224,138 @@ func TestProjectService_Get(t *testing.T) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
-			"subjectPrefix": null,
+			"allowedDomains": [
+				"*"
+			],
+			"avatar": {
+				"avatarType": "letter_avatar",
+				"avatarUuid": null
+			},
+			"color": "#3fbf7f",
+			"dataScrubber": true,
+			"dataScrubberDefaults": true,
+			"dateCreated": "2018-10-02T14:19:09.864Z",
 			"defaultEnvironment": null,
+			"digestsMaxDelay": 1800,
+			"digestsMinDelay": 300,
 			"features": [
 				"data-forwarding",
 				"rate-limits",
 				"releases"
 			],
-			"color": "#3fbf7f",
-			"platforms": [],
-			"plugins": [
-				{
-					"status": "unknown",
-					"assets": [],
-					"isTestable": true,
-					"contexts": [],
-					"doc": "",
-					"enabled": false,
-					"name": "WebHooks",
-					"canDisable": true,
-					"type": "notification",
-					"id": "webhooks",
-					"metadata": {}
-				}
-			],
-			"callSignReviewed": false,
-			"id": "2",
-			"digestsMinDelay": 300,
 			"firstEvent": null,
-			"digestsMaxDelay": 1800,
-			"processingIssues": 0,
-			"status": "active",
-			"isPublic": false,
-			"dateCreated": "2017-07-18T19:29:24.793Z",
-			"subjectTemplate": "[$project] ${tag:level}: $title",
-			"slug": "pump-station",
-			"name": "Pump Station",
+			"hasAccess": true,
+			"id": "2",
 			"isBookmarked": false,
-			"callSign": "PUMP-STATION",
-			"team": {
-				"slug": "powerful-abolitionist",
-				"name": "Powerful Abolitionist",
-				"hasAccess": true,
-				"isPending": false,
-				"dateCreated": "2017-07-18T19:29:24.743Z",
-				"isMember": false,
-				"id": "2"
+			"isInternal": false,
+			"isMember": false,
+			"isPublic": false,
+			"latestRelease": {
+				"authors": [],
+				"commitCount": 0,
+				"data": {},
+				"dateCreated": "2018-10-02T14:19:25.397Z",
+				"dateReleased": null,
+				"deployCount": 0,
+				"firstEvent": null,
+				"lastCommit": null,
+				"lastDeploy": null,
+				"lastEvent": null,
+				"newGroups": 0,
+				"owner": null,
+				"projects": [{
+					"name": "Pump Station",
+					"slug": "pump-station"
+				}],
+				"ref": "6ba09a7c53235ee8a8fa5ee4c1ca8ca886e7fdbb",
+				"shortVersion": "2.0rc2",
+				"url": null,
+				"version": "2.0rc2"
+			},
+			"name": "Pump Station",
+			"options": {
+				"feedback:branding": true,
+				"filters:blacklisted_ips": "",
+				"filters:error_messages": "",
+				"filters:releases": "",
+				"sentry:csp_ignored_sources": "",
+				"sentry:csp_ignored_sources_defaults": true,
+				"sentry:reprocessing_active": false
 			},
 			"organization": {
-				"name": "The Interstellar Jurisdiction",
-				"slug": "the-interstellar-jurisdiction",
 				"avatar": {
-					"avatarUuid": null,
-					"avatarType": "letter_avatar"
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
 				},
-				"dateCreated": "2017-07-18T19:29:24.565Z",
+				"dateCreated": "2018-10-02T14:19:09.817Z",
 				"id": "2",
-				"isEarlyAdopter": false
+				"isEarlyAdopter": false,
+				"name": "The Interstellar Jurisdiction",
+				"require2FA": false,
+				"slug": "the-interstellar-jurisdiction",
+				"status": {
+					"id": "active",
+					"name": "active"
+				}
 			},
-			"options": {
-				"sentry:csp_ignored_sources_defaults": true,
-				"sentry:scrub_defaults": true,
-				"sentry:origins": "*",
-				"sentry:resolve_age": 0,
-				"sentry:sensitive_fields": [],
-				"sentry:scrub_data": true,
-				"sentry:reprocessing_active": false,
-				"sentry:csp_ignored_sources": "",
-				"filters:blacklisted_ips": "",
-				"sentry:safe_fields": [],
-				"feedback:branding": true,
-				"sentry:default_environment": null
-			}
+			"platform": null,
+			"platforms": [],
+			"plugins": [{
+				"assets": [],
+				"author": {
+					"name": "Sentry Team",
+					"url": "https://github.com/getsentry/sentry"
+				},
+				"canDisable": true,
+				"contexts": [],
+				"description": "Integrates web hooks.",
+				"doc": "",
+				"enabled": false,
+				"hasConfiguration": true,
+				"id": "webhooks",
+				"isTestable": true,
+				"metadata": {},
+				"name": "WebHooks",
+				"resourceLinks": [{
+						"title": "Bug Tracker",
+						"url": "https://github.com/getsentry/sentry/issues"
+					},
+					{
+						"title": "Source",
+						"url": "https://github.com/getsentry/sentry"
+					}
+				],
+				"shortName": "WebHooks",
+				"slug": "webhooks",
+				"status": "unknown",
+				"type": "notification",
+				"version": "9.1.0.dev0"
+			}],
+			"processingIssues": 0,
+			"relayPiiConfig": null,
+			"resolveAge": 0,
+			"safeFields": [],
+			"scrapeJavaScript": true,
+			"scrubIPAddresses": false,
+			"securityToken": "320e3180c64e11e8b61e0242ac110002",
+			"securityTokenHeader": null,
+			"sensitiveFields": [],
+			"slug": "pump-station",
+			"status": "active",
+			"storeCrashReports": false,
+			"subjectPrefix": "[Sentry] ",
+			"subjectTemplate": "$shortID - $title",
+			"team": {
+				"id": "2",
+				"name": "Powerful Abolitionist",
+				"slug": "powerful-abolitionist"
+			},
+			"teams": [{
+				"id": "2",
+				"name": "Powerful Abolitionist",
+				"slug": "powerful-abolitionist"
+			}],
+			"verifySSL": false
 		}`)
 	})
 
@@ -270,55 +363,65 @@ func TestProjectService_Get(t *testing.T) {
 	project, _, err := client.Projects.Get("the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
 	expected := &Project{
-		ID:           "2",
-		Slug:         "pump-station",
-		Name:         "Pump Station",
-		DateCreated:  mustParseTime("2017-07-18T19:29:24.793Z"),
-		IsPublic:     false,
-		IsBookmarked: false,
-		CallSign:     "PUMP-STATION",
-		Color:        "#3fbf7f",
+		ID:          "2",
+		Slug:        "pump-station",
+		Name:        "Pump Station",
+		Color:       "#3fbf7f",
+		DateCreated: mustParseTime("2018-10-02T14:19:09.864Z"),
 		Features: []string{
 			"data-forwarding",
 			"rate-limits",
 			"releases",
 		},
-		Status: "active",
+		Status:    "active",
+		HasAccess: true,
+		Avatar: Avatar{
+			Type: "letter_avatar",
+		},
 		Options: map[string]interface{}{
-			"sentry:csp_ignored_sources_defaults": true,
-			"sentry:scrub_defaults":               true,
-			"sentry:origins":                      "*",
-			"sentry:resolve_age":                  float64(0),
-			"sentry:sensitive_fields":             []interface{}{},
-			"sentry:scrub_data":                   true,
-			"sentry:reprocessing_active":          false,
-			"sentry:csp_ignored_sources":          "",
-			"filters:blacklisted_ips":             "",
-			"sentry:safe_fields":                  []interface{}{},
 			"feedback:branding":                   true,
-			"sentry:default_environment":          nil,
+			"filters:blacklisted_ips":             "",
+			"filters:error_messages":              "",
+			"filters:releases":                    "",
+			"sentry:csp_ignored_sources":          "",
+			"sentry:csp_ignored_sources_defaults": true,
+			"sentry:reprocessing_active":          false,
 		},
-		DigestsMinDelay: 300,
-		DigestsMaxDelay: 1800,
-		SubjectTemplate: "[$project] ${tag:level}: $title",
-		Team: Team{
-			ID:          "2",
-			Slug:        "powerful-abolitionist",
-			Name:        "Powerful Abolitionist",
-			DateCreated: mustParseTime("2017-07-18T19:29:24.743Z"),
-			HasAccess:   true,
-			IsPending:   false,
-			IsMember:    false,
-		},
+		DigestsMinDelay:      300,
+		DigestsMaxDelay:      1800,
+		SubjectPrefix:        "[Sentry] ",
+		AllowedDomains:       []string{"*"},
+		DataScrubber:         true,
+		DataScrubberDefaults: true,
+		SafeFields:           []string{},
+		SensitiveFields:      []string{},
+		SubjectTemplate:      "$shortID - $title",
+		SecurityToken:        "320e3180c64e11e8b61e0242ac110002",
+		ScrapeJavaScript:     true,
 		Organization: Organization{
-			ID:          "2",
-			Slug:        "the-interstellar-jurisdiction",
+			ID:   "2",
+			Slug: "the-interstellar-jurisdiction",
+			Status: OrganizationStatus{
+				ID:   "active",
+				Name: "active",
+			},
 			Name:        "The Interstellar Jurisdiction",
-			DateCreated: mustParseTime("2017-07-18T19:29:24.565Z"),
+			DateCreated: mustParseTime("2018-10-02T14:19:09.817Z"),
 			Avatar: Avatar{
 				Type: "letter_avatar",
 			},
-			IsEarlyAdopter: false,
+		},
+		Team: Team{
+			ID:   "2",
+			Slug: "powerful-abolitionist",
+			Name: "Powerful Abolitionist",
+		},
+		Teams: []Team{
+			{
+				ID:   "2",
+				Slug: "powerful-abolitionist",
+				Name: "Powerful Abolitionist",
+			},
 		},
 	}
 	assert.Equal(t, expected, project)
@@ -370,7 +473,6 @@ func TestProjectService_Create(t *testing.T) {
 		DateCreated:  mustParseTime("2017-07-18T19:29:44.996Z"),
 		IsPublic:     false,
 		IsBookmarked: false,
-		CallSign:     "THE-SPOILED-YOGHURT",
 		Color:        "#bf6e3f",
 		Features: []string{
 			"data-forwarding",
@@ -443,7 +545,6 @@ func TestProjectService_Update(t *testing.T) {
 		DateCreated:  mustParseTime("2017-07-18T19:30:09.751Z"),
 		IsPublic:     false,
 		IsBookmarked: false,
-		CallSign:     "PLANE-PROXY",
 		Color:        "#bf803f",
 		Features: []string{
 			"data-forwarding",

@@ -8,35 +8,56 @@ import (
 )
 
 // Project represents a Sentry project.
-// Based on https://github.com/getsentry/sentry/blob/cc81fff31d4f2c9cede14ce9c479d6f4f78c5e5b/src/sentry/api/serializers/models/project.py#L137.
+// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project.py
 type Project struct {
 	ID   string `json:"id"`
 	Slug string `json:"slug"`
 	Name string `json:"name"`
 
+	IsPublic     bool   `json:"isPublic"`
+	IsBookmarked bool   `json:"isBookmarked"`
+	Color        string `json:"color"`
+
 	DateCreated time.Time `json:"dateCreated"`
 	FirstEvent  time.Time `json:"firstEvent"`
 
-	IsPublic     bool     `json:"isPublic"`
-	IsBookmarked bool     `json:"isBookmarked"`
-	CallSign     string   `json:"callSign"`
-	Color        string   `json:"color"`
-	Features     []string `json:"features"`
-	Status       string   `json:"status"`
+	Features []string `json:"features"`
+	Status   string   `json:"status"`
+	Platform string   `json:"platform"`
+
+	IsInternal bool `json:"isInternal"`
+	IsMember   bool `json:"isMember"`
+	HasAccess  bool `json:"hasAccess"`
+
+	Avatar Avatar `json:"avatar"`
 
 	// TODO: latestRelease
-	Options         map[string]interface{} `json:"options"`
-	DigestsMinDelay int                    `json:"digestsMinDelay"`
-	DigestsMaxDelay int                    `json:"digestsMaxDelay"`
-	SubjectPrefix   string                 `json:"subjectPrefix"`
-	SubjectTemplate string                 `json:"subjectTemplate"`
+	Options map[string]interface{} `json:"options"`
+
+	DigestsMinDelay      int      `json:"digestsMinDelay"`
+	DigestsMaxDelay      int      `json:"digestsMaxDelay"`
+	SubjectPrefix        string   `json:"subjectPrefix"`
+	AllowedDomains       []string `json:"allowedDomains"`
+	ResolveAge           int      `json:"resolveAge"`
+	DataScrubber         bool     `json:"dataScrubber"`
+	DataScrubberDefaults bool     `json:"dataScrubberDefaults"`
+	SafeFields           []string `json:"safeFields"`
+	SensitiveFields      []string `json:"sensitiveFields"`
+	SubjectTemplate      string   `json:"subjectTemplate"`
+	SecurityToken        string   `json:"securityToken"`
+	SecurityTokenHeader  *string  `json:"securityTokenHeader"`
+	VerifySSL            bool     `json:"verifySSL"`
+	ScrubIPAddresses     bool     `json:"scrubIPAddresses"`
+	ScrapeJavaScript     bool     `json:"scrapeJavaScript"`
+
+	Organization Organization `json:"organization"`
 	// TODO: plugins
 	// TODO: platforms
 	ProcessingIssues int `json:"processingIssues"`
 	// TODO: defaultEnvironment
 
-	Team         Team         `json:"team"`
-	Organization Organization `json:"organization"`
+	Team  Team   `json:"team"`
+	Teams []Team `json:"teams"`
 }
 
 // ProjectSummary represents the summary of a Sentry project.
