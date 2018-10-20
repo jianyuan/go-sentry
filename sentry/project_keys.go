@@ -15,16 +15,20 @@ type ProjectKeyRateLimit struct {
 
 // ProjectKeyDSN represents a project key's DSN.
 type ProjectKeyDSN struct {
-	Secret string `json:"secret"`
-	Public string `json:"public"`
-	CSP    string `json:"csp"`
+	Secret   string `json:"secret"`
+	Public   string `json:"public"`
+	CSP      string `json:"csp"`
+	Security string `json:"security"`
+	Minidump string `json:"minidump"`
+	CDN      string `json:"cdn"`
 }
 
 // ProjectKey represents a client key bound to a project.
-// Based on https://github.com/getsentry/sentry/blob/a418072946ebd2933724945e1ea2a833cf4c9b94/src/sentry/api/serializers/models/project_key.py.
+// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project_key.py
 type ProjectKey struct {
 	ID          string               `json:"id"`
 	Name        string               `json:"name"`
+	Label       string               `json:"label"`
 	Public      string               `json:"public"`
 	Secret      string               `json:"secret"`
 	ProjectID   int                  `json:"projectId"`
