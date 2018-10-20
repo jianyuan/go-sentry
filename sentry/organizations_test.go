@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -60,33 +61,9 @@ func TestOrganizationService_Get(t *testing.T) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
-			"defaultRole": "member",
-			"features": [
-				"sso",
-				"callsigns",
-				"api-keys",
-				"open-membership",
-				"shared-issues"
-			],
-			"safeFields": [],
-			"id": "2",
-			"isEarlyAdopter": false,
-			"scrubIPAddresses": false,
 			"access": [],
 			"allowSharedIssues": true,
-			"isDefault": false,
-			"sensitiveFields": [],
-			"quota": {
-				"maxRateInterval": 60,
-				"projectLimit": 100,
-				"accountLimit": 0,
-				"maxRate": 0
-			},
-			"dateCreated": "2017-07-18T19:29:24.565Z",
-			"slug": "the-interstellar-jurisdiction",
-			"openMembership": true,
-			"availableRoles": [
-				{
+			"availableRoles": [{
 					"id": "member",
 					"name": "Member"
 				},
@@ -103,107 +80,150 @@ func TestOrganizationService_Get(t *testing.T) {
 					"name": "Owner"
 				}
 			],
-			"name": "The Interstellar Jurisdiction",
+			"avatar": {
+				"avatarType": "letter_avatar",
+				"avatarUuid": null
+			},
+			"dataScrubber": false,
+			"dataScrubberDefaults": false,
+			"dateCreated": "2018-09-20T15:47:52.908Z",
+			"defaultRole": "member",
 			"enhancedPrivacy": false,
-			"teams": [
-				{
-					"slug": "ancient-gabelers",
-					"name": "Ancient Gabelers",
+			"experiments": {},
+			"features": [
+				"sso",
+				"api-keys",
+				"github-apps",
+				"repos",
+				"new-issue-ui",
+				"github-enterprise",
+				"bitbucket-integration",
+				"jira-integration",
+				"vsts-integration",
+				"suggested-commits",
+				"new-teams",
+				"open-membership",
+				"shared-issues"
+			],
+			"id": "2",
+			"isDefault": false,
+			"isEarlyAdopter": false,
+			"name": "The Interstellar Jurisdiction",
+			"onboardingTasks": [],
+			"openMembership": true,
+			"pendingAccessRequests": 0,
+			"projects": [{
+					"dateCreated": "2018-09-20T15:47:56.723Z",
+					"firstEvent": null,
 					"hasAccess": true,
-					"isPending": false,
-					"dateCreated": "2017-07-18T19:29:46.305Z",
-					"isMember": false,
 					"id": "3",
-					"projects": []
+					"isBookmarked": false,
+					"isMember": false,
+					"latestDeploys": null,
+					"name": "Prime Mover",
+					"platform": null,
+					"platforms": [],
+					"slug": "prime-mover",
+					"team": {
+						"id": "2",
+						"name": "Powerful Abolitionist",
+						"slug": "powerful-abolitionist"
+					},
+					"teams": [{
+						"id": "2",
+						"name": "Powerful Abolitionist",
+						"slug": "powerful-abolitionist"
+					}]
 				},
 				{
-					"slug": "powerful-abolitionist",
-					"name": "Powerful Abolitionist",
+					"dateCreated": "2018-09-20T15:47:52.926Z",
+					"firstEvent": null,
 					"hasAccess": true,
-					"isPending": false,
-					"dateCreated": "2017-07-18T19:29:24.743Z",
-					"isMember": false,
 					"id": "2",
-					"projects": [
-						{
-							"status": "active",
-							"slug": "prime-mover",
-							"defaultEnvironment": null,
-							"features": [
-								"data-forwarding",
-								"rate-limits",
-								"releases"
-							],
-							"color": "#bf5b3f",
-							"isPublic": false,
-							"dateCreated": "2017-07-18T19:29:30.063Z",
-							"platforms": [],
-							"callSign": "PRIME-MOVER",
-							"firstEvent": null,
-							"processingIssues": 0,
-							"isBookmarked": false,
-							"callSignReviewed": false,
-							"id": "3",
-							"name": "Prime Mover"
-						},
-						{
-							"status": "active",
-							"slug": "pump-station",
-							"defaultEnvironment": null,
-							"features": [
-								"data-forwarding",
-								"rate-limits",
-								"releases"
-							],
-							"color": "#3fbf7f",
-							"isPublic": false,
-							"dateCreated": "2017-07-18T19:29:24.793Z",
-							"platforms": [],
-							"callSign": "PUMP-STATION",
-							"firstEvent": null,
-							"processingIssues": 0,
-							"isBookmarked": false,
-							"callSignReviewed": false,
-							"id": "2",
-							"name": "Pump Station"
-						},
-						{
-							"status": "active",
-							"slug": "the-spoiled-yoghurt",
-							"defaultEnvironment": null,
-							"features": [
-								"data-forwarding",
-								"rate-limits"
-							],
-							"color": "#bf6e3f",
-							"isPublic": false,
-							"dateCreated": "2017-07-18T19:29:44.996Z",
-							"platforms": [],
-							"callSign": "THE-SPOILED-YOGHURT",
-							"firstEvent": null,
-							"processingIssues": 0,
-							"isBookmarked": false,
-							"callSignReviewed": false,
-							"id": "4",
-							"name": "The Spoiled Yoghurt"
-						}
-					]
+					"isBookmarked": false,
+					"isMember": false,
+					"latestDeploys": null,
+					"name": "Pump Station",
+					"platform": null,
+					"platforms": [],
+					"slug": "pump-station",
+					"team": {
+						"id": "2",
+						"name": "Powerful Abolitionist",
+						"slug": "powerful-abolitionist"
+					},
+					"teams": [{
+						"id": "2",
+						"name": "Powerful Abolitionist",
+						"slug": "powerful-abolitionist"
+					}]
+				},
+				{
+					"dateCreated": "2018-09-20T15:48:07.592Z",
+					"firstEvent": null,
+					"hasAccess": true,
+					"id": "4",
+					"isBookmarked": false,
+					"isMember": false,
+					"latestDeploys": null,
+					"name": "The Spoiled Yoghurt",
+					"platform": null,
+					"platforms": [],
+					"slug": "the-spoiled-yoghurt",
+					"team": {
+						"id": "2",
+						"name": "Powerful Abolitionist",
+						"slug": "powerful-abolitionist"
+					},
+					"teams": [{
+						"id": "2",
+						"name": "Powerful Abolitionist",
+						"slug": "powerful-abolitionist"
+					}]
 				}
 			],
-			"pendingAccessRequests": 0,
-			"dataScrubberDefaults": false,
-			"dataScrubber": false,
-			"avatar": {
-				"avatarUuid": null,
-				"avatarType": "letter_avatar"
+			"quota": {
+				"accountLimit": 0,
+				"maxRate": 0,
+				"maxRateInterval": 60,
+				"projectLimit": 100
 			},
-			"onboardingTasks": [
+			"require2FA": false,
+			"safeFields": [],
+			"scrapeJavaScript": true,
+			"scrubIPAddresses": false,
+			"sensitiveFields": [],
+			"slug": "the-interstellar-jurisdiction",
+			"status": {
+				"id": "active",
+				"name": "active"
+			},
+			"storeCrashReports": false,
+			"teams": [{
+					"avatar": {
+						"avatarType": "letter_avatar",
+						"avatarUuid": null
+					},
+					"dateCreated": "2018-09-20T15:48:07.803Z",
+					"hasAccess": true,
+					"id": "3",
+					"isMember": false,
+					"isPending": false,
+					"name": "Ancient Gabelers",
+					"slug": "ancient-gabelers"
+				},
 				{
-					"status": "complete",
-					"dateCompleted": "2017-07-18T19:29:45.084Z",
-					"task": 1,
-					"data": {},
-					"user": null
+					"avatar": {
+						"avatarType": "letter_avatar",
+						"avatarUuid": null
+					},
+					"dateCreated": "2018-09-20T15:47:52.922Z",
+					"hasAccess": true,
+					"id": "2",
+					"isMember": false,
+					"isPending": false,
+					"name": "Powerful Abolitionist",
+					"slug": "powerful-abolitionist"
 				}
 			]
 		}`)
@@ -213,27 +233,28 @@ func TestOrganizationService_Get(t *testing.T) {
 	organization, _, err := client.Organizations.Get("the-interstellar-jurisdiction")
 	assert.NoError(t, err)
 	expected := &Organization{
-		ID:          "2",
-		Slug:        "the-interstellar-jurisdiction",
-		Name:        "The Interstellar Jurisdiction",
-		DateCreated: mustParseTime("2017-07-18T19:29:24.565Z"),
+		ID:   "2",
+		Slug: "the-interstellar-jurisdiction",
+		Status: OrganizationStatus{
+			ID:   "active",
+			Name: "active",
+		},
+		Name:           "The Interstellar Jurisdiction",
+		DateCreated:    mustParseTime("2018-09-20T15:47:52.908Z"),
+		IsEarlyAdopter: false,
+		Avatar: OrganizationAvatar{
+			Type: "letter_avatar",
+		},
+
 		Quota: OrganizationQuota{
 			MaxRate:         0,
 			MaxRateInterval: 60,
 			AccountLimit:    0,
 			ProjectLimit:    100,
 		},
-		Access: []string{},
-		Features: []string{
-			"sso",
-			"callsigns",
-			"api-keys",
-			"open-membership",
-			"shared-issues",
-		},
-		PendingAccessRequests: 0,
-		IsDefault:             false,
-		DefaultRole:           "member",
+
+		IsDefault:   false,
+		DefaultRole: "member",
 		AvailableRoles: []OrganizationAvailableRole{
 			{
 				ID:   "member",
@@ -252,12 +273,8 @@ func TestOrganizationService_Get(t *testing.T) {
 				Name: "Owner",
 			},
 		},
-		AccountRateLimit: 0,
-		ProjectRateLimit: 0,
-		Avatar: OrganizationAvatar{
-			Type: "letter_avatar",
-		},
 		OpenMembership:       true,
+		Require2FA:           false,
 		AllowSharedIssues:    true,
 		EnhancedPrivacy:      false,
 		DataScrubber:         false,
@@ -265,7 +282,128 @@ func TestOrganizationService_Get(t *testing.T) {
 		SensitiveFields:      []string{},
 		SafeFields:           []string{},
 		ScrubIPAddresses:     false,
-		IsEarlyAdopter:       false,
+
+		Access: []string{},
+		Features: []string{
+			"sso",
+			"api-keys",
+			"github-apps",
+			"repos",
+			"new-issue-ui",
+			"github-enterprise",
+			"bitbucket-integration",
+			"jira-integration",
+			"vsts-integration",
+			"suggested-commits",
+			"new-teams",
+			"open-membership",
+			"shared-issues",
+		},
+		PendingAccessRequests: 0,
+
+		AccountRateLimit: 0,
+		ProjectRateLimit: 0,
+
+		Teams: []Team{
+			{
+				ID:          "3",
+				Slug:        "ancient-gabelers",
+				Name:        "Ancient Gabelers",
+				DateCreated: mustParseTime("2018-09-20T15:48:07.803Z"),
+				IsMember:    false,
+				HasAccess:   true,
+				IsPending:   false,
+				Avatar: TeamAvatar{
+					Type: "letter_avatar",
+				},
+			},
+			{
+				ID:          "2",
+				Slug:        "powerful-abolitionist",
+				Name:        "Powerful Abolitionist",
+				DateCreated: mustParseTime("2018-09-20T15:47:52.922Z"),
+				IsMember:    false,
+				HasAccess:   true,
+				IsPending:   false,
+				Avatar: TeamAvatar{
+					Type: "letter_avatar",
+				},
+			},
+		},
+		Projects: []ProjectSummary{
+			{
+				ID:           "3",
+				Name:         "Prime Mover",
+				Slug:         "prime-mover",
+				IsBookmarked: false,
+				IsMember:     false,
+				HasAccess:    true,
+				DateCreated:  mustParseTime("2018-09-20T15:47:56.723Z"),
+				FirstEvent:   time.Time{},
+				Platform:     nil,
+				Platforms:    []string{},
+				Team: &ProjectSummaryTeam{
+					ID:   "2",
+					Name: "Powerful Abolitionist",
+					Slug: "powerful-abolitionist",
+				},
+				Teams: []ProjectSummaryTeam{
+					{
+						ID:   "2",
+						Name: "Powerful Abolitionist",
+						Slug: "powerful-abolitionist",
+					},
+				},
+			},
+			{
+				ID:           "2",
+				Name:         "Pump Station",
+				Slug:         "pump-station",
+				IsBookmarked: false,
+				IsMember:     false,
+				HasAccess:    true,
+				DateCreated:  mustParseTime("2018-09-20T15:47:52.926Z"),
+				FirstEvent:   time.Time{},
+				Platform:     nil,
+				Platforms:    []string{},
+				Team: &ProjectSummaryTeam{
+					ID:   "2",
+					Name: "Powerful Abolitionist",
+					Slug: "powerful-abolitionist",
+				},
+				Teams: []ProjectSummaryTeam{
+					{
+						ID:   "2",
+						Name: "Powerful Abolitionist",
+						Slug: "powerful-abolitionist",
+					},
+				},
+			},
+			{
+				ID:           "4",
+				Name:         "The Spoiled Yoghurt",
+				Slug:         "the-spoiled-yoghurt",
+				IsBookmarked: false,
+				IsMember:     false,
+				HasAccess:    true,
+				DateCreated:  mustParseTime("2018-09-20T15:48:07.592Z"),
+				FirstEvent:   time.Time{},
+				Platform:     nil,
+				Platforms:    []string{},
+				Team: &ProjectSummaryTeam{
+					ID:   "2",
+					Name: "Powerful Abolitionist",
+					Slug: "powerful-abolitionist",
+				},
+				Teams: []ProjectSummaryTeam{
+					{
+						ID:   "2",
+						Name: "Powerful Abolitionist",
+						Slug: "powerful-abolitionist",
+					},
+				},
+			},
+		},
 	}
 	assert.Equal(t, expected, organization)
 }

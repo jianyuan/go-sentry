@@ -7,6 +7,12 @@ import (
 	"github.com/dghubble/sling"
 )
 
+// OrganizationStatus represents a Sentry organization's status.
+type OrganizationStatus struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // OrganizationAvatar represents a Sentry organization's avatar.
 type OrganizationAvatar struct {
 	UUID *string `json:"avatarUuid"`
@@ -28,39 +34,40 @@ type OrganizationAvailableRole struct {
 }
 
 // Organization represents a Sentry organization.
-// Based on https://github.com/getsentry/sentry/blob/cc81fff31d4f2c9cede14ce9c479d6f4f78c5e5b/src/sentry/api/endpoints/organization_details.py#L66.
+// Based on https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/organization.py
 type Organization struct {
-	ID   string `json:"id"`
-	Slug string `json:"slug"`
-	Name string `json:"name"`
-
-	DateCreated time.Time `json:"dateCreated"`
+	ID             string             `json:"id"`
+	Slug           string             `json:"slug"`
+	Status         OrganizationStatus `json:"status"`
+	Name           string             `json:"name"`
+	DateCreated    time.Time          `json:"dateCreated"`
+	IsEarlyAdopter bool               `json:"isEarlyAdopter"`
+	Avatar         OrganizationAvatar `json:"avatar"`
 
 	Quota OrganizationQuota `json:"quota"`
+
+	IsDefault            bool                        `json:"isDefault"`
+	DefaultRole          string                      `json:"defaultRole"`
+	AvailableRoles       []OrganizationAvailableRole `json:"availableRoles"`
+	OpenMembership       bool                        `json:"openMembership"`
+	Require2FA           bool                        `json:"require2FA"`
+	AllowSharedIssues    bool                        `json:"allowSharedIssues"`
+	EnhancedPrivacy      bool                        `json:"enhancedPrivacy"`
+	DataScrubber         bool                        `json:"dataScrubber"`
+	DataScrubberDefaults bool                        `json:"dataScrubberDefaults"`
+	SensitiveFields      []string                    `json:"sensitiveFields"`
+	SafeFields           []string                    `json:"safeFields"`
+	ScrubIPAddresses     bool                        `json:"scrubIPAddresses"`
 
 	Access                []string `json:"access"`
 	Features              []string `json:"features"`
 	PendingAccessRequests int      `json:"pendingAccessRequests"`
 
-	IsDefault        bool                        `json:"isDefault"`
-	DefaultRole      string                      `json:"defaultRole"`
-	AvailableRoles   []OrganizationAvailableRole `json:"availableRoles"`
-	AccountRateLimit int                         `json:"accountRateLimit"`
-	ProjectRateLimit int                         `json:"projectRateLimit"`
+	AccountRateLimit int `json:"accountRateLimit"`
+	ProjectRateLimit int `json:"projectRateLimit"`
 
-	Avatar OrganizationAvatar `json:"avatar"`
-
-	OpenMembership       bool     `json:"openMembership"`
-	AllowSharedIssues    bool     `json:"allowSharedIssues"`
-	EnhancedPrivacy      bool     `json:"enhancedPrivacy"`
-	DataScrubber         bool     `json:"dataScrubber"`
-	DataScrubberDefaults bool     `json:"dataScrubberDefaults"`
-	SensitiveFields      []string `json:"sensitiveFields"`
-	SafeFields           []string `json:"safeFields"`
-	ScrubIPAddresses     bool     `json:"scrubIPAddresses"`
-	IsEarlyAdopter       bool     `json:"isEarlyAdopter"`
-
-	// TODO: teams
+	Teams    []Team           `json:"teams"`
+	Projects []ProjectSummary `json:"projects"`
 	// TODO: onboardingTasks
 }
 

@@ -39,6 +39,35 @@ type Project struct {
 	Organization Organization `json:"organization"`
 }
 
+// ProjectSummary represents the summary of a Sentry project.
+// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project.py#L258
+type ProjectSummary struct {
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Slug         string `json:"slug"`
+	IsBookmarked bool   `json:"isBookmarked"`
+	IsMember     bool   `json:"isMember"`
+	HasAccess    bool   `json:"hasAccess"`
+
+	DateCreated time.Time `json:"dateCreated"`
+	FirstEvent  time.Time `json:"firstEvent"`
+
+	Platform  *string  `json:"platform"`
+	Platforms []string `json:"platforms"`
+
+	Team  *ProjectSummaryTeam  `json:"team"`
+	Teams []ProjectSummaryTeam `json:"teams"`
+	// TODO: deploys
+}
+
+// ProjectSummaryTeam represents a team in a ProjectSummary.
+// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project.py#L223
+type ProjectSummaryTeam struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
 // ProjectService provides methods for accessing Sentry project API endpoints.
 // https://docs.sentry.io/api/projects/
 type ProjectService struct {
