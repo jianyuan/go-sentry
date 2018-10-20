@@ -44,7 +44,7 @@ func TestOrganizationService_List(t *testing.T) {
 			Name:           "The Interstellar Jurisdiction",
 			DateCreated:    mustParseTime("2017-07-17T14:10:36.141Z"),
 			IsEarlyAdopter: false,
-			Avatar: OrganizationAvatar{
+			Avatar: Avatar{
 				UUID: nil,
 				Type: "letter_avatar",
 			},
@@ -242,7 +242,7 @@ func TestOrganizationService_Get(t *testing.T) {
 		Name:           "The Interstellar Jurisdiction",
 		DateCreated:    mustParseTime("2018-09-20T15:47:52.908Z"),
 		IsEarlyAdopter: false,
-		Avatar: OrganizationAvatar{
+		Avatar: Avatar{
 			Type: "letter_avatar",
 		},
 
@@ -313,7 +313,7 @@ func TestOrganizationService_Get(t *testing.T) {
 				IsMember:    false,
 				HasAccess:   true,
 				IsPending:   false,
-				Avatar: TeamAvatar{
+				Avatar: Avatar{
 					Type: "letter_avatar",
 				},
 			},
@@ -325,7 +325,7 @@ func TestOrganizationService_Get(t *testing.T) {
 				IsMember:    false,
 				HasAccess:   true,
 				IsPending:   false,
-				Avatar: TeamAvatar{
+				Avatar: Avatar{
 					Type: "letter_avatar",
 				},
 			},

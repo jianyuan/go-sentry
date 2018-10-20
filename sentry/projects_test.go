@@ -123,7 +123,7 @@ func TestProjectService_List(t *testing.T) {
 		Slug:        "the-interstellar-jurisdiction",
 		Name:        "The Interstellar Jurisdiction",
 		DateCreated: mustParseTime("2017-07-18T19:29:24.565Z"),
-		Avatar: OrganizationAvatar{
+		Avatar: Avatar{
 			Type: "letter_avatar",
 		},
 		IsEarlyAdopter: false,
@@ -315,7 +315,7 @@ func TestProjectService_Get(t *testing.T) {
 			Slug:        "the-interstellar-jurisdiction",
 			Name:        "The Interstellar Jurisdiction",
 			DateCreated: mustParseTime("2017-07-18T19:29:24.565Z"),
-			Avatar: OrganizationAvatar{
+			Avatar: Avatar{
 				Type: "letter_avatar",
 			},
 			IsEarlyAdopter: false,

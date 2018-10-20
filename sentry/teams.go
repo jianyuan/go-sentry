@@ -7,23 +7,17 @@ import (
 	"github.com/dghubble/sling"
 )
 
-// TeamAvatar represents a Sentry team's avatar.
-type TeamAvatar struct {
-	UUID *string `json:"avatarUuid"`
-	Type string  `json:"avatarType"`
-}
-
 // Team represents a Sentry team that is bound to an organization.
 // https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/team.py#L48
 type Team struct {
-	ID          string     `json:"id"`
-	Slug        string     `json:"slug"`
-	Name        string     `json:"name"`
-	DateCreated time.Time  `json:"dateCreated"`
-	IsMember    bool       `json:"isMember"`
-	HasAccess   bool       `json:"hasAccess"`
-	IsPending   bool       `json:"isPending"`
-	Avatar      TeamAvatar `json:"avatar"`
+	ID          string    `json:"id"`
+	Slug        string    `json:"slug"`
+	Name        string    `json:"name"`
+	DateCreated time.Time `json:"dateCreated"`
+	IsMember    bool      `json:"isMember"`
+	HasAccess   bool      `json:"hasAccess"`
+	IsPending   bool      `json:"isPending"`
+	Avatar      Avatar    `json:"avatar"`
 }
 
 // TeamService provides methods for accessing Sentry team API endpoints.

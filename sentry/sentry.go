@@ -3,7 +3,6 @@ package sentry
 import (
 	"net/http"
 	"net/url"
-
 	"path"
 
 	"github.com/dghubble/sling"
@@ -51,4 +50,10 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 		ProjectPlugins: newProjectPluginService(base.New()),
 	}
 	return c
+}
+
+// Avatar represents an avatar.
+type Avatar struct {
+	UUID *string `json:"avatarUuid"`
+	Type string  `json:"avatarType"`
 }

@@ -13,12 +13,6 @@ type OrganizationStatus struct {
 	Name string `json:"name"`
 }
 
-// OrganizationAvatar represents a Sentry organization's avatar.
-type OrganizationAvatar struct {
-	UUID *string `json:"avatarUuid"`
-	Type string  `json:"avatarType"`
-}
-
 // OrganizationQuota represents a Sentry organization's quota.
 type OrganizationQuota struct {
 	MaxRate         int `json:"maxRate"`
@@ -42,7 +36,7 @@ type Organization struct {
 	Name           string             `json:"name"`
 	DateCreated    time.Time          `json:"dateCreated"`
 	IsEarlyAdopter bool               `json:"isEarlyAdopter"`
-	Avatar         OrganizationAvatar `json:"avatar"`
+	Avatar         Avatar             `json:"avatar"`
 
 	Quota OrganizationQuota `json:"quota"`
 
