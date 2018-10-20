@@ -117,6 +117,7 @@ func (s *ProjectService) Create(organizationSlug string, teamSlug string, params
 type UpdateProjectParams struct {
 	Name            string                 `json:"name,omitempty"`
 	Slug            string                 `json:"slug,omitempty"`
+	Platform        string                 `json:"platform,omitempty"`
 	IsBookmarked    *bool                  `json:"isBookmarked,omitempty"`
 	DigestsMinDelay *int                   `json:"digestsMinDelay,omitempty"`
 	DigestsMaxDelay *int                   `json:"digestsMaxDelay,omitempty"`
