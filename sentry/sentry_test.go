@@ -61,9 +61,13 @@ func assertQuery(t *testing.T, expected map[string]string, req *http.Request) {
 // assertPostJSON tests that the Request has the expected JSON in its Body
 func assertPostJSON(t *testing.T, expected interface{}, req *http.Request) {
 	var actual interface{}
-	err := json.NewDecoder(req.Body).Decode(&actual)
+
+	d := json.NewDecoder(req.Body)
+	d.UseNumber()
+
+	err := d.Decode(&actual)
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.EqualValues(t, expected, actual)
 }
 
 func mustParseTime(value string) time.Time {
