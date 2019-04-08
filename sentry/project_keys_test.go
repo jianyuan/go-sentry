@@ -191,6 +191,50 @@ func TestProjectKeyService_Create_RateLimit(t *testing.T) {
 			"name": "Fabulous Key",
 			"projectId": 2,
 			"public": "cfc7b0341c6e4f6ea1a9d256a30dba00",
+			"rateLimit": null,
+			"secret": "a07dcd97aa56481f82aeabaed43ca448"
+		}`)
+	})
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/cfc7b0341c6e4f6ea1a9d256a30dba00/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "PUT", r)
+		assertPostJSON(t, map[string]interface{}{
+			"name": "Fabulous Key",
+			"rateLimit": map[string]interface{}{
+				"window": json.Number("86400"),
+				"count":  json.Number("1000"),
+			},
+		}, r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"browserSdk": {
+				"choices": [
+					[
+						"latest",
+						"latest"
+					],
+					[
+						"4.x",
+						"4.x"
+					]
+				]
+			},
+			"browserSdkVersion": "4.x",
+			"dateCreated": "2018-09-20T15:48:07.397Z",
+			"dsn": {
+				"cdn": "https://sentry.io/js-sdk-loader/cfc7b0341c6e4f6ea1a9d256a30dba00.min.js",
+				"csp": "https://sentry.io/api/2/csp-report/?sentry_key=cfc7b0341c6e4f6ea1a9d256a30dba00",
+				"minidump": "https://sentry.io/api/2/minidump/?sentry_key=cfc7b0341c6e4f6ea1a9d256a30dba00",
+				"public": "https://cfc7b0341c6e4f6ea1a9d256a30dba00@sentry.io/2",
+				"secret": "https://cfc7b0341c6e4f6ea1a9d256a30dba00:a07dcd97aa56481f82aeabaed43ca448@sentry.io/2",
+				"security": "https://sentry.io/api/2/security/?sentry_key=cfc7b0341c6e4f6ea1a9d256a30dba00"
+			},
+			"id": "cfc7b0341c6e4f6ea1a9d256a30dba00",
+			"isActive": true,
+			"label": "Fabulous Key",
+			"name": "Fabulous Key",
+			"projectId": 2,
+			"public": "cfc7b0341c6e4f6ea1a9d256a30dba00",
 			"rateLimit": {
 				"count": 1000,
 				"window": 86400
