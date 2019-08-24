@@ -282,3 +282,16 @@ func TestRulesService_Update(t *testing.T) {
 		assert.Equal(t, expected, rules)
 	})
 }
+
+func TestRuleService_Delete(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/12345/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.Rules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
+	assert.NoError(t, err)
+}
