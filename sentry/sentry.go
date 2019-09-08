@@ -20,6 +20,7 @@ type Client struct {
 	Projects       *ProjectService
 	ProjectKeys    *ProjectKeyService
 	ProjectPlugins *ProjectPluginService
+	Rules          *RuleService
 }
 
 // NewClient returns a new Sentry API client.
@@ -48,6 +49,7 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 		Projects:       newProjectService(base.New()),
 		ProjectKeys:    newProjectKeyService(base.New()),
 		ProjectPlugins: newProjectPluginService(base.New()),
+		Rules:          newRuleService(base.New()),
 	}
 	return c
 }
