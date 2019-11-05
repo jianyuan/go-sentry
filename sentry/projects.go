@@ -143,6 +143,7 @@ type UpdateProjectParams struct {
 	DigestsMinDelay *int                   `json:"digestsMinDelay,omitempty"`
 	DigestsMaxDelay *int                   `json:"digestsMaxDelay,omitempty"`
 	Options         map[string]interface{} `json:"options,omitempty"`
+	AllowedDomains  []string               `json:"allowedDomains,omitempty"`
 }
 
 // Update various attributes and configurable settings for a given project.
