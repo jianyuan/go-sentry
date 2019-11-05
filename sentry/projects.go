@@ -52,6 +52,7 @@ type Project struct {
 
 	Organization Organization `json:"organization"`
 	// TODO: plugins
+	// TODO: platforms
 	ProcessingIssues int `json:"processingIssues"`
 	// TODO: defaultEnvironment
 
