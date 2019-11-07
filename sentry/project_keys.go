@@ -62,7 +62,8 @@ func (s *ProjectKeyService) List(organizationSlug string, projectSlug string) ([
 
 // CreateProjectKeyParams are the parameters for ProjectKeyService.Create.
 type CreateProjectKeyParams struct {
-	Name string `json:"name,omitempty"`
+	Name      string               `json:"name,omitempty"`
+	RateLimit *ProjectKeyRateLimit `json:"rateLimit,omitempty"`
 }
 
 // Create a new client key bound to a project.
@@ -71,12 +72,27 @@ func (s *ProjectKeyService) Create(organizationSlug string, projectSlug string, 
 	projectKey := new(ProjectKey)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Post("projects/"+organizationSlug+"/"+projectSlug+"/keys/").BodyJSON(params).Receive(projectKey, apiError)
+
+	if err != nil {
+		return projectKey, resp, relevantError(err, *apiError)
+	}
+
+	// Hack as currently the API does not support setting rate limits on Create
+	if params.RateLimit != nil {
+		updateParams := &UpdateProjectKeyParams{
+			Name:      params.Name,
+			RateLimit: params.RateLimit,
+		}
+		projectKey, resp, err = s.Update(organizationSlug, projectSlug, projectKey.ID, updateParams)
+	}
+
 	return projectKey, resp, relevantError(err, *apiError)
 }
 
 // UpdateProjectKeyParams are the parameters for ProjectKeyService.Update.
 type UpdateProjectKeyParams struct {
-	Name string `json:"name,omitempty"`
+	Name      string               `json:"name,omitempty"`
+	RateLimit *ProjectKeyRateLimit `json:"rateLimit,omitempty"`
 }
 
 // Update a client key.
