@@ -121,8 +121,9 @@ func (s *ProjectService) Get(organizationSlug string, slug string) (*Project, *h
 
 // CreateProjectParams are the parameters for ProjectService.Create.
 type CreateProjectParams struct {
-	Name string `json:"name,omitempty"`
-	Slug string `json:"slug,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Slug     string `json:"slug,omitempty"`
+	Platform string `json:"platform,omitempty"`
 }
 
 // Create a new project bound to a team.
@@ -143,6 +144,7 @@ type UpdateProjectParams struct {
 	DigestsMinDelay *int                   `json:"digestsMinDelay,omitempty"`
 	DigestsMaxDelay *int                   `json:"digestsMaxDelay,omitempty"`
 	Options         map[string]interface{} `json:"options,omitempty"`
+	AllowedDomains  []string               `json:"allowedDomains,omitempty"`
 }
 
 // Update various attributes and configurable settings for a given project.
