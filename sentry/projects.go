@@ -143,6 +143,7 @@ type UpdateProjectParams struct {
 	IsBookmarked    *bool                  `json:"isBookmarked,omitempty"`
 	DigestsMinDelay *int                   `json:"digestsMinDelay,omitempty"`
 	DigestsMaxDelay *int                   `json:"digestsMaxDelay,omitempty"`
+	ResolveAge      *int                   `json:"resolveAge,omitempty"`
 	Options         map[string]interface{} `json:"options,omitempty"`
 	AllowedDomains  []string               `json:"allowedDomains,omitempty"`
 }
