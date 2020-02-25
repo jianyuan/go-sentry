@@ -333,7 +333,7 @@ func TestProjectService_Get(t *testing.T) {
 			}],
 			"processingIssues": 0,
 			"relayPiiConfig": null,
-			"resolveAge": 0,
+			"resolveAge": 720,
 			"safeFields": [],
 			"scrapeJavaScript": true,
 			"scrubIPAddresses": false,
@@ -389,6 +389,7 @@ func TestProjectService_Get(t *testing.T) {
 		},
 		DigestsMinDelay:      300,
 		DigestsMaxDelay:      1800,
+		ResolveAge:           720,
 		SubjectPrefix:        "[Sentry] ",
 		AllowedDomains:       []string{"*"},
 		DataScrubber:         true,
@@ -502,7 +503,7 @@ func TestProjectService_Update(t *testing.T) {
 			"digestsMinDelay": 300,
 			"options": {
 				"sentry:origins": "http://example.com\nhttp://example.invalid",
-				"sentry:resolve_age": 0
+				"sentry:resolve_age": 720
 			},
 			"defaultEnvironment": null,
 			"features": [
@@ -519,6 +520,7 @@ func TestProjectService_Update(t *testing.T) {
 			"callSign": "PLANE-PROXY",
 			"firstEvent": null,
 			"digestsMaxDelay": 1800,
+			"resolveAge": 720,
 			"processingIssues": 0,
 			"isBookmarked": false,
 			"callSignReviewed": false,
@@ -554,10 +556,11 @@ func TestProjectService_Update(t *testing.T) {
 		Status: "active",
 		Options: map[string]interface{}{
 			"sentry:origins":     "http://example.com\nhttp://example.invalid",
-			"sentry:resolve_age": float64(0),
+			"sentry:resolve_age": float64(720),
 		},
 		DigestsMinDelay: 300,
 		DigestsMaxDelay: 1800,
+		ResolveAge:      720,
 		SubjectTemplate: "[$project] ${tag:level}: $title",
 	}
 	assert.Equal(t, expected, project)
