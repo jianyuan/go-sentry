@@ -12,7 +12,7 @@ import (
 type Rule struct {
 	ID          string          `json:"id"`
 	ActionMatch string          `json:"actionMatch"`
-	Environment string          `json:"environment"`
+	Environment *string         `json:"environment"`
 	Frequency   int             `json:"frequency"`
 	Name        string          `json:"name"`
 	Conditions  []RuleCondition `json:"conditions"`
