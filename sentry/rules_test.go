@@ -24,7 +24,9 @@ func TestRulesService_List(t *testing.T) {
 			  "conditions": [
 				{
 				  "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-				  "name": "An issue is first seen"
+				  "name": "An issue is first seen",
+          "value": 500,
+          "interval": "1h"
 				}
 			  ],
 			  "id": "123456",
@@ -89,7 +91,7 @@ func TestRulesService_Create(t *testing.T) {
 			"frequency":   30,
 			"name":        "Notify errors",
 			"conditions": []map[string]interface{}{
-				{"ID": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"},
+				{"ID": "sentry.rules.conditions.event_frequency.EventFrequencyCondition", "value": 500, "interval": "1h"},
 			},
 			"actions": []map[string]interface{}{
 				{
@@ -133,7 +135,11 @@ func TestRulesService_Create(t *testing.T) {
 			Frequency:   30,
 			Name:        "Notify errors",
 			Conditions: []*CreateRuleConditionParams{
-				{ID: "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"},
+				{
+					ID:       "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
+					Value:    500,
+					Interval: "1h",
+				},
 			},
 			Actions: []*CreateRuleActionParams{
 				{
@@ -190,7 +196,7 @@ func TestRulesService_Update(t *testing.T) {
 			"frequency":   30,
 			"name":        "Notify errors",
 			"conditions": []map[string]interface{}{
-				{"ID": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"},
+				{"ID": "sentry.rules.conditions.event_frequency.EventFrequencyCondition", "value": 500, "interval": "1h"},
 			},
 			"actions": []map[string]interface{}{
 				{
@@ -237,8 +243,9 @@ func TestRulesService_Update(t *testing.T) {
 			Name:        "Notify errors",
 			Conditions: []RuleCondition{
 				{
-					ID:   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-					Name: "An issue is first seen",
+					ID:       "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
+					Value:    500,
+					Interval: "1h",
 				},
 			},
 			Actions: []RuleAction{
