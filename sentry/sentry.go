@@ -17,6 +17,7 @@ type Client struct {
 	sling          *sling.Sling
 	Organizations  *OrganizationService
 	Teams          *TeamService
+	TeamMembers    *TeamMemberService
 	Projects       *ProjectService
 	ProjectKeys    *ProjectKeyService
 	ProjectPlugins *ProjectPluginService
@@ -46,6 +47,7 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 		sling:          base,
 		Organizations:  newOrganizationService(base.New()),
 		Teams:          newTeamService(base.New()),
+		TeamMembers:    newTeamMemberService(base.New()),
 		Projects:       newProjectService(base.New()),
 		ProjectKeys:    newProjectKeyService(base.New()),
 		ProjectPlugins: newProjectPluginService(base.New()),
