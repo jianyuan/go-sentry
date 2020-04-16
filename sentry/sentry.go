@@ -14,14 +14,15 @@ const (
 )
 
 type Client struct {
-	sling          *sling.Sling
-	Organizations  *OrganizationService
-	Teams          *TeamService
-	TeamMembers    *TeamMemberService
-	Projects       *ProjectService
-	ProjectKeys    *ProjectKeyService
-	ProjectPlugins *ProjectPluginService
-	Rules          *RuleService
+	sling             *sling.Sling
+	Organizations     *OrganizationService
+	OrganizationUsers *OrganizationUserService
+	Teams             *TeamService
+	TeamMembers       *TeamMemberService
+	Projects          *ProjectService
+	ProjectKeys       *ProjectKeyService
+	ProjectPlugins    *ProjectPluginService
+	Rules             *RuleService
 }
 
 // NewClient returns a new Sentry API client.
@@ -44,14 +45,15 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 	}
 
 	c := &Client{
-		sling:          base,
-		Organizations:  newOrganizationService(base.New()),
-		Teams:          newTeamService(base.New()),
-		TeamMembers:    newTeamMemberService(base.New()),
-		Projects:       newProjectService(base.New()),
-		ProjectKeys:    newProjectKeyService(base.New()),
-		ProjectPlugins: newProjectPluginService(base.New()),
-		Rules:          newRuleService(base.New()),
+		sling:             base,
+		Organizations:     newOrganizationService(base.New()),
+		OrganizationUsers: newOrganizationUserService(base.New()),
+		Teams:             newTeamService(base.New()),
+		TeamMembers:       newTeamMemberService(base.New()),
+		Projects:          newProjectService(base.New()),
+		ProjectKeys:       newProjectKeyService(base.New()),
+		ProjectPlugins:    newProjectPluginService(base.New()),
+		Rules:             newRuleService(base.New()),
 	}
 	return c
 }

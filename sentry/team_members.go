@@ -14,7 +14,6 @@ type TeamMember struct {
 }
 
 // TeamMemberService provides methods for accessing Sentry team members
-// client key API endpoints.
 // /api/0/organizations/{organization_slug}/members/{user_id}/
 type TeamMemberService struct {
 	sling *sling.Sling
