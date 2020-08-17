@@ -84,6 +84,8 @@ type CreateRuleConditionParams struct {
 	ID       string `json:"id"`
 	Interval string `json:"interval"`
 	Value    int    `json:"value"`
+	Level    int    `json:"level"`
+	Match    string `json:"match"`
 }
 
 // Create a new alert rule bound to a project.
