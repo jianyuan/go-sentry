@@ -1,11 +1,13 @@
 package sentry
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRulesService_List(t *testing.T) {
@@ -25,11 +27,11 @@ func TestRulesService_List(t *testing.T) {
 				{
 				  "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
 				  "name": "An issue is first seen",
-          "value": 500,
-          "interval": "1h"
+				  "value": 500,
+				  "interval": "1h"
 				}
 			  ],
-			  "id": "123456",
+			  "id": "12345",
 			  "actions": [
 				{
 				  "name": "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -43,40 +45,42 @@ func TestRulesService_List(t *testing.T) {
 			  "dateCreated": "2019-08-24T18:12:16.321Z"
 			}
 		]`)
-
-		client := NewClient(httpClient, nil, "")
-		rules, _, err := client.Rules.List("the-interstellar-jurisdiction", "pump-station")
-		assert.NoError(t, err)
-
-		environment := "production"
-		expected := []Rule{
-			{
-				ID:          "123456",
-				ActionMatch: "all",
-				Environment: &environment,
-				Frequency:   30,
-				Name:        "Notify errors",
-				Conditions: []RuleCondition{
-					{
-						ID:   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-						Name: "An issue is first seen",
-					},
-				},
-				Actions: []RuleAction{
-					{
-						ID:        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-						Name:      "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
-						Tags:      "environment",
-						ChannelID: "XX00X0X0X",
-						Channel:   "#dummy-channel",
-						Workspace: "1234",
-					},
-				},
-				Created: mustParseTime("2019-08-24T18:12:16.321Z"),
-			},
-		}
-		assert.Equal(t, expected, rules)
 	})
+	client := NewClient(httpClient, nil, "")
+	rules, _, err := client.Rules.List("the-interstellar-jurisdiction", "pump-station")
+	require.NoError(t, err)
+
+	environment := "production"
+	expected := []Rule{
+		{
+			ID:          "12345",
+			ActionMatch: "any",
+			Environment: &environment,
+			Frequency:   30,
+			Name:        "Notify errors",
+			Conditions: []ConditionType{
+				{
+					"id":       "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
+					"name":     "An issue is first seen",
+					"value":    float64(500),
+					"interval": "1h",
+				},
+			},
+			Actions: []ActionType{
+				{
+					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+					"tags":       "environment",
+					"channel_id": "XX00X0X0X",
+					"channel":    "#dummy-channel",
+					"workspace":  "1234",
+				},
+			},
+			Created: mustParseTime("2019-08-24T18:12:16.321Z"),
+		},
+	}
+	require.Equal(t, expected, rules)
+
 }
 
 func TestRulesService_Create(t *testing.T) {
@@ -85,125 +89,205 @@ func TestRulesService_Create(t *testing.T) {
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
-		assertPostJSON(t, map[string]interface{}{
+		assertPostJSONValue(t, map[string]interface{}{
 			"actionMatch": "all",
 			"environment": "production",
 			"frequency":   30,
 			"name":        "Notify errors",
 			"conditions": []map[string]interface{}{
-				{"ID": "sentry.rules.conditions.event_frequency.EventFrequencyCondition", "value": 500, "interval": "1h"},
+				{
+					"interval": "1h",
+					"name":     "The issue is seen more than 10 times in 1h",
+					"value":    10,
+					"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
+				},
 			},
 			"actions": []map[string]interface{}{
 				{
-					"ID":        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-					"Tags":      "environment",
-					"Channel":   "#dummy-channel",
-					"Workspace": "1234",
+					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+					"tags":       "environment",
+					"channel":    "#dummy-channel",
+					"channel_id": "XX00X0X0X",
+					"workspace":  "1234",
 				},
 			},
 		}, r)
 
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
+			"id": "123456",
+			"actionMatch": "all",
 			"environment": "production",
-			"actionMatch": "any",
 			"frequency": 30,
 			"name": "Notify errors",
 			"conditions": [
 				{
-					"id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-					"name": "An issue is first seen"
+					"interval": "1h",
+					"name": "The issue is seen more than 10 times in 1h",
+					"value": 10,
+					"id": "sentry.rules.conditions.event_frequency.EventFrequencyCondition"
 				}
 			],
-			"id": "123456",
 			"actions": [
 				{
+					"id": "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"name": "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
 					"tags": "environment",
 					"channel_id": "XX00X0X0X",
 					"workspace": "1234",
-					"id": "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"channel": "#dummy-channel"
 				}
 			],
 			"dateCreated": "2019-08-24T18:12:16.321Z"
 		}`)
-
-		params := &CreateRuleParams{
-			ActionMatch: "all",
-			Environment: "production",
-			Frequency:   30,
-			Name:        "Notify errors",
-			Conditions: []*CreateRuleConditionParams{
-				{
-					ID:       "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-					Value:    500,
-					Interval: "1h",
-				},
-			},
-			Actions: []*CreateRuleActionParams{
-				{
-					ID:        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-					Tags:      "environment",
-					Channel:   "#dummy-channel",
-					Workspace: "1234",
-				},
-			},
-		}
-
-		client := NewClient(httpClient, nil, "")
-		rules, _, err := client.Rules.Create("the-interstellar-jurisdiction", "pump-station", params)
-		assert.NoError(t, err)
-
-		environment := "production"
-		expected := Rule{
-			ID:          "123456",
-			ActionMatch: "all",
-			Environment: &environment,
-			Frequency:   30,
-			Name:        "Notify errors",
-			Conditions: []RuleCondition{
-				{
-					ID:   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-					Name: "An issue is first seen",
-				},
-			},
-			Actions: []RuleAction{
-				{
-					ID:        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-					Name:      "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
-					Tags:      "environment",
-					ChannelID: "XX00X0X0X",
-					Channel:   "#dummy-channel",
-					Workspace: "1234",
-				},
-			},
-			Created: mustParseTime("2019-08-24T18:12:16.321Z"),
-		}
-		assert.Equal(t, expected, rules)
 	})
+
+	params := &CreateRuleParams{
+		ActionMatch: "all",
+		Environment: "production",
+		Frequency:   30,
+		Name:        "Notify errors",
+		Conditions: []ConditionType{
+			{
+				"interval": "1h",
+				"name":     "The issue is seen more than 10 times in 1h",
+				"value":    float64(10),
+				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
+			},
+		},
+		Actions: []ActionType{
+			{
+				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+				"tags":       "environment",
+				"channel_id": "XX00X0X0X",
+				"workspace":  "1234",
+				"channel":    "#dummy-channel",
+			},
+		},
+	}
+
+	client := NewClient(httpClient, nil, "")
+	rules, _, err := client.Rules.Create("the-interstellar-jurisdiction", "pump-station", params)
+	require.NoError(t, err)
+
+	environment := "production"
+	expected := &Rule{
+		ID:          "123456",
+		ActionMatch: "all",
+		Environment: &environment,
+		Frequency:   30,
+		Name:        "Notify errors",
+		Conditions: []ConditionType{
+			{
+				"interval": "1h",
+				"name":     "The issue is seen more than 10 times in 1h",
+				"value":    float64(10),
+				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
+			},
+		},
+		Actions: []ActionType{
+			{
+				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+				"tags":       "environment",
+				"channel_id": "XX00X0X0X",
+				"channel":    "#dummy-channel",
+				"workspace":  "1234",
+			},
+		},
+		Created: mustParseTime("2019-08-24T18:12:16.321Z"),
+	}
+	require.Equal(t, expected, rules)
+
 }
 
 func TestRulesService_Update(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
+	environment := "staging"
+	params := &Rule{
+		ID:          "12345",
+		ActionMatch: "all",
+		FilterMatch: "any",
+		Environment: &environment,
+		Frequency:   30,
+		Name:        "Notify errors",
+		Conditions: []ConditionType{
+			{
+				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
+				"value":    500,
+				"interval": "1h",
+			},
+		},
+		Actions: []ActionType{
+			{
+				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+				"tags":       "environment",
+				"channel_id": "XX00X0X0X",
+				"channel":    "#dummy-channel",
+				"workspace":  "1234",
+			},
+		},
+		Filters: []FilterType{
+			{
+				"id":    "sentry.rules.filters.issue_occurrences.IssueOccurrencesFilter",
+				"name":  "The issue has happened at least 4 times",
+				"value": 4,
+			},
+			{
+				"attribute": "message",
+				"id":        "sentry.rules.filters.event_attribute.EventAttributeFilter",
+				"match":     "eq",
+				"name":      "The event's message value equals test",
+				"value":     "test",
+			},
+		},
+		Created: mustParseTime("2019-08-24T18:12:16.321Z"),
+	}
+
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/12345/", func(w http.ResponseWriter, r *http.Request) {
-		assertMethod(t, "POST", r)
-		assertPostJSON(t, map[string]interface{}{
+		assertMethod(t, "PUT", r)
+		assertPostJSONValue(t, map[string]interface{}{
+			"id":          "12345",
 			"actionMatch": "all",
+			"filterMatch": "any",
 			"environment": "staging",
-			"frequency":   30,
+			"frequency":   json.Number("30"),
 			"name":        "Notify errors",
+			"dateCreated": "2019-08-24T18:12:16.321Z",
 			"conditions": []map[string]interface{}{
-				{"ID": "sentry.rules.conditions.event_frequency.EventFrequencyCondition", "value": 500, "interval": "1h"},
+				{
+					"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
+					"value":    json.Number("500"),
+					"interval": "1h",
+				},
 			},
 			"actions": []map[string]interface{}{
 				{
-					"ID":        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-					"Tags":      "environment",
-					"Channel":   "#dummy-channel",
-					"Workspace": "1234",
+					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+					"tags":       "environment",
+					"channel":    "#dummy-channel",
+					"channel_id": "XX00X0X0X",
+					"workspace":  "1234",
+				},
+			},
+			"filters": []map[string]interface{}{
+				{
+					"id":    "sentry.rules.filters.issue_occurrences.IssueOccurrencesFilter",
+					"name":  "The issue has happened at least 4 times",
+					"value": json.Number("4"),
+				},
+				{
+					"attribute": "message",
+					"id":        "sentry.rules.filters.event_attribute.EventAttributeFilter",
+					"match":     "eq",
+					"name":      "The event's message value equals test",
+					"value":     "test",
 				},
 			},
 		}, r)
@@ -220,7 +304,7 @@ func TestRulesService_Update(t *testing.T) {
 					"name": "An issue is first seen"
 				}
 			],
-			"id": "123456",
+			"id": "12345",
 			"actions": [
 				{
 					"name": "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -233,65 +317,38 @@ func TestRulesService_Update(t *testing.T) {
 			],
 			"dateCreated": "2019-08-24T18:12:16.321Z"
 		}`)
-
-		environment := "staging"
-		params := &Rule{
-			ID:          "123456",
-			ActionMatch: "all",
-			Environment: &environment,
-			Frequency:   30,
-			Name:        "Notify errors",
-			Conditions: []RuleCondition{
-				{
-					ID:       "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-					Value:    500,
-					Interval: "1h",
-				},
-			},
-			Actions: []RuleAction{
-				{
-					ID:        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-					Name:      "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
-					Tags:      "environment",
-					ChannelID: "XX00X0X0X",
-					Channel:   "#dummy-channel",
-					Workspace: "1234",
-				},
-			},
-			Created: mustParseTime("2019-08-24T18:12:16.321Z"),
-		}
-
-		client := NewClient(httpClient, nil, "")
-		rules, _, err := client.Rules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
-		assert.NoError(t, err)
-
-		environment = "production"
-		expected := Rule{
-			ID:          "123456",
-			ActionMatch: "all",
-			Environment: &environment,
-			Frequency:   30,
-			Name:        "Notify errors",
-			Conditions: []RuleCondition{
-				{
-					ID:   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-					Name: "An issue is first seen",
-				},
-			},
-			Actions: []RuleAction{
-				{
-					ID:        "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-					Name:      "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
-					Tags:      "environment",
-					ChannelID: "XX00X0X0X",
-					Channel:   "#dummy-channel",
-					Workspace: "1234",
-				},
-			},
-			Created: mustParseTime("2019-08-24T18:12:16.321Z"),
-		}
-		assert.Equal(t, expected, rules)
 	})
+
+	client := NewClient(httpClient, nil, "")
+	rules, _, err := client.Rules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
+	assert.NoError(t, err)
+
+	expected := &Rule{
+		ID:          "12345",
+		ActionMatch: "any",
+		Environment: &environment,
+		Frequency:   30,
+		Name:        "Notify errors",
+		Conditions: []ConditionType{
+			{
+				"id":   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
+				"name": "An issue is first seen",
+			},
+		},
+		Actions: []ActionType{
+			{
+				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+				"tags":       "environment",
+				"channel_id": "XX00X0X0X",
+				"channel":    "#dummy-channel",
+				"workspace":  "1234",
+			},
+		},
+		Created: mustParseTime("2019-08-24T18:12:16.321Z"),
+	}
+	require.Equal(t, expected, rules)
+
 }
 
 func TestRuleService_Delete(t *testing.T) {
@@ -304,5 +361,5 @@ func TestRuleService_Delete(t *testing.T) {
 
 	client := NewClient(httpClient, nil, "")
 	_, err := client.Rules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

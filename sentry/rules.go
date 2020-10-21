@@ -12,35 +12,17 @@ import (
 type Rule struct {
 	ID          string          `json:"id"`
 	ActionMatch string          `json:"actionMatch"`
-	Environment *string         `json:"environment"`
+	FilterMatch string          `json:"filterMatch"`
+	Environment *string         `json:"environment,omitempty"`
 	Frequency   int             `json:"frequency"`
 	Name        string          `json:"name"`
-	Conditions  []RuleCondition `json:"conditions"`
-	Actions     []RuleAction    `json:"actions"`
+	Conditions  []ConditionType `json:"conditions"`
+	Actions     []ActionType    `json:"actions"`
+	Filters     []FilterType    `json:"filters"`
 	Created     time.Time       `json:"dateCreated"`
 }
 
-// RuleCondition represents the conditions for each rule.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/rule.py
-type RuleCondition struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Interval string `json:"interval"`
-	Value    int    `json:"value"`
-}
-
-// RuleAction represents the actions will be taken for each rule based on its conditions.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/rule.py
-type RuleAction struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Tags      string `json:"tags"`
-	ChannelID string `json:"channel_id"`
-	Channel   string `json:"channel"`
-	Workspace string `json:"workspace"`
-}
-
-// ProjectKeyService provides methods for accessing Sentry project
+// RuleService provides methods for accessing Sentry project
 // client key API endpoints.
 // https://docs.sentry.io/api/projects/
 type RuleService struct {
@@ -61,14 +43,25 @@ func (s *RuleService) List(organizationSlug string, projectSlug string) ([]Rule,
 	return *rules, resp, relevantError(err, *apiError)
 }
 
+// ConditionType for defining conditions.
+type ConditionType map[string]interface{}
+
+// ActionType for defining actions.
+type ActionType map[string]interface{}
+
+// FilterType for defining actions.
+type FilterType map[string]interface{}
+
 // CreateRuleParams are the parameters for RuleService.Create.
 type CreateRuleParams struct {
-	ActionMatch string                       `json:"actionMatch"`
-	Environment string                       `json:"environment,omitempty"`
-	Frequency   int                          `json:"frequency"`
-	Name        string                       `json:"name"`
-	Conditions  []*CreateRuleConditionParams `json:"conditions"`
-	Actions     []*CreateRuleActionParams    `json:"actions"`
+	ActionMatch string          `json:"actionMatch"`
+	FilterMatch string          `json:"filterMatch"`
+	Environment string          `json:"environment,omitempty"`
+	Frequency   int             `json:"frequency"`
+	Name        string          `json:"name"`
+	Conditions  []ConditionType `json:"conditions"`
+	Actions     []ActionType    `json:"actions"`
+	Filters     []FilterType    `json:"filters"`
 }
 
 // CreateRuleActionParams models the actions when creating the action for the rule.

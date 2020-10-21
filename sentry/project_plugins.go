@@ -7,7 +7,7 @@ import (
 	"github.com/dghubble/sling"
 )
 
-// ProjectPlugin represents an asset of a plugin.
+// ProjectPluginAsset represents an asset of a plugin.
 type ProjectPluginAsset struct {
 	URL string `json:"url"`
 }
@@ -71,7 +71,7 @@ func (s *ProjectPluginService) Get(organizationSlug string, projectSlug string, 
 	return projectPlugin, resp, relevantError(err, *apiError)
 }
 
-// UpdateTeamParams are the parameters for TeamService.Update.
+// UpdateProjectPluginParams are the parameters for TeamService.Update.
 type UpdateProjectPluginParams map[string]interface{}
 
 // Update settings for a given team.

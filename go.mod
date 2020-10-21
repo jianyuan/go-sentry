@@ -1,5 +1,7 @@
 module github.com/jianyuan/go-sentry
 
+go 1.14
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dghubble/sling v1.1.0
