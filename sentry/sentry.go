@@ -8,11 +8,13 @@ import (
 	"github.com/dghubble/sling"
 )
 
+// public constants for external use
 const (
 	DefaultBaseURL = "https://sentry.io/api/"
 	APIVersion     = "0"
 )
 
+// Client for sentry api
 type Client struct {
 	sling          *sling.Sling
 	Organizations  *OrganizationService

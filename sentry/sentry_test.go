@@ -70,6 +70,18 @@ func assertPostJSON(t *testing.T, expected interface{}, req *http.Request) {
 	assert.EqualValues(t, expected, actual)
 }
 
+// assertPostJSON tests that the request has the expected values in its body.
+func assertPostJSONValue(t *testing.T, expected interface{}, req *http.Request) {
+	var actual interface{}
+
+	d := json.NewDecoder(req.Body)
+	d.UseNumber()
+
+	err := d.Decode(&actual)
+	assert.NoError(t, err)
+	assert.ObjectsAreEqualValues(expected, actual)
+}
+
 func mustParseTime(value string) time.Time {
 	t, err := time.Parse(time.RFC3339, value)
 	if err != nil {
