@@ -17,30 +17,35 @@ func TestRulesService_List(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `[
 			{
-			  "environment": "production",
-			  "actionMatch": "any",
-			  "frequency": 30,
-			  "name": "Notify errors",
-			  "conditions": [
-				{
-				  "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
-				  "name": "An issue is first seen",
-          "value": 500,
-          "interval": "1h"
-				}
-			  ],
-			  "id": "123456",
-			  "actions": [
-				{
-				  "name": "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
-				  "tags": "environment",
-				  "channel_id": "XX00X0X0X",
-				  "workspace": "1234",
-				  "id": "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
-				  "channel": "#dummy-channel"
-				}
-			  ],
-			  "dateCreated": "2019-08-24T18:12:16.321Z"
+				"environment": "production",
+				"actionMatch": "any",
+				"frequency": 30,
+				"name": "Notify errors",
+				"conditions": [
+					{
+						"id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
+						"name": "An issue is first seen",
+						"value": 500,
+						"interval": "1h"
+					}
+				],
+				"id": "123456",
+				"actions": [
+					{
+						"name": "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
+						"tags": "environment",
+						"channel_id": "XX00X0X0X",
+						"workspace": "1234",
+						"id": "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
+						"channel": "#dummy-channel"
+					},
+					{
+						"name": "Send a notification via opsgenie",
+						"id": "sentry.rules.actions.notify_event_service.NotifyEventServiceAction",
+						"service": "opsgenie"
+					}
+				],
+				"dateCreated": "2019-08-24T18:12:16.321Z"
 			}
 		]`)
 
@@ -71,6 +76,10 @@ func TestRulesService_List(t *testing.T) {
 						Channel:   "#dummy-channel",
 						Workspace: "1234",
 					},
+					{
+						ID:      "sentry.rules.actions.notify_event_service.NotifyEventServiceAction",
+						Service: "opsgenie",
+					},
 				},
 				Created: mustParseTime("2019-08-24T18:12:16.321Z"),
 			},
@@ -100,6 +109,10 @@ func TestRulesService_Create(t *testing.T) {
 					"Channel":   "#dummy-channel",
 					"Workspace": "1234",
 				},
+				{
+					"ID":      "sentry.rules.actions.notify_event_service.NotifyEventServiceAction",
+					"Service": "opsgenie",
+				},
 			},
 		}, r)
 
@@ -124,6 +137,11 @@ func TestRulesService_Create(t *testing.T) {
 					"workspace": "1234",
 					"id": "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"channel": "#dummy-channel"
+				},
+				{
+					"name": "Send a notification via opsgenie",
+					"id": "sentry.rules.actions.notify_event_service.NotifyEventServiceAction",
+					"service": "opsgenie"
 				}
 			],
 			"dateCreated": "2019-08-24T18:12:16.321Z"
@@ -205,6 +223,10 @@ func TestRulesService_Update(t *testing.T) {
 					"Channel":   "#dummy-channel",
 					"Workspace": "1234",
 				},
+				{
+					"ID":      "sentry.rules.actions.notify_event_service.NotifyEventServiceAction",
+					"Service": "opsgenie",
+				},
 			},
 		}, r)
 
@@ -229,6 +251,11 @@ func TestRulesService_Update(t *testing.T) {
 					"workspace": "1234",
 					"id": "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"channel": "#dummy-channel"
+				},
+				{
+					"name": "Send a notification via opsgenie",
+					"id": "sentry.rules.actions.notify_event_service.NotifyEventServiceAction",
+					"service": "opsgenie"
 				}
 			],
 			"dateCreated": "2019-08-24T18:12:16.321Z"

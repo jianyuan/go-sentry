@@ -37,6 +37,7 @@ type RuleAction struct {
 	Tags      string `json:"tags"`
 	ChannelID string `json:"channel_id"`
 	Channel   string `json:"channel"`
+	Service   string `json:"service"`
 	Workspace string `json:"workspace"`
 }
 
@@ -76,6 +77,7 @@ type CreateRuleActionParams struct {
 	ID        string `json:"id"`
 	Tags      string `json:"tags"`
 	Channel   string `json:"channel"`
+	Service   string `json:"service"`
 	Workspace string `json:"workspace"`
 }
 
