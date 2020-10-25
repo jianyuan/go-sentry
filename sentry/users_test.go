@@ -3,7 +3,6 @@ package sentry
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -61,10 +60,10 @@ func TestUserUnmarshal(t *testing.T) {
 		IsActive:        true,
 		HasPasswordAuth: true,
 		IsManaged:       false,
-		DateJoined:      time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-		LastLogin:       time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC),
+		DateJoined:      mustParseTime("2020-01-01T00:00:00.000000Z"),
+		LastLogin:       mustParseTime("2020-01-02T00:00:00.000000Z"),
 		Has2FA:          false,
-		LastActive:      time.Date(2020, 1, 3, 0, 0, 0, 0, time.UTC),
+		LastActive:      mustParseTime("2020-01-03T00:00:00.000000Z"),
 		IsSuperuser:     false,
 		IsStaff:         false,
 		Avatar: UserAvatar{
