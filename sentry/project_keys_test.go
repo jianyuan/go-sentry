@@ -52,7 +52,7 @@ func TestProjectKeyService_List(t *testing.T) {
 	})
 
 	client := NewClient(httpClient, nil, "")
-	projectKeys, _, err := client.ProjectKeys.List("the-interstellar-jurisdiction", "pump-station", "")
+	projectKeys, _, err := client.ProjectKeys.List("the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
 
 	expected := []ProjectKey{
@@ -162,7 +162,7 @@ func TestProjectKeyService_ListWithPagination(t *testing.T) {
 	// Kind of abusing the cursor field here. Normally this should always be a query of the form ?&cursor=bla but as
 	// mux.HandleFunc is somewhat stiff in mocking different results for the same path but with different queries
 	// calling the function like this allows us to mock a different response for the second page of results
-	projectKeys, _, err := client.ProjectKeys.List("the-interstellar-jurisdiction", "pump-station", "test")
+	projectKeys, _, err := client.ProjectKeys.listPerPage("the-interstellar-jurisdiction", "pump-station", "test")
 	assert.NoError(t, err)
 
 	expected := []ProjectKey{
@@ -253,7 +253,7 @@ func TestProjectKeyService_ListWithPagination_ReturnsErrorWhenAPageIsNotPresent(
 	// Kind of abusing the cursor field here. Normally this should always be a query of the form ?&cursor=bla but as
 	// mux.HandleFunc is somewhat stiff in mocking different results for the same path but with different queries
 	// calling the function like this allows us to have the second call return a 404
-	projectKeys, resp, err := client.ProjectKeys.List("the-interstellar-jurisdiction", "pump-station", "test")
+	projectKeys, resp, err := client.ProjectKeys.listPerPage("the-interstellar-jurisdiction", "pump-station", "test")
 	assert.Equal(t, 404, resp.StatusCode)
 	assert.Error(t, err)
 

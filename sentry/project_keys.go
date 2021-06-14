@@ -55,7 +55,13 @@ func newProjectKeyService(sling *sling.Sling) *ProjectKeyService {
 
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
-func (s *ProjectKeyService) List(organizationSlug string, projectSlug string, cursor string) ([]ProjectKey, *http.Response, error) {
+func (s *ProjectKeyService) List(organizationSlug string, projectSlug string) ([]ProjectKey, *http.Response, error) {
+	cursor := ""
+	return s.listPerPage(organizationSlug, projectSlug, cursor)
+}
+
+// https://docs.sentry.io/api/projects/get-project-keys/
+func (s *ProjectKeyService) listPerPage(organizationSlug string, projectSlug string, cursor string) ([]ProjectKey, *http.Response, error) {
 	projectKeys := new([]ProjectKey)
 	apiError := new(APIError)
 
@@ -68,7 +74,7 @@ func (s *ProjectKeyService) List(organizationSlug string, projectSlug string, cu
 
 		if nextLink.Param("results") == "true" {
 			c := fmt.Sprintf("?&cursor=%s", nextLink.Param("cursor"))
-			pagedProjectKeys, pagedResp, err2 := s.List(organizationSlug, projectSlug, c)
+			pagedProjectKeys, pagedResp, err2 := s.listPerPage(organizationSlug, projectSlug, c)
 			if err2 != nil {
 				return nil, pagedResp, relevantError(err2, *apiError)
 			}
