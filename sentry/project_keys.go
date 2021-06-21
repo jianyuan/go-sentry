@@ -1,10 +1,12 @@
 package sentry
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/dghubble/sling"
+	"github.com/tomnomnom/linkheader"
 )
 
 // ProjectKeyRateLimit represents a project key's rate limit.
@@ -54,9 +56,32 @@ func newProjectKeyService(sling *sling.Sling) *ProjectKeyService {
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
 func (s *ProjectKeyService) List(organizationSlug string, projectSlug string) ([]ProjectKey, *http.Response, error) {
+	cursor := ""
+	return s.listPerPage(organizationSlug, projectSlug, cursor)
+}
+
+// https://docs.sentry.io/api/projects/get-project-keys/
+func (s *ProjectKeyService) listPerPage(organizationSlug string, projectSlug string, cursor string) ([]ProjectKey, *http.Response, error) {
 	projectKeys := new([]ProjectKey)
 	apiError := new(APIError)
-	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+projectSlug+"/keys/").Receive(projectKeys, apiError)
+
+	URL := "projects/"+organizationSlug+"/"+projectSlug+"/keys/" + cursor
+	resp, err := s.sling.New().Get(URL).Receive(projectKeys, apiError)
+	if resp != nil && resp.StatusCode == 200 {
+		linkHeaders := linkheader.Parse(resp.Header.Get("Link"))
+		// If the next Link has results query it as well
+		nextLink := linkHeaders[len(linkHeaders) - 1]
+
+		if nextLink.Param("results") == "true" {
+			c := fmt.Sprintf("?&cursor=%s", nextLink.Param("cursor"))
+			pagedProjectKeys, pagedResp, err2 := s.listPerPage(organizationSlug, projectSlug, c)
+			if err2 != nil {
+				return nil, pagedResp, relevantError(err2, *apiError)
+			}
+			*projectKeys = append(*projectKeys, pagedProjectKeys...)
+		}
+	}
+
 	return *projectKeys, resp, relevantError(err, *apiError)
 }
 
