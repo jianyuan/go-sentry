@@ -17,87 +17,115 @@ func TestTeamService_List(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `[
 			{
-				"slug": "ancient-gabelers",
-				"name": "Ancient Gabelers",
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"dateCreated": "2018-11-06T21:20:08.115Z",
 				"hasAccess": true,
-				"isPending": false,
-				"dateCreated": "2017-07-18T19:29:46.305Z",
-				"isMember": false,
 				"id": "3",
-				"projects": []
+				"isMember": true,
+				"isPending": false,
+				"memberCount": 1,
+				"name": "Ancient Gabelers",
+				"projects": [],
+				"slug": "ancient-gabelers"
 			},
 			{
-				"slug": "powerful-abolitionist",
-				"name": "Powerful Abolitionist",
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"dateCreated": "2018-11-06T21:19:55.114Z",
 				"hasAccess": true,
-				"isPending": false,
-				"dateCreated": "2017-07-18T19:29:24.743Z",
-				"isMember": false,
 				"id": "2",
+				"isMember": true,
+				"isPending": false,
+				"memberCount": 1,
+				"name": "Powerful Abolitionist",
 				"projects": [
 					{
-						"status": "active",
-						"slug": "prime-mover",
-						"defaultEnvironment": null,
-						"features": [
-							"data-forwarding",
-							"rate-limits",
-							"releases"
-						],
+						"avatar": {
+							"avatarType": "letter_avatar",
+							"avatarUuid": null
+						},
 						"color": "#bf5b3f",
-						"isPublic": false,
-						"dateCreated": "2017-07-18T19:29:30.063Z",
-						"platforms": [],
-						"callSign": "PRIME-MOVER",
+						"dateCreated": "2018-11-06T21:19:58.536Z",
+						"features": [
+							"releases",
+							"sample-events",
+							"minidump",
+							"servicehooks",
+							"rate-limits",
+							"data-forwarding"
+						],
 						"firstEvent": null,
-						"processingIssues": 0,
-						"isBookmarked": false,
-						"callSignReviewed": false,
+						"hasAccess": true,
 						"id": "3",
-						"name": "Prime Mover"
+						"isBookmarked": false,
+						"isInternal": false,
+						"isMember": true,
+						"isPublic": false,
+						"name": "Prime Mover",
+						"platform": null,
+						"slug": "prime-mover",
+						"status": "active"
 					},
 					{
-						"status": "active",
-						"slug": "pump-station",
-						"defaultEnvironment": null,
+						"avatar": {
+							"avatarType": "letter_avatar",
+							"avatarUuid": null
+						},
+						"color": "#3fbf7f",
+						"dateCreated": "2018-11-06T21:19:55.121Z",
 						"features": [
+							"releases",
+							"sample-events",
+							"minidump",
+							"servicehooks",
+							"rate-limits",
+							"data-forwarding"
+						],
+						"firstEvent": null,
+						"hasAccess": true,
+						"id": "2",
+						"isBookmarked": false,
+						"isInternal": false,
+						"isMember": true,
+						"isPublic": false,
+						"name": "Pump Station",
+						"platform": null,
+						"slug": "pump-station",
+						"status": "active"
+					},
+					{
+						"avatar": {
+							"avatarType": "letter_avatar",
+							"avatarUuid": null
+						},
+						"color": "#bf6e3f",
+						"dateCreated": "2018-11-06T21:20:08.064Z",
+						"features": [
+							"servicehooks",
+							"sample-events",
 							"data-forwarding",
 							"rate-limits",
-							"releases"
+							"minidump"
 						],
-						"color": "#3fbf7f",
-						"isPublic": false,
-						"dateCreated": "2017-07-18T19:29:24.793Z",
-						"platforms": [],
-						"callSign": "PUMP-STATION",
 						"firstEvent": null,
-						"processingIssues": 0,
-						"isBookmarked": false,
-						"callSignReviewed": false,
-						"id": "2",
-						"name": "Pump Station"
-					},
-					{
-						"status": "active",
-						"slug": "the-spoiled-yoghurt",
-						"defaultEnvironment": null,
-						"features": [
-							"data-forwarding",
-							"rate-limits"
-						],
-						"color": "#bf6e3f",
-						"isPublic": false,
-						"dateCreated": "2017-07-18T19:29:44.996Z",
-						"platforms": [],
-						"callSign": "THE-SPOILED-YOGHURT",
-						"firstEvent": null,
-						"processingIssues": 0,
-						"isBookmarked": false,
-						"callSignReviewed": false,
+						"hasAccess": true,
 						"id": "4",
-						"name": "The Spoiled Yoghurt"
+						"isBookmarked": false,
+						"isInternal": false,
+						"isMember": true,
+						"isPublic": false,
+						"name": "The Spoiled Yoghurt",
+						"platform": null,
+						"slug": "the-spoiled-yoghurt",
+						"status": "active"
 					}
-				]
+				],
+				"slug": "powerful-abolitionist"
 			}
 		]`)
 	})
