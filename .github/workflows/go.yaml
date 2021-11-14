@@ -27,7 +27,7 @@ jobs:
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
     - name: Run pre-commit
-      uses: pre-commit/action@v2.0.2
+      uses: pre-commit/action@v2.0.3
 
   build:
     runs-on: ubuntu-latest
