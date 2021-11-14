@@ -3,31 +3,25 @@ name: Go
 on: push
 
 jobs:
-
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: "1.17"
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.17"
 
-    - name: Install Go binarires
-      run: |
-        go get -u golang.org/x/lint/golint
-        go get -u golang.org/x/tools/cmd/goimports
-        go get -u github.com/fzipp/gocyclo/cmd/gocyclo
-        go get -u github.com/BurntSushi/toml/cmd/tomlv
-        go get -u github.com/go-critic/go-critic/cmd/gocritic
-        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+      - name: Install Go binarires
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
-    - name: Run pre-commit
-      uses: pre-commit/action@v2.0.3
+      - name: Run pre-commit
+        uses: pre-commit/action@v2.0.3
 
   build:
     runs-on: ubuntu-latest
@@ -36,15 +30,15 @@ jobs:
       matrix:
         go: ["1.14", "1.15", "1.16", "1.17"]
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go }}
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
 
-    - name: Build
-      run: go build -v ./...
+      - name: Build
+        run: go build -v ./...
 
-    - name: Test
-      run: make test
+      - name: Test
+        run: make test
