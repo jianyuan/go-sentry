@@ -23,11 +23,13 @@ type User struct {
 	Emails          []UserEmail `json:"emails"`
 }
 
+// UserAvatar represents a user's avatar.
 type UserAvatar struct {
 	AvatarType string  `json:"avatarType"`
 	AvatarUUID *string `json:"avatarUuid"`
 }
 
+// UserEmail represents a user's email and its verification status.
 type UserEmail struct {
 	ID         string `json:"id"`
 	Email      string `json:"email"`

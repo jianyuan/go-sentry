@@ -65,12 +65,12 @@ func (s *ProjectKeyService) listPerPage(organizationSlug string, projectSlug str
 	projectKeys := new([]ProjectKey)
 	apiError := new(APIError)
 
-	URL := "projects/"+organizationSlug+"/"+projectSlug+"/keys/" + cursor
+	URL := "projects/" + organizationSlug + "/" + projectSlug + "/keys/" + cursor
 	resp, err := s.sling.New().Get(URL).Receive(projectKeys, apiError)
 	if resp != nil && resp.StatusCode == 200 {
 		linkHeaders := linkheader.Parse(resp.Header.Get("Link"))
 		// If the next Link has results query it as well
-		nextLink := linkHeaders[len(linkHeaders) - 1]
+		nextLink := linkHeaders[len(linkHeaders)-1]
 
 		if nextLink.Param("results") == "true" {
 			c := fmt.Sprintf("?&cursor=%s", nextLink.Param("cursor"))

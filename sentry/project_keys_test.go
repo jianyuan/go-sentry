@@ -120,7 +120,7 @@ func TestProjectKeyService_ListWithPagination(t *testing.T) {
 		}]`)
 	})
 
-	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/",  func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Link", "</api/0/projects/the-interstellar-jurisdiction/pump-station/keys/?&cursor=0:0:1>; rel=\"previous\"; results=\"true\"; cursor=\"0:0:1\", </api/0/projects/the-interstellar-jurisdiction/pump-station/keys/?&cursor=12:2:1>; rel=\"next\"; results=\"false\"; cursor=\"12:2:1\"")
@@ -205,7 +205,6 @@ func TestProjectKeyService_ListWithPagination(t *testing.T) {
 	}
 	assert.Equal(t, expected, projectKeys)
 }
-
 
 func TestProjectKeyService_ListWithPagination_ReturnsErrorWhenAPageIsNotPresent(t *testing.T) {
 	httpClient, mux, server := testServer()
