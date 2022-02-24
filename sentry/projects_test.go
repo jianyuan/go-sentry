@@ -584,13 +584,31 @@ func TestProjectService_UpdateTeam(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
-	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/planet-express/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"slug": "plane-proxy",
+			"id": "5",
+			"name": "Plane Proxy",
+			"team": {
+				"id": "420",
+				"name": "Planet Express",
+				"slug": "planet-express"
+			}
+		}`)
 	})
 
 	client := NewClient(httpClient, nil, "")
-	_, err := client.Projects.AddTeam("the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
+	project, _, err := client.Projects.AddTeam("the-interstellar-jurisdiction", "pump-station", "planet-express")
 	assert.NoError(t, err)
+	expected := &Project{
+		ID:   "5",
+		Slug: "plane-proxy",
+		Name: "Plane Proxy",
+		Team: Team{ID: "420", Slug: "planet-express", Name: "Planet Express"},
+	}
+	assert.Equal(t, expected, project)
 }
 
 func TestProjectService_DeleteTeam(t *testing.T) {
