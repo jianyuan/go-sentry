@@ -579,3 +579,29 @@ func TestProjectService_Delete(t *testing.T) {
 	assert.NoError(t, err)
 
 }
+
+func TestProjectService_UpdateTeam(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "POST", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.Projects.AddTeam("the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
+	assert.NoError(t, err)
+}
+
+func TestProjectService_DeleteTeam(t *testing.T) {
+	httpClient, mux, server := testServer()
+	defer server.Close()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	client := NewClient(httpClient, nil, "")
+	_, err := client.Projects.RemoveTeam("the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
+	assert.NoError(t, err)
+}
