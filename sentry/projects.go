@@ -164,3 +164,18 @@ func (s *ProjectService) Delete(organizationSlug string, slug string) (*http.Res
 	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)
 	return resp, relevantError(err, *apiError)
 }
+
+// AddTeam add a team to a project.
+func (s *ProjectService) AddTeam(organizationSlug string, slug string, teamSlug string) (*Project, *http.Response, error) {
+	project := new(Project)
+	apiError := new(APIError)
+	res, err := s.sling.New().Post("projects/"+organizationSlug+"/"+slug+"/teams/"+teamSlug+"/").Receive(project, apiError)
+	return project, res, relevantError(err, *apiError)
+}
+
+// RemoveTeam remove a team from a project.
+func (s *ProjectService) RemoveTeam(organizationSlug string, slug string, teamSlug string) (*http.Response, error) {
+	apiError := new(APIError)
+	res, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+slug+"/teams/"+teamSlug+"/").Receive(nil, apiError)
+	return res, relevantError(err, *apiError)
+}
