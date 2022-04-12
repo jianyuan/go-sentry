@@ -70,6 +70,10 @@ type CreateRuleActionParams struct {
 	Tags      string `json:"tags"`
 	Channel   string `json:"channel"`
 	Workspace string `json:"workspace"`
+
+	Action    string `json:"action,omitempty"`
+	Service   string `json:"service,omitempty"`
+	ChannelID string `json:"channel_id,omitempty"`
 }
 
 // CreateRuleConditionParams models the conditions when creating the action for the rule.
@@ -79,6 +83,10 @@ type CreateRuleConditionParams struct {
 	Value    int    `json:"value"`
 	Level    int    `json:"level"`
 	Match    string `json:"match"`
+
+	Attribute string `json:"attribute,omitempty"`
+	Key       string `json:"key,omitempty"`
+	Name      string `json:"name"`
 }
 
 // Create a new alert rule bound to a project.
@@ -102,4 +110,14 @@ func (s *RuleService) Delete(organizationSlug string, projectSlug string, ruleID
 	apiError := new(APIError)
 	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+projectSlug+"/rules/"+ruleID+"/").Receive(nil, apiError)
 	return resp, relevantError(err, *apiError)
+}
+
+// Canva
+
+// Get a rule.
+func (s *RuleService) Get(organizationSlug string, projectSlug string, ruleId string) (*Rule, *http.Response, error) {
+	rule := new(Rule)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+projectSlug+"/rules/"+ruleId+"/").Receive(rule, apiError)
+	return rule, resp, relevantError(err, *apiError)
 }
