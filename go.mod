@@ -1,4 +1,4 @@
-module github.com/Canva/go-sentry
+module github.com/canva/go-sentry
 
 replace github.com/jianyuan/go-sentry => ./
 
