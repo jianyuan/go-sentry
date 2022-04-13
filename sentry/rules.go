@@ -112,8 +112,6 @@ func (s *RuleService) Delete(organizationSlug string, projectSlug string, ruleID
 	return resp, relevantError(err, *apiError)
 }
 
-// Canva
-
 // Get a rule.
 func (s *RuleService) Get(organizationSlug string, projectSlug string, ruleId string) (*Rule, *http.Response, error) {
 	rule := new(Rule)
