@@ -26,7 +26,6 @@ type Client struct {
 	Rules               *RuleService
 	Ownership           *ProjectOwnershipService
 
-	// Canva
 	ProjectFilter *ProjectFilterService
 }
 
@@ -60,7 +59,6 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 		Rules:               newRuleService(base.New()),
 		Ownership:           newProjectOwnershipService(base.New()),
 
-		// Canva
 		ProjectFilter: newProjectFilterService(base.New()),
 	}
 	return c
