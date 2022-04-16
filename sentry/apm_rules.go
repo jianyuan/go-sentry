@@ -7,9 +7,6 @@ import (
 	"github.com/dghubble/sling"
 )
 
-// RuleService provides methods for accessing Sentry project
-// client key API endpoints.
-// https://docs.sentry.io/api/projects/
 type APMRuleService struct {
 	sling *sling.Sling
 }
