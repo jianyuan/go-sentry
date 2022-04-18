@@ -102,7 +102,7 @@ func newProjectService(sling *sling.Sling) *ProjectService {
 }
 
 // List projects available.
-// https://docs.sentry.io/api/projects/get-project-index/
+// https://docs.sentry.io/api/projects/list-your-projects/
 func (s *ProjectService) List() ([]Project, *http.Response, error) {
 	projects := new([]Project)
 	apiError := new(APIError)
@@ -111,7 +111,7 @@ func (s *ProjectService) List() ([]Project, *http.Response, error) {
 }
 
 // Get details on an individual project.
-// https://docs.sentry.io/api/projects/get-project-details/
+// https://docs.sentry.io/api/projects/retrieve-a-project/
 func (s *ProjectService) Get(organizationSlug string, slug string) (*Project, *http.Response, error) {
 	project := new(Project)
 	apiError := new(APIError)
@@ -127,7 +127,7 @@ type CreateProjectParams struct {
 }
 
 // Create a new project bound to a team.
-// https://docs.sentry.io/api/teams/post-team-project-index/
+// https://docs.sentry.io/api/teams/create-a-new-project/
 func (s *ProjectService) Create(organizationSlug string, teamSlug string, params *CreateProjectParams) (*Project, *http.Response, error) {
 	project := new(Project)
 	apiError := new(APIError)
@@ -146,10 +146,11 @@ type UpdateProjectParams struct {
 	ResolveAge      *int                   `json:"resolveAge,omitempty"`
 	Options         map[string]interface{} `json:"options,omitempty"`
 	AllowedDomains  []string               `json:"allowedDomains,omitempty"`
+	Teams           []Team                 `json:"teams"`
 }
 
 // Update various attributes and configurable settings for a given project.
-// https://docs.sentry.io/api/projects/put-project-details/
+// https://docs.sentry.io/api/projects/update-a-project/
 func (s *ProjectService) Update(organizationSlug string, slug string, params *UpdateProjectParams) (*Project, *http.Response, error) {
 	project := new(Project)
 	apiError := new(APIError)
@@ -158,7 +159,7 @@ func (s *ProjectService) Update(organizationSlug string, slug string, params *Up
 }
 
 // Delete a project.
-// https://docs.sentry.io/api/projects/delete-project-details/
+// https://docs.sentry.io/api/projects/delete-a-project/
 func (s *ProjectService) Delete(organizationSlug string, slug string) (*http.Response, error) {
 	apiError := new(APIError)
 	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)

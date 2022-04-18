@@ -526,7 +526,17 @@ func TestProjectService_Update(t *testing.T) {
 			"callSignReviewed": false,
 			"id": "5",
 			"subjectTemplate": "[$project] ${tag:level}: $title",
-			"name": "Plane Proxy"
+			"name": "Plane Proxy",
+			"teams" : [{
+				ID:   "2",
+				Slug: "powerful-abolitionist",
+				Name: "Powerful Abolitionist",
+			},
+			{
+				ID: 3
+				Slug: "less-santos",
+				Name: "Less Santos",
+			}]
 		}`)
 	})
 
@@ -536,6 +546,18 @@ func TestProjectService_Update(t *testing.T) {
 		Slug: "plane-proxy",
 		Options: map[string]interface{}{
 			"sentry:origins": "http://example.com\nhttp://example.invalid",
+		},
+		Teams: []Team{
+			{
+				ID:   "2",
+				Slug: "powerful-abolitionist",
+				Name: "Powerful Abolitionist",
+			},
+			{
+				ID:   "3",
+				Slug: "less-santos",
+				Name: "Less Santos",
+			},
 		},
 	}
 	project, _, err := client.Projects.Update("the-interstellar-jurisdiction", "plain-proxy", params)
@@ -562,6 +584,18 @@ func TestProjectService_Update(t *testing.T) {
 		DigestsMaxDelay: 1800,
 		ResolveAge:      720,
 		SubjectTemplate: "[$project] ${tag:level}: $title",
+		Teams: []Team{
+			{
+				ID:   "2",
+				Slug: "powerful-abolitionist",
+				Name: "Powerful Abolitionist",
+			},
+			{
+				ID:   "3",
+				Slug: "less-santos",
+				Name: "Less Santos",
+			},
+		},
 	}
 	assert.Equal(t, expected, project)
 }
