@@ -64,31 +64,6 @@ type CreateRuleParams struct {
 	Filters     []FilterType    `json:"filters"`
 }
 
-// CreateRuleActionParams models the actions when creating the action for the rule.
-type CreateRuleActionParams struct {
-	ID        string `json:"id"`
-	Tags      string `json:"tags"`
-	Channel   string `json:"channel"`
-	Workspace string `json:"workspace"`
-
-	Action    string `json:"action,omitempty"`
-	Service   string `json:"service,omitempty"`
-	ChannelID string `json:"channel_id,omitempty"`
-}
-
-// CreateRuleConditionParams models the conditions when creating the action for the rule.
-type CreateRuleConditionParams struct {
-	ID       string `json:"id"`
-	Interval string `json:"interval"`
-	Value    int    `json:"value"`
-	Level    int    `json:"level"`
-	Match    string `json:"match"`
-
-	Attribute string `json:"attribute,omitempty"`
-	Key       string `json:"key,omitempty"`
-	Name      string `json:"name"`
-}
-
 // Create a new alert rule bound to a project.
 func (s *RuleService) Create(organizationSlug string, projectSlug string, params *CreateRuleParams) (*Rule, *http.Response, error) {
 	rule := new(Rule)

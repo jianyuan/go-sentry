@@ -25,6 +25,8 @@ type Client struct {
 	ProjectPlugins      *ProjectPluginService
 	Rules               *RuleService
 	Ownership           *ProjectOwnershipService
+
+	ProjectFilter *ProjectFilterService
 }
 
 // NewClient returns a new Sentry API client.
@@ -56,6 +58,8 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 		ProjectPlugins:      newProjectPluginService(base.New()),
 		Rules:               newRuleService(base.New()),
 		Ownership:           newProjectOwnershipService(base.New()),
+
+		ProjectFilter: newProjectFilterService(base.New()),
 	}
 	return c
 }
