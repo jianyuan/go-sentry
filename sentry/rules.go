@@ -64,23 +64,6 @@ type CreateRuleParams struct {
 	Filters     []FilterType    `json:"filters"`
 }
 
-// CreateRuleActionParams models the actions when creating the action for the rule.
-type CreateRuleActionParams struct {
-	ID        string `json:"id"`
-	Tags      string `json:"tags"`
-	Channel   string `json:"channel"`
-	Workspace string `json:"workspace"`
-}
-
-// CreateRuleConditionParams models the conditions when creating the action for the rule.
-type CreateRuleConditionParams struct {
-	ID       string `json:"id"`
-	Interval string `json:"interval"`
-	Value    int    `json:"value"`
-	Level    int    `json:"level"`
-	Match    string `json:"match"`
-}
-
 // Create a new alert rule bound to a project.
 func (s *RuleService) Create(organizationSlug string, projectSlug string, params *CreateRuleParams) (*Rule, *http.Response, error) {
 	rule := new(Rule)
@@ -102,4 +85,12 @@ func (s *RuleService) Delete(organizationSlug string, projectSlug string, ruleID
 	apiError := new(APIError)
 	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+projectSlug+"/rules/"+ruleID+"/").Receive(nil, apiError)
 	return resp, relevantError(err, *apiError)
+}
+
+// Get a rule.
+func (s *RuleService) Get(organizationSlug string, projectSlug string, ruleId string) (*Rule, *http.Response, error) {
+	rule := new(Rule)
+	apiError := new(APIError)
+	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+projectSlug+"/rules/"+ruleId+"/").Receive(rule, apiError)
+	return rule, resp, relevantError(err, *apiError)
 }

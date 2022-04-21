@@ -58,6 +58,8 @@ type Project struct {
 
 	Team  Team   `json:"team"`
 	Teams []Team `json:"teams"`
+
+	GroupingEnhancements string `json:"groupingEnhancements"`
 }
 
 // ProjectSummary represents the summary of a Sentry project.
@@ -146,6 +148,8 @@ type UpdateProjectParams struct {
 	ResolveAge      *int                   `json:"resolveAge,omitempty"`
 	Options         map[string]interface{} `json:"options,omitempty"`
 	AllowedDomains  []string               `json:"allowedDomains,omitempty"`
+
+	GroupingEnhancements string `json:"groupingEnhancements,omitempty"`
 }
 
 // Update various attributes and configurable settings for a given project.
