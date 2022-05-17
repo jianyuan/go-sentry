@@ -1,4 +1,4 @@
-# go-sentry [![CircleCI](https://circleci.com/gh/jianyuan/go-sentry/tree/master.svg?style=svg)](https://circleci.com/gh/jianyuan/go-sentry/tree/master) [![GoDoc](https://godoc.org/github.com/jianyuan/go-sentry/sentry?status.svg)](https://godoc.org/github.com/jianyuan/go-sentry/sentry)
+# go-sentry [![GoDoc](https://godoc.org/github.com/jianyuan/go-sentry/sentry?status.svg)](https://godoc.org/github.com/jianyuan/go-sentry/sentry)
 Go library for accessing the [Sentry Web API](https://docs.sentry.io/api/).
 
 ## Install
