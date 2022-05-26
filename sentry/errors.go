@@ -1,29 +1,47 @@
 package sentry
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
-// APIError represents a Sentry API Error response
-type APIError map[string]interface{}
+// APIError represents a Sentry API Error response.
+// Should look like:
+//
+// 	type apiError struct {
+// 		Detail string `json:"detail"`
+// 	}
+//
+type APIError struct {
+	f interface{} // unknown
+}
 
-// TODO: use this instead
-// type apiError struct {
-// 	Detail string `json:"detail"`
-// }
+func (e *APIError) UnmarshalJSON(b []byte) error {
+	if err := json.Unmarshal(b, &e.f); err != nil {
+		e.f = string(b)
+	}
+	return nil
+}
+func (e *APIError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(e.f)
+}
 
 func (e APIError) Error() string {
-	if len(e) == 1 {
-		if detail, ok := e["detail"].(string); ok {
-			return fmt.Sprintf("sentry: %s", detail)
+	switch v := e.f.(type) {
+	case map[string]interface{}:
+		if len(v) == 1 {
+			if detail, ok := v["detail"].(string); ok {
+				return fmt.Sprintf("sentry: %s", detail)
+			}
 		}
+		return fmt.Sprintf("sentry: %v", v)
+	default:
+		return fmt.Sprintf("sentry: %v", v)
 	}
-
-	return fmt.Sprintf("sentry: %v", map[string]interface{}(e))
 }
 
 // Empty returns true if empty.
-func (e APIError) Empty() bool {
-	return len(e) == 0
-}
+func (e APIError) Empty() bool { return e.f != nil }
 
 func relevantError(httpError error, apiError APIError) error {
 	if httpError != nil {
