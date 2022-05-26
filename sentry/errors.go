@@ -22,6 +22,7 @@ func (e *APIError) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
+
 func (e *APIError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.f)
 }
@@ -41,7 +42,9 @@ func (e APIError) Error() string {
 }
 
 // Empty returns true if empty.
-func (e APIError) Empty() bool { return e.f != nil }
+func (e APIError) Empty() bool {
+	return e.f == nil
+}
 
 func relevantError(httpError error, apiError APIError) error {
 	if httpError != nil {
