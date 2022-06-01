@@ -47,3 +47,49 @@ func (s *OrganizationMemberService) List(organizationSlug string, params *ListOr
 	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/members/").QueryStruct(params).Receive(members, apiError)
 	return *members, resp, relevantError(err, *apiError)
 }
+
+const (
+	RoleMember  string = "member"
+	RoleBilling string = "billing"
+	RoleAdmin   string = "admin"
+	RoleOwner   string = "owner"
+	RoleManager string = "manager"
+)
+
+type CreateOrganizationMemberParams struct {
+	Email string   `json:"email"`
+	Role  string   `json:"role"`
+	Teams []string `json:"teams,omitempty"`
+}
+
+func (s *OrganizationMemberService) Create(organizationSlug string, params *CreateOrganizationMemberParams) (*OrganizationMember, *http.Response, error) {
+	apiError := new(APIError)
+	organizationMember := new(OrganizationMember)
+	resp, err := s.sling.New().Post("organizations/"+organizationSlug+"/members/").BodyJSON(params).Receive(organizationMember, apiError)
+	return organizationMember, resp, relevantError(err, *apiError)
+}
+
+func (s *OrganizationMemberService) Delete(organizationSlug string, memberId string) (*http.Response, error) {
+	apiError := new(APIError)
+	resp, err := s.sling.New().Delete("organizations/"+organizationSlug+"/members/"+memberId).Receive(nil, apiError)
+	return resp, relevantError(err, *apiError)
+}
+
+func (s *OrganizationMemberService) Get(organizationSlug string, memberId string) (*OrganizationMember, *http.Response, error) {
+	apiError := new(APIError)
+	organizationMember := new(OrganizationMember)
+	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/members/"+memberId).Receive(organizationMember, apiError)
+	return organizationMember, resp, relevantError(err, *apiError)
+}
+
+type UpdateOrganizationMemberParams struct {
+	Role  string   `json:"role"`
+	Teams []string `json:"teams,omitempty"`
+}
+
+func (s *OrganizationMemberService) Update(organizationSlug string, memberId string, params *UpdateOrganizationMemberParams) (*OrganizationMember, *http.Response, error) {
+	apiError := new(APIError)
+	organizationMember := new(OrganizationMember)
+	resp, err := s.sling.New().Put("organizations/"+organizationSlug+"/members/"+memberId).BodyJSON(params).Receive(organizationMember, apiError)
+	return organizationMember, resp, relevantError(err, *apiError)
+}
