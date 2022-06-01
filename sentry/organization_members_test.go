@@ -185,6 +185,7 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 					"sso:linked": false,
 					"sso:invalid": false
 				},
+				"teams": [],
 				"email": "test@example.com",
 				"pending": false
 			}`)
@@ -232,6 +233,7 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 			"sso:invalid": false,
 			"sso:linked":  false,
 		},
+		Teams:        []string{},
 		DateCreated:  mustParseTime("2020-01-04T00:00:00.000000Z"),
 		InviteStatus: "approved",
 		InviterName:  nil,
@@ -276,6 +278,7 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 				"sso:invalid": false,
 				"member-limit:restricted": false
 			},
+			"teams": [],
 			"dateCreated": "2020-01-01T00:00:00.000000Z",
 			"inviteStatus": "approved",
 			"inviterName": "John Doe"
@@ -305,6 +308,7 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 			"sso:invalid":             false,
 			"member-limit:restricted": false,
 		},
+		Teams:        []string{},
 		DateCreated:  mustParseTime("2020-01-01T00:00:00.000000Z"),
 		InviteStatus: "approved",
 		InviterName:  &inviterName,
@@ -334,6 +338,7 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 				"sso:invalid": false,
 				"member-limit:restricted": false
 			},
+			"teams": [],
 			"dateCreated": "2020-01-01T00:00:00.000000Z",
 			"inviteStatus": "approved",
 			"inviterName": "John Doe"
@@ -362,6 +367,7 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 			"sso:invalid":             false,
 			"member-limit:restricted": false,
 		},
+		Teams:        []string{},
 		DateCreated:  mustParseTime("2020-01-01T00:00:00.000000Z"),
 		InviteStatus: "approved",
 		InviterName:  &inviterName,

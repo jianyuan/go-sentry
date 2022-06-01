@@ -22,6 +22,7 @@ type OrganizationMember struct {
 	DateCreated  time.Time       `json:"dateCreated"`
 	InviteStatus string          `json:"inviteStatus"`
 	InviterName  *string         `json:"inviterName"`
+	Teams        []string        `json:"teams"`
 }
 
 // OrganizationMemberService provides methods for accessing Sentry membership API endpoints.
