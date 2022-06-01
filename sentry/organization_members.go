@@ -72,14 +72,14 @@ func (s *OrganizationMemberService) Create(organizationSlug string, params *Crea
 
 func (s *OrganizationMemberService) Delete(organizationSlug string, memberId string) (*http.Response, error) {
 	apiError := new(APIError)
-	resp, err := s.sling.New().Delete("organizations/"+organizationSlug+"/members/"+memberId).Receive(nil, apiError)
+	resp, err := s.sling.New().Delete("organizations/"+organizationSlug+"/members/"+memberId+"/").Receive(nil, apiError)
 	return resp, relevantError(err, *apiError)
 }
 
 func (s *OrganizationMemberService) Get(organizationSlug string, memberId string) (*OrganizationMember, *http.Response, error) {
 	apiError := new(APIError)
 	organizationMember := new(OrganizationMember)
-	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/members/"+memberId).Receive(organizationMember, apiError)
+	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/members/"+memberId+"/").Receive(organizationMember, apiError)
 	return organizationMember, resp, relevantError(err, *apiError)
 }
 
@@ -91,6 +91,6 @@ type UpdateOrganizationMemberParams struct {
 func (s *OrganizationMemberService) Update(organizationSlug string, memberId string, params *UpdateOrganizationMemberParams) (*OrganizationMember, *http.Response, error) {
 	apiError := new(APIError)
 	organizationMember := new(OrganizationMember)
-	resp, err := s.sling.New().Put("organizations/"+organizationSlug+"/members/"+memberId).BodyJSON(params).Receive(organizationMember, apiError)
+	resp, err := s.sling.New().Put("organizations/"+organizationSlug+"/members/"+memberId+"/").BodyJSON(params).Receive(organizationMember, apiError)
 	return organizationMember, resp, relevantError(err, *apiError)
 }

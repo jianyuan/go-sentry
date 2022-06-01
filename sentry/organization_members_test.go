@@ -131,7 +131,7 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
-	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
@@ -245,7 +245,7 @@ func TestOrganizationMemberService_Delete(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
-	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -321,7 +321,7 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
-	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
