@@ -203,7 +203,7 @@ func TestRulesService_Create(t *testing.T) {
 
 }
 
-func TestRulesService_Create_Async_Task(t *testing.T) {
+func TestRulesService_Create_With_Async_Task(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
