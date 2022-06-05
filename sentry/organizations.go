@@ -105,7 +105,7 @@ type ListOrganizationParams struct {
 }
 
 // List organizations available to the authenticated session.
-// https://docs.sentry.io/api/organizations/get-organization-index/
+// https://docs.sentry.io/api/organizations/list-your-organizations/
 func (s *OrganizationService) List(params *ListOrganizationParams) ([]Organization, *http.Response, error) {
 	organizations := new([]Organization)
 	apiError := new(APIError)
@@ -121,7 +121,7 @@ type CreateOrganizationParams struct {
 }
 
 // Get a Sentry organization.
-// https://docs.sentry.io/api/organizations/get-organization-details/
+// https://docs.sentry.io/api/organizations/retrieve-an-organization/
 func (s *OrganizationService) Get(slug string) (*DetailedOrganization, *http.Response, error) {
 	org := new(DetailedOrganization)
 	apiError := new(APIError)
@@ -130,7 +130,6 @@ func (s *OrganizationService) Get(slug string) (*DetailedOrganization, *http.Res
 }
 
 // Create a new Sentry organization.
-// https://docs.sentry.io/api/organizations/post-organization-index/
 func (s *OrganizationService) Create(params *CreateOrganizationParams) (*Organization, *http.Response, error) {
 	org := new(Organization)
 	apiError := new(APIError)
@@ -145,7 +144,7 @@ type UpdateOrganizationParams struct {
 }
 
 // Update a Sentry organization.
-// https://docs.sentry.io/api/organizations/put-organization-details/
+// https://docs.sentry.io/api/organizations/update-an-organization/
 func (s *OrganizationService) Update(slug string, params *UpdateOrganizationParams) (*Organization, *http.Response, error) {
 	org := new(Organization)
 	apiError := new(APIError)
