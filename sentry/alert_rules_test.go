@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAPMRuleService_List(t *testing.T) {
+func TestAlertRuleService_List(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
@@ -43,12 +43,12 @@ func TestAPMRuleService_List(t *testing.T) {
 								"alertRuleTriggerId": "12345",
 								"type": "slack",
 								"targetType": "specific",
-								"targetIdentifier": "#apm-alerts",
+								"targetIdentifier": "#alert-rule-alerts",
 								"inputChannelId": "C038NF00X4F",
 								"integrationId": 123,
 								"sentryAppId": null,
 								"dateCreated": "2022-04-07T16:46:49.154638Z",
-								"desc": "Send a Slack notification to #apm-alerts"
+								"desc": "Send a Slack notification to #alert-rule-alerts"
 							}
 						]
 					}
@@ -63,11 +63,11 @@ func TestAPMRuleService_List(t *testing.T) {
 	})
 
 	client := NewClient(httpClient, nil, "")
-	apmRules, _, err := client.APMRules.List("the-interstellar-jurisdiction", "pump-station")
+	alertRules, _, err := client.AlertRules.List("the-interstellar-jurisdiction", "pump-station")
 	require.NoError(t, err)
 
 	environment := "production"
-	expected := []APMRule{
+	expected := []AlertRule{
 		{
 			ID:               "12345",
 			Name:             "pump-station-alert",
@@ -92,12 +92,12 @@ func TestAPMRuleService_List(t *testing.T) {
 						"alertRuleTriggerId": "12345",
 						"type":               "slack",
 						"targetType":         "specific",
-						"targetIdentifier":   "#apm-alerts",
+						"targetIdentifier":   "#alert-rule-alerts",
 						"inputChannelId":     "C038NF00X4F",
 						"integrationId":      float64(123),
 						"sentryAppId":        interface{}(nil),
 						"dateCreated":        "2022-04-07T16:46:49.154638Z",
-						"desc":               "Send a Slack notification to #apm-alerts",
+						"desc":               "Send a Slack notification to #alert-rule-alerts",
 					},
 					},
 				},
@@ -107,10 +107,10 @@ func TestAPMRuleService_List(t *testing.T) {
 			Created:  mustParseTime("2022-04-07T16:46:48.569571Z"),
 		},
 	}
-	require.Equal(t, expected, apmRules)
+	require.Equal(t, expected, alertRules)
 }
 
-func TestAPMRuleService_Create(t *testing.T) {
+func TestAlertRuleService_Create(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
@@ -134,12 +134,12 @@ func TestAPMRuleService_Create(t *testing.T) {
 					  {
 						"alertRuleTriggerId": "56789",
 						"dateCreated": "2022-04-15T15:06:01.087054Z",
-						"desc": "Send a Slack notification to #apm-alerts",
+						"desc": "Send a Slack notification to #alert-rule-alerts",
 						"id": "12389",
 						"inputChannelId": "C0XXXFKLXXX",
 						"integrationId": 111,
 						"sentryAppId": null,
-						"targetIdentifier": "#apm-alerts",
+						"targetIdentifier": "#alert-rule-alerts",
 						"targetType": "specific",
 						"type": "slack"
 					  }
@@ -164,7 +164,7 @@ func TestAPMRuleService_Create(t *testing.T) {
 
 	client := NewClient(httpClient, nil, "")
 	environment := "production"
-	params := CreateAPMRuleParams{
+	params := CreateAlertRuleParams{
 		Name:             "pump-station-alert",
 		Environment:      &environment,
 		DataSet:          "transactions",
@@ -177,7 +177,7 @@ func TestAPMRuleService_Create(t *testing.T) {
 			"actions": []interface{}{map[string]interface{}{
 				"type":             "slack",
 				"targetType":       "specific",
-				"targetIdentifier": "#apm-alerts",
+				"targetIdentifier": "#alert-rule-alerts",
 				"inputChannelId":   "C0XXXFKLXXX",
 				"integrationId":    111,
 			},
@@ -190,10 +190,10 @@ func TestAPMRuleService_Create(t *testing.T) {
 		Projects: []string{"pump-station"},
 		Owner:    "pump-station:12345",
 	}
-	apmRule, _, err := client.APMRules.Create("the-interstellar-jurisdiction", "pump-station", &params)
+	alertRule, _, err := client.AlertRules.Create("the-interstellar-jurisdiction", "pump-station", &params)
 	require.NoError(t, err)
 
-	expected := &APMRule{
+	expected := &AlertRule{
 		ID:               "12345",
 		Name:             "pump-station-alert",
 		Environment:      &environment,
@@ -217,12 +217,12 @@ func TestAPMRuleService_Create(t *testing.T) {
 					"alertRuleTriggerId": "56789",
 					"type":               "slack",
 					"targetType":         "specific",
-					"targetIdentifier":   "#apm-alerts",
+					"targetIdentifier":   "#alert-rule-alerts",
 					"inputChannelId":     "C0XXXFKLXXX",
 					"integrationId":      float64(111),
 					"sentryAppId":        interface{}(nil),
 					"dateCreated":        "2022-04-15T15:06:01.087054Z",
-					"desc":               "Send a Slack notification to #apm-alerts",
+					"desc":               "Send a Slack notification to #alert-rule-alerts",
 				},
 				},
 			},
@@ -232,15 +232,15 @@ func TestAPMRuleService_Create(t *testing.T) {
 		Created:  mustParseTime("2022-04-15T15:06:01.05618Z"),
 	}
 
-	require.Equal(t, expected, apmRule)
+	require.Equal(t, expected, alertRule)
 }
 
-func TestAPMRuleService_Update(t *testing.T) {
+func TestAlertRuleService_Update(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
 	environment := "production"
-	params := &APMRule{
+	params := &AlertRule{
 		ID:               "12345",
 		Name:             "pump-station-alert",
 		Environment:      &environment,
@@ -312,12 +312,12 @@ func TestAPMRuleService_Update(t *testing.T) {
 							"alertRuleTriggerId": "56789",
 							"type":               "slack",
 							"targetType":         "specific",
-							"targetIdentifier":   "#apm-alerts",
+							"targetIdentifier":   "#alert-rule-alerts",
 							"inputChannelId":     "C0XXXFKLXXX",
 							"integrationId":      111,
 							"sentryAppId":        null,
 							"dateCreated":        "2022-04-15T15:06:01.087054Z",
-							"desc":               "Send a Slack notification to #apm-alerts"
+							"desc":               "Send a Slack notification to #alert-rule-alerts"
 						}
 					],
 					"alertRuleId": "12345",
@@ -339,10 +339,10 @@ func TestAPMRuleService_Update(t *testing.T) {
 	})
 
 	client := NewClient(httpClient, nil, "")
-	apmRule, _, err := client.APMRules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
+	alertRule, _, err := client.AlertRules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
 	assert.NoError(t, err)
 
-	expected := &APMRule{
+	expected := &AlertRule{
 		ID:               "12345",
 		Name:             "pump-station-alert",
 		Environment:      &environment,
@@ -366,12 +366,12 @@ func TestAPMRuleService_Update(t *testing.T) {
 					"alertRuleTriggerId": "56789",
 					"type":               "slack",
 					"targetType":         "specific",
-					"targetIdentifier":   "#apm-alerts",
+					"targetIdentifier":   "#alert-rule-alerts",
 					"inputChannelId":     "C0XXXFKLXXX",
 					"integrationId":      float64(111),
 					"sentryAppId":        interface{}(nil),
 					"dateCreated":        "2022-04-15T15:06:01.087054Z",
-					"desc":               "Send a Slack notification to #apm-alerts",
+					"desc":               "Send a Slack notification to #alert-rule-alerts",
 				}},
 			},
 		},
@@ -380,10 +380,10 @@ func TestAPMRuleService_Update(t *testing.T) {
 		Created:  mustParseTime("2022-04-15T15:06:01.05618Z"),
 	}
 
-	require.Equal(t, expected, apmRule)
+	require.Equal(t, expected, alertRule)
 }
 
-func TestAPMRuleService_Delete(t *testing.T) {
+func TestAlertRuleService_Delete(t *testing.T) {
 	httpClient, mux, server := testServer()
 	defer server.Close()
 
@@ -392,6 +392,6 @@ func TestAPMRuleService_Delete(t *testing.T) {
 	})
 
 	client := NewClient(httpClient, nil, "")
-	_, err := client.APMRules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
+	_, err := client.AlertRules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
 	require.NoError(t, err)
 }
