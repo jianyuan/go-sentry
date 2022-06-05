@@ -3,7 +3,7 @@ package sentry
 import (
 	"net/http"
 	"net/url"
-	"path"
+	"strings"
 
 	"github.com/dghubble/sling"
 )
@@ -31,6 +31,7 @@ type Client struct {
 // NewClient returns a new Sentry API client.
 // If a nil httpClient is given, the http.DefaultClient will be used.
 // If a nil baseURL is given, the DefaultBaseURL will be used.
+// If the baseURL does not have the suffix "/api/", it will be added automatically.
 func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -39,7 +40,13 @@ func NewClient(httpClient *http.Client, baseURL *url.URL, token string) *Client 
 	if baseURL == nil {
 		baseURL, _ = url.Parse(DefaultBaseURL)
 	}
-	baseURL.Path = path.Join(baseURL.Path, APIVersion) + "/"
+	if !strings.HasSuffix(baseURL.Path, "/") {
+		baseURL.Path += "/"
+	}
+	if !strings.HasSuffix(baseURL.Path, "/api/") {
+		baseURL.Path += "api/"
+	}
+	baseURL.Path += APIVersion + "/"
 
 	base := sling.New().Base(baseURL.String()).Client(httpClient)
 

@@ -89,3 +89,32 @@ func mustParseTime(value string) time.Time {
 	}
 	return t
 }
+
+func TestNewClient(t *testing.T) {
+	c := NewClient(nil, nil, "")
+	req, _ := c.sling.New().Request()
+
+	assert.Equal(t, "https://sentry.io/api/0/", req.URL.String())
+}
+
+func TestNewClient_withBaseURL(t *testing.T) {
+	testCases := []struct {
+		baseURL string
+	}{
+		{"https://example.com"},
+		{"https://example.com/"},
+		{"https://example.com/api"},
+		{"https://example.com/api/"},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.baseURL, func(t *testing.T) {
+			baseURL, _ := url.Parse(tc.baseURL)
+
+			c := NewClient(nil, baseURL, "")
+			req, _ := c.sling.New().Request()
+
+			assert.Equal(t, "https://example.com/api/0/", req.URL.String())
+		})
+	}
+
+}
