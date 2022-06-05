@@ -17,23 +17,37 @@ func TestTeamService_List(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `[
 			{
+				"id": "3",
 				"slug": "ancient-gabelers",
 				"name": "Ancient Gabelers",
-				"hasAccess": true,
-				"isPending": false,
 				"dateCreated": "2017-07-18T19:29:46.305Z",
 				"isMember": false,
-				"id": "3",
+				"teamRole": "admin",
+				"hasAccess": true,
+				"isPending": false,
+				"memberCount": 1,
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"externalTeams": [],
 				"projects": []
 			},
 			{
+				"id": "2",
 				"slug": "powerful-abolitionist",
 				"name": "Powerful Abolitionist",
-				"hasAccess": true,
-				"isPending": false,
 				"dateCreated": "2017-07-18T19:29:24.743Z",
 				"isMember": false,
-				"id": "2",
+				"teamRole": "admin",
+				"hasAccess": true,
+				"isPending": false,
+				"memberCount": 1,
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"externalTeams": [],
 				"projects": [
 					{
 						"status": "active",
@@ -112,18 +126,28 @@ func TestTeamService_List(t *testing.T) {
 			Slug:        "ancient-gabelers",
 			Name:        "Ancient Gabelers",
 			DateCreated: mustParseTime("2017-07-18T19:29:46.305Z"),
+			IsMember:    false,
+			TeamRole:    "admin",
 			HasAccess:   true,
 			IsPending:   false,
-			IsMember:    false,
+			MemberCount: 1,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+			},
 		},
 		{
 			ID:          "2",
 			Slug:        "powerful-abolitionist",
 			Name:        "Powerful Abolitionist",
 			DateCreated: mustParseTime("2017-07-18T19:29:24.743Z"),
+			IsMember:    false,
+			TeamRole:    "admin",
 			HasAccess:   true,
 			IsPending:   false,
-			IsMember:    false,
+			MemberCount: 1,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+			},
 		},
 	}
 	assert.Equal(t, expected, teams)

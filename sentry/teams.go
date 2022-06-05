@@ -8,16 +8,20 @@ import (
 )
 
 // Team represents a Sentry team that is bound to an organization.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/team.py#L48
+// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/team.py#L109-L119
 type Team struct {
 	ID          string    `json:"id"`
 	Slug        string    `json:"slug"`
 	Name        string    `json:"name"`
 	DateCreated time.Time `json:"dateCreated"`
 	IsMember    bool      `json:"isMember"`
+	TeamRole    string    `json:"teamRole"`
 	HasAccess   bool      `json:"hasAccess"`
 	IsPending   bool      `json:"isPending"`
+	MemberCount int       `json:"memberCount"`
 	Avatar      Avatar    `json:"avatar"`
+	// TODO: externalTeams
+	// TODO: projects
 }
 
 // TeamService provides methods for accessing Sentry team API endpoints.
@@ -42,7 +46,7 @@ func (s *TeamService) List(organizationSlug string) ([]Team, *http.Response, err
 }
 
 // Get details on an individual team of an organization.
-// https://docs.sentry.io/api/teams/get-team-details/
+// https://docs.sentry.io/api/teams/retrieve-a-team/
 func (s *TeamService) Get(organizationSlug string, slug string) (*Team, *http.Response, error) {
 	team := new(Team)
 	apiError := new(APIError)
@@ -57,7 +61,7 @@ type CreateTeamParams struct {
 }
 
 // Create a new Sentry team bound to an organization.
-// https://docs.sentry.io/api/teams/post-organization-teams/
+// https://docs.sentry.io/api/teams/create-a-new-team/
 func (s *TeamService) Create(organizationSlug string, params *CreateTeamParams) (*Team, *http.Response, error) {
 	team := new(Team)
 	apiError := new(APIError)
@@ -72,7 +76,7 @@ type UpdateTeamParams struct {
 }
 
 // Update settings for a given team.
-// https://docs.sentry.io/api/teams/put-team-details/
+// https://docs.sentry.io/api/teams/update-a-team/
 func (s *TeamService) Update(organizationSlug string, slug string, params *UpdateTeamParams) (*Team, *http.Response, error) {
 	team := new(Team)
 	apiError := new(APIError)
@@ -81,7 +85,7 @@ func (s *TeamService) Update(organizationSlug string, slug string, params *Updat
 }
 
 // Delete a team.
-// https://docs.sentry.io/api/teams/delete-team-details/
+// https://docs.sentry.io/api/teams/update-a-team/
 func (s *TeamService) Delete(organizationSlug string, slug string) (*http.Response, error) {
 	apiError := new(APIError)
 	resp, err := s.sling.New().Delete("teams/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)
