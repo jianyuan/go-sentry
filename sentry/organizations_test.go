@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -61,9 +60,77 @@ func TestOrganizationService_Get(t *testing.T) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
-			"access": [],
-			"allowSharedIssues": true,
-			"availableRoles": [{
+			"id": "2",
+			"slug": "the-interstellar-jurisdiction",
+			"status": {
+				"id": "active",
+				"name": "active"
+			},
+			"name": "The Interstellar Jurisdiction",
+			"dateCreated": "2022-06-05T17:31:31.170029Z",
+			"isEarlyAdopter": false,
+			"require2FA": false,
+			"requireEmailVerification": false,
+			"avatar": {
+				"avatarType": "letter_avatar",
+				"avatarUuid": null
+			},
+			"features": [
+				"release-health-return-metrics",
+				"slack-overage-notifications",
+				"symbol-sources",
+				"discover-frontend-use-events-endpoint",
+				"dashboard-grid-layout",
+				"performance-view",
+				"open-membership",
+				"integrations-stacktrace-link",
+				"performance-frontend-use-events-endpoint",
+				"performance-dry-run-mep",
+				"auto-start-free-trial",
+				"event-attachments",
+				"new-widget-builder-experience-design",
+				"metrics-extraction",
+				"shared-issues",
+				"performance-suspect-spans-view",
+				"dashboards-template",
+				"advanced-search",
+				"performance-autogroup-sibling-spans",
+				"widget-library",
+				"performance-span-histogram-view",
+				"performance-ops-breakdown",
+				"intl-sales-tax",
+				"crash-rate-alerts",
+				"widget-viewer-modal",
+				"invite-members-rate-limits",
+				"onboarding",
+				"images-loaded-v2",
+				"new-weekly-report",
+				"unified-span-view",
+				"org-subdomains",
+				"ondemand-budgets",
+				"alert-crash-free-metrics",
+				"custom-event-title",
+				"mobile-app",
+				"minute-resolution-sessions"
+			],
+			"experiments": {
+				"TargetedOnboardingIntegrationSelectExperiment": 0,
+				"TargetedOnboardingMobileRedirectExperiment": "hide"
+			},
+			"quota": {
+				"maxRate": null,
+				"maxRateInterval": 60,
+				"accountLimit": 0,
+				"projectLimit": 100
+			},
+			"isDefault": false,
+			"defaultRole": "member",
+			"availableRoles": [
+				{
+					"id": "billing",
+					"name": "Billing"
+				},
+				{
 					"id": "member",
 					"name": "Member"
 				},
@@ -80,182 +147,120 @@ func TestOrganizationService_Get(t *testing.T) {
 					"name": "Owner"
 				}
 			],
-			"avatar": {
-				"avatarType": "letter_avatar",
-				"avatarUuid": null
-			},
+			"openMembership": true,
+			"allowSharedIssues": true,
+			"enhancedPrivacy": false,
 			"dataScrubber": false,
 			"dataScrubberDefaults": false,
-			"dateCreated": "2018-09-20T15:47:52.908Z",
-			"defaultRole": "member",
-			"enhancedPrivacy": false,
-			"experiments": {},
-			"features": [
-				"sso",
-				"api-keys",
-				"github-apps",
-				"repos",
-				"new-issue-ui",
-				"github-enterprise",
-				"bitbucket-integration",
-				"jira-integration",
-				"vsts-integration",
-				"suggested-commits",
-				"new-teams",
-				"open-membership",
-				"shared-issues"
-			],
-			"id": "2",
-			"isDefault": false,
-			"isEarlyAdopter": false,
-			"name": "The Interstellar Jurisdiction",
-			"onboardingTasks": [],
-			"openMembership": true,
-			"pendingAccessRequests": 0,
-			"projects": [{
-					"dateCreated": "2018-09-20T15:47:56.723Z",
-					"firstEvent": null,
-					"hasAccess": true,
-					"id": "3",
-					"isBookmarked": false,
-					"isMember": false,
-					"latestDeploys": null,
-					"name": "Prime Mover",
-					"platform": null,
-					"platforms": [],
-					"slug": "prime-mover",
-					"team": {
-						"id": "2",
-						"name": "Powerful Abolitionist",
-						"slug": "powerful-abolitionist"
-					},
-					"teams": [{
-						"id": "2",
-						"name": "Powerful Abolitionist",
-						"slug": "powerful-abolitionist"
-					}]
-				},
-				{
-					"dateCreated": "2018-09-20T15:47:52.926Z",
-					"firstEvent": null,
-					"hasAccess": true,
-					"id": "2",
-					"isBookmarked": false,
-					"isMember": false,
-					"latestDeploys": null,
-					"name": "Pump Station",
-					"platform": null,
-					"platforms": [],
-					"slug": "pump-station",
-					"team": {
-						"id": "2",
-						"name": "Powerful Abolitionist",
-						"slug": "powerful-abolitionist"
-					},
-					"teams": [{
-						"id": "2",
-						"name": "Powerful Abolitionist",
-						"slug": "powerful-abolitionist"
-					}]
-				},
-				{
-					"dateCreated": "2018-09-20T15:48:07.592Z",
-					"firstEvent": null,
-					"hasAccess": true,
-					"id": "4",
-					"isBookmarked": false,
-					"isMember": false,
-					"latestDeploys": null,
-					"name": "The Spoiled Yoghurt",
-					"platform": null,
-					"platforms": [],
-					"slug": "the-spoiled-yoghurt",
-					"team": {
-						"id": "2",
-						"name": "Powerful Abolitionist",
-						"slug": "powerful-abolitionist"
-					},
-					"teams": [{
-						"id": "2",
-						"name": "Powerful Abolitionist",
-						"slug": "powerful-abolitionist"
-					}]
-				}
-			],
-			"quota": {
-				"accountLimit": 0,
-				"maxRate": 0,
-				"maxRateInterval": 60,
-				"projectLimit": 100
-			},
-			"require2FA": false,
-			"safeFields": [],
-			"scrapeJavaScript": true,
-			"scrubIPAddresses": false,
 			"sensitiveFields": [],
-			"slug": "the-interstellar-jurisdiction",
-			"status": {
-				"id": "active",
-				"name": "active"
-			},
-			"storeCrashReports": false,
-			"teams": [{
-					"avatar": {
-						"avatarType": "letter_avatar",
-						"avatarUuid": null
-					},
-					"dateCreated": "2018-09-20T15:48:07.803Z",
-					"hasAccess": true,
-					"id": "3",
-					"isMember": false,
-					"isPending": false,
-					"name": "Ancient Gabelers",
-					"slug": "ancient-gabelers"
-				},
-				{
-					"avatar": {
-						"avatarType": "letter_avatar",
-						"avatarUuid": null
-					},
-					"dateCreated": "2018-09-20T15:47:52.922Z",
-					"hasAccess": true,
-					"id": "2",
-					"isMember": false,
-					"isPending": false,
-					"name": "Powerful Abolitionist",
-					"slug": "powerful-abolitionist"
-				}
-			]
+			"safeFields": [],
+			"storeCrashReports": 0,
+			"attachmentsRole": "member",
+			"debugFilesRole": "admin",
+			"eventsMemberAdmin": true,
+			"alertsMemberWrite": true,
+			"scrubIPAddresses": false,
+			"scrapeJavaScript": true,
+			"allowJoinRequests": true,
+			"relayPiiConfig": null,
+			"trustedRelays": [],
+			"access": [
+				"org:write",
+				"team:admin",
+				"alerts:write",
+				"project:releases",
+				"member:admin",
+				"org:admin",
+				"project:read",
+				"project:write",
+				"alerts:read",
+				"org:integrations",
+				"event:admin",
+				"project:admin",
+				"member:write",
+				"member:read",
+				"org:billing",
+				"team:write",
+				"event:write",
+				"event:read",
+				"org:read",
+				"team:read"
+			],
+			"role": "owner",
+			"pendingAccessRequests": 0,
+			"onboardingTasks": []
 		}`)
 	})
 
 	client := NewClient(httpClient, nil, "")
 	organization, _, err := client.Organizations.Get("the-interstellar-jurisdiction")
 	assert.NoError(t, err)
-	expected := &Organization{
+	expected := &DetailedOrganization{
 		ID:   "2",
 		Slug: "the-interstellar-jurisdiction",
 		Status: OrganizationStatus{
 			ID:   "active",
 			Name: "active",
 		},
-		Name:           "The Interstellar Jurisdiction",
-		DateCreated:    mustParseTime("2018-09-20T15:47:52.908Z"),
-		IsEarlyAdopter: false,
+		Name:                     "The Interstellar Jurisdiction",
+		DateCreated:              mustParseTime("2022-06-05T17:31:31.170029Z"),
+		IsEarlyAdopter:           false,
+		Require2FA:               false,
+		RequireEmailVerification: false,
 		Avatar: Avatar{
 			Type: "letter_avatar",
 		},
-
+		Features: []string{
+			"release-health-return-metrics",
+			"slack-overage-notifications",
+			"symbol-sources",
+			"discover-frontend-use-events-endpoint",
+			"dashboard-grid-layout",
+			"performance-view",
+			"open-membership",
+			"integrations-stacktrace-link",
+			"performance-frontend-use-events-endpoint",
+			"performance-dry-run-mep",
+			"auto-start-free-trial",
+			"event-attachments",
+			"new-widget-builder-experience-design",
+			"metrics-extraction",
+			"shared-issues",
+			"performance-suspect-spans-view",
+			"dashboards-template",
+			"advanced-search",
+			"performance-autogroup-sibling-spans",
+			"widget-library",
+			"performance-span-histogram-view",
+			"performance-ops-breakdown",
+			"intl-sales-tax",
+			"crash-rate-alerts",
+			"widget-viewer-modal",
+			"invite-members-rate-limits",
+			"onboarding",
+			"images-loaded-v2",
+			"new-weekly-report",
+			"unified-span-view",
+			"org-subdomains",
+			"ondemand-budgets",
+			"alert-crash-free-metrics",
+			"custom-event-title",
+			"mobile-app",
+			"minute-resolution-sessions",
+		},
 		Quota: OrganizationQuota{
 			MaxRate:         0,
 			MaxRateInterval: 60,
 			AccountLimit:    0,
 			ProjectLimit:    100,
 		},
-
 		IsDefault:   false,
 		DefaultRole: "member",
 		AvailableRoles: []OrganizationAvailableRole{
+			{
+				ID:   "billing",
+				Name: "Billing",
+			},
 			{
 				ID:   "member",
 				Name: "Member",
@@ -274,136 +279,45 @@ func TestOrganizationService_Get(t *testing.T) {
 			},
 		},
 		OpenMembership:       true,
-		Require2FA:           false,
 		AllowSharedIssues:    true,
 		EnhancedPrivacy:      false,
 		DataScrubber:         false,
 		DataScrubberDefaults: false,
 		SensitiveFields:      []string{},
 		SafeFields:           []string{},
+		StoreCrashReports:    0,
+		AttachmentsRole:      "member",
+		DebugFilesRole:       "admin",
+		EventsMemberAdmin:    true,
+		AlertsMemberWrite:    true,
 		ScrubIPAddresses:     false,
-
-		Access: []string{},
-		Features: []string{
-			"sso",
-			"api-keys",
-			"github-apps",
-			"repos",
-			"new-issue-ui",
-			"github-enterprise",
-			"bitbucket-integration",
-			"jira-integration",
-			"vsts-integration",
-			"suggested-commits",
-			"new-teams",
-			"open-membership",
-			"shared-issues",
+		ScrapeJavaScript:     true,
+		AllowJoinRequests:    true,
+		RelayPiiConfig:       nil,
+		Access: []string{
+			"org:write",
+			"team:admin",
+			"alerts:write",
+			"project:releases",
+			"member:admin",
+			"org:admin",
+			"project:read",
+			"project:write",
+			"alerts:read",
+			"org:integrations",
+			"event:admin",
+			"project:admin",
+			"member:write",
+			"member:read",
+			"org:billing",
+			"team:write",
+			"event:write",
+			"event:read",
+			"org:read",
+			"team:read",
 		},
+		Role:                  "owner",
 		PendingAccessRequests: 0,
-
-		AccountRateLimit: 0,
-		ProjectRateLimit: 0,
-
-		Teams: []Team{
-			{
-				ID:          "3",
-				Slug:        "ancient-gabelers",
-				Name:        "Ancient Gabelers",
-				DateCreated: mustParseTime("2018-09-20T15:48:07.803Z"),
-				IsMember:    false,
-				HasAccess:   true,
-				IsPending:   false,
-				Avatar: Avatar{
-					Type: "letter_avatar",
-				},
-			},
-			{
-				ID:          "2",
-				Slug:        "powerful-abolitionist",
-				Name:        "Powerful Abolitionist",
-				DateCreated: mustParseTime("2018-09-20T15:47:52.922Z"),
-				IsMember:    false,
-				HasAccess:   true,
-				IsPending:   false,
-				Avatar: Avatar{
-					Type: "letter_avatar",
-				},
-			},
-		},
-		Projects: []ProjectSummary{
-			{
-				ID:           "3",
-				Name:         "Prime Mover",
-				Slug:         "prime-mover",
-				IsBookmarked: false,
-				IsMember:     false,
-				HasAccess:    true,
-				DateCreated:  mustParseTime("2018-09-20T15:47:56.723Z"),
-				FirstEvent:   time.Time{},
-				Platform:     nil,
-				Platforms:    []string{},
-				Team: &ProjectSummaryTeam{
-					ID:   "2",
-					Name: "Powerful Abolitionist",
-					Slug: "powerful-abolitionist",
-				},
-				Teams: []ProjectSummaryTeam{
-					{
-						ID:   "2",
-						Name: "Powerful Abolitionist",
-						Slug: "powerful-abolitionist",
-					},
-				},
-			},
-			{
-				ID:           "2",
-				Name:         "Pump Station",
-				Slug:         "pump-station",
-				IsBookmarked: false,
-				IsMember:     false,
-				HasAccess:    true,
-				DateCreated:  mustParseTime("2018-09-20T15:47:52.926Z"),
-				FirstEvent:   time.Time{},
-				Platform:     nil,
-				Platforms:    []string{},
-				Team: &ProjectSummaryTeam{
-					ID:   "2",
-					Name: "Powerful Abolitionist",
-					Slug: "powerful-abolitionist",
-				},
-				Teams: []ProjectSummaryTeam{
-					{
-						ID:   "2",
-						Name: "Powerful Abolitionist",
-						Slug: "powerful-abolitionist",
-					},
-				},
-			},
-			{
-				ID:           "4",
-				Name:         "The Spoiled Yoghurt",
-				Slug:         "the-spoiled-yoghurt",
-				IsBookmarked: false,
-				IsMember:     false,
-				HasAccess:    true,
-				DateCreated:  mustParseTime("2018-09-20T15:48:07.592Z"),
-				FirstEvent:   time.Time{},
-				Platform:     nil,
-				Platforms:    []string{},
-				Team: &ProjectSummaryTeam{
-					ID:   "2",
-					Name: "Powerful Abolitionist",
-					Slug: "powerful-abolitionist",
-				},
-				Teams: []ProjectSummaryTeam{
-					{
-						ID:   "2",
-						Name: "Powerful Abolitionist",
-						Slug: "powerful-abolitionist",
-					},
-				},
-			},
-		},
 	}
 	assert.Equal(t, expected, organization)
 }
