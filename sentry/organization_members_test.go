@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -8,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOrganizationMemberService_List(t *testing.T) {
+func TestOrganizationMembersService_List(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -74,11 +75,12 @@ func TestOrganizationMemberService_List(t *testing.T) {
 		]`)
 	})
 
-	members, _, err := client.OrganizationMembers.List("the-interstellar-jurisdiction", &ListOrganizationMemberParams{
+	ctx := context.Background()
+	members, _, err := client.OrganizationMembers.List(ctx, "the-interstellar-jurisdiction", &ListOrganizationMemberParams{
 		Cursor: "100:-1:1",
 	})
 	assert.NoError(t, err)
-	expected := []OrganizationMember{
+	expected := []*OrganizationMember{
 		{
 			ID:    "1",
 			Email: "test@example.com",
@@ -126,7 +128,7 @@ func TestOrganizationMemberService_List(t *testing.T) {
 	assert.Equal(t, expected, members)
 }
 
-func TestOrganizationMemberService_Get(t *testing.T) {
+func TestOrganizationMembersService_Get(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -190,7 +192,8 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 			}`)
 	})
 
-	members, _, err := client.OrganizationMembers.Get("the-interstellar-jurisdiction", "1")
+	ctx := context.Background()
+	members, _, err := client.OrganizationMembers.Get(ctx, "the-interstellar-jurisdiction", "1")
 	assert.NoError(t, err)
 	expected := OrganizationMember{
 		ID:    "1",
@@ -239,21 +242,7 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 	assert.Equal(t, &expected, members)
 }
 
-func TestOrganizationMemberService_Delete(t *testing.T) {
-	client, mux, _, teardown := setup()
-	defer teardown()
-
-	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
-		assertMethod(t, "DELETE", r)
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	resp, err := client.OrganizationMembers.Delete("the-interstellar-jurisdiction", "1")
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), resp.ContentLength)
-}
-
-func TestOrganizationMemberService_Create(t *testing.T) {
+func TestOrganizationMembersService_Create(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -286,7 +275,8 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 		Email: "test@example.com",
 		Role:  RoleMember,
 	}
-	member, _, err := client.OrganizationMembers.Create("the-interstellar-jurisdiction", &createOrganizationMemberParams)
+	ctx := context.Background()
+	member, _, err := client.OrganizationMembers.Create(ctx, "the-interstellar-jurisdiction", &createOrganizationMemberParams)
 	assert.NoError(t, err)
 
 	inviterName := "John Doe"
@@ -313,7 +303,7 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 	assert.Equal(t, &expected, member)
 }
 
-func TestOrganizationMemberService_Update(t *testing.T) {
+func TestOrganizationMembersService_Update(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -344,7 +334,8 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 	updateOrganizationMemberParams := UpdateOrganizationMemberParams{
 		Role: RoleMember,
 	}
-	member, _, err := client.OrganizationMembers.Update("the-interstellar-jurisdiction", "1", &updateOrganizationMemberParams)
+	ctx := context.Background()
+	member, _, err := client.OrganizationMembers.Update(ctx, "the-interstellar-jurisdiction", "1", &updateOrganizationMemberParams)
 	assert.NoError(t, err)
 
 	inviterName := "John Doe"
@@ -369,4 +360,19 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 	}
 
 	assert.Equal(t, &expected, member)
+}
+
+func TestOrganizationMembersService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	ctx := context.Background()
+	resp, err := client.OrganizationMembers.Delete(ctx, "the-interstellar-jurisdiction", "1")
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), resp.ContentLength)
 }
