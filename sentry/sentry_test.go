@@ -17,7 +17,7 @@ func setup() (client *Client, mux *http.ServeMux, serverURL string, teardown fun
 	mux = http.NewServeMux()
 	server := httptest.NewServer(mux)
 	client = NewClient(nil)
-	url, _ := url.Parse(server.URL)
+	url, _ := url.Parse(server.URL + "/api/")
 	client.BaseURL = url
 	return client, mux, server.URL, server.Close
 }
@@ -87,7 +87,7 @@ func mustParseTime(value string) time.Time {
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 
-	assert.Equal(t, "https://sentry.io/api/0/", c.BaseURL.String())
+	assert.Equal(t, "https://sentry.io/api/", c.BaseURL.String())
 }
 
 func TestNewOnPremiseClient(t *testing.T) {
