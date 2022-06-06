@@ -11,8 +11,8 @@ import (
 )
 
 func TestRulesService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -46,7 +46,7 @@ func TestRulesService_List(t *testing.T) {
 			}
 		]`)
 	})
-	client := NewClient(httpClient, nil, "")
+
 	rules, _, err := client.Rules.List("the-interstellar-jurisdiction", "pump-station")
 	require.NoError(t, err)
 
@@ -84,8 +84,8 @@ func TestRulesService_List(t *testing.T) {
 }
 
 func TestRulesService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -168,7 +168,6 @@ func TestRulesService_Create(t *testing.T) {
 		},
 	}
 
-	client := NewClient(httpClient, nil, "")
 	rules, _, err := client.Rules.Create("the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
@@ -204,8 +203,8 @@ func TestRulesService_Create(t *testing.T) {
 }
 
 func TestRulesService_Create_With_Async_Task(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rule-task/fakeuuid/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -298,7 +297,6 @@ func TestRulesService_Create_With_Async_Task(t *testing.T) {
 		},
 	}
 
-	client := NewClient(httpClient, nil, "")
 	rule, _, err := client.Rules.Create("the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
@@ -334,8 +332,8 @@ func TestRulesService_Create_With_Async_Task(t *testing.T) {
 }
 
 func TestRulesService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	environment := "staging"
 	params := &Rule{
@@ -449,7 +447,6 @@ func TestRulesService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	rules, _, err := client.Rules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
 	assert.NoError(t, err)
 
@@ -482,14 +479,13 @@ func TestRulesService_Update(t *testing.T) {
 }
 
 func TestRuleService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/12345/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	_, err := client.Rules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
 	require.NoError(t, err)
 }

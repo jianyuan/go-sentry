@@ -9,8 +9,8 @@ import (
 )
 
 func TestProjectOwnershipService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/powerful-abolitionist/ownership/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -26,7 +26,6 @@ func TestProjectOwnershipService_Get(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	ownership, _, err := client.Ownership.Get("the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
@@ -44,8 +43,8 @@ func TestProjectOwnershipService_Get(t *testing.T) {
 }
 
 func TestProjectOwnershipService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/the-obese-philosophers/ownership/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -64,7 +63,6 @@ func TestProjectOwnershipService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateProjectOwnershipParams{
 		Raw: "# assign issues to the product team, no matter the area\nurl:https://example.com/areas/*/*/products/* #product-team",
 	}

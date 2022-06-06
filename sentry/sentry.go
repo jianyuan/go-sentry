@@ -9,9 +9,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/dghubble/sling"
+	"github.com/google/go-querystring/query"
 )
 
 const (
@@ -36,9 +38,13 @@ type Client struct {
 	// TODO: Remove sling
 	sling *sling.Sling
 
-	Organizations       *OrganizationService
+	// Common struct used by all services.
+	common service
+
+	// Services
+	Organizations       *OrganizationsService
 	OrganizationMembers *OrganizationMemberService
-	Teams               *TeamService
+	Teams               *TeamsService
 	Projects            *ProjectService
 	ProjectKeys         *ProjectKeyService
 	ProjectPlugins      *ProjectPluginService
@@ -59,7 +65,6 @@ func NewClient(httpClient *http.Client) *Client {
 	}
 	baseURL, _ := url.Parse(defaultBaseURL)
 
-	// base := sling.New().Base(baseURL.String()).Client(httpClient)
 	base := sling.New().Client(httpClient)
 
 	c := &Client{
@@ -68,9 +73,7 @@ func NewClient(httpClient *http.Client) *Client {
 		client:  httpClient,
 		BaseURL: baseURL,
 
-		Organizations:       newOrganizationService(base.New()),
 		OrganizationMembers: newOrganizationMemberService(base.New()),
-		Teams:               newTeamService(base.New()),
 		Projects:            newProjectService(base.New()),
 		ProjectKeys:         newProjectKeyService(base.New()),
 		ProjectPlugins:      newProjectPluginService(base.New()),
@@ -78,6 +81,9 @@ func NewClient(httpClient *http.Client) *Client {
 		AlertRules:          newAlertRuleService(base.New()),
 		Ownership:           newProjectOwnershipService(base.New()),
 	}
+	c.common.client = c
+	c.Organizations = (*OrganizationsService)(&c.common)
+	c.Teams = (*TeamsService)(&c.common)
 	return c
 }
 
@@ -101,6 +107,26 @@ func NewOnPremiseClient(baseURL string, httpClient *http.Client) (*Client, error
 	c := NewClient(httpClient)
 	c.BaseURL = baseEndpoint
 	return c, nil
+}
+
+func addQuery(s string, params interface{}) (string, error) {
+	v := reflect.ValueOf(params)
+	if v.Kind() == reflect.Ptr && v.IsNil() {
+		return s, nil
+	}
+
+	u, err := url.Parse(s)
+	if err != nil {
+		return s, err
+	}
+
+	qs, err := query.Values(params)
+	if err != nil {
+		return s, err
+	}
+
+	u.RawQuery = qs.Encode()
+	return u.String(), nil
 }
 
 // NewRequest creates an API request.

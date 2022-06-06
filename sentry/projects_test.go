@@ -9,8 +9,8 @@ import (
 )
 
 func TestProjectService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -137,7 +137,6 @@ func TestProjectService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	projects, _, err := client.Projects.List()
 	assert.NoError(t, err)
 
@@ -217,8 +216,8 @@ func TestProjectService_List(t *testing.T) {
 }
 
 func TestProjectService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -359,7 +358,6 @@ func TestProjectService_Get(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	project, _, err := client.Projects.Get("the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
 	expected := &Project{
@@ -429,8 +427,8 @@ func TestProjectService_Get(t *testing.T) {
 }
 
 func TestProjectService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/powerful-abolitionist/projects/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -460,7 +458,6 @@ func TestProjectService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateProjectParams{
 		Name: "The Spoiled Yoghurt",
 	}
@@ -485,8 +482,8 @@ func TestProjectService_Create(t *testing.T) {
 }
 
 func TestProjectService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/plain-proxy/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -530,7 +527,6 @@ func TestProjectService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateProjectParams{
 		Name: "Plane Proxy",
 		Slug: "plane-proxy",
@@ -567,22 +563,21 @@ func TestProjectService_Update(t *testing.T) {
 }
 
 func TestProjectService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/plain-proxy/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	_, err := client.Projects.Delete("the-interstellar-jurisdiction", "plain-proxy")
 	assert.NoError(t, err)
 
 }
 
 func TestProjectService_UpdateTeam(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/planet-express/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -599,7 +594,6 @@ func TestProjectService_UpdateTeam(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	project, _, err := client.Projects.AddTeam("the-interstellar-jurisdiction", "pump-station", "planet-express")
 	assert.NoError(t, err)
 	expected := &Project{
@@ -612,14 +606,13 @@ func TestProjectService_UpdateTeam(t *testing.T) {
 }
 
 func TestProjectService_DeleteTeam(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	_, err := client.Projects.RemoveTeam("the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
 	assert.NoError(t, err)
 }

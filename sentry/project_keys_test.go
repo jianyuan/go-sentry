@@ -10,8 +10,8 @@ import (
 )
 
 func TestProjectKeyService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -51,7 +51,6 @@ func TestProjectKeyService_List(t *testing.T) {
 		}]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	projectKeys, _, err := client.ProjectKeys.List("the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
 
@@ -79,8 +78,8 @@ func TestProjectKeyService_List(t *testing.T) {
 }
 
 func TestProjectKeyService_ListWithPagination(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/test", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -120,7 +119,7 @@ func TestProjectKeyService_ListWithPagination(t *testing.T) {
 		}]`)
 	})
 
-	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/",  func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Link", "</api/0/projects/the-interstellar-jurisdiction/pump-station/keys/?&cursor=0:0:1>; rel=\"previous\"; results=\"true\"; cursor=\"0:0:1\", </api/0/projects/the-interstellar-jurisdiction/pump-station/keys/?&cursor=12:2:1>; rel=\"next\"; results=\"false\"; cursor=\"12:2:1\"")
@@ -158,7 +157,6 @@ func TestProjectKeyService_ListWithPagination(t *testing.T) {
 		}]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	// Kind of abusing the cursor field here. Normally this should always be a query of the form ?&cursor=bla but as
 	// mux.HandleFunc is somewhat stiff in mocking different results for the same path but with different queries
 	// calling the function like this allows us to mock a different response for the second page of results
@@ -206,10 +204,9 @@ func TestProjectKeyService_ListWithPagination(t *testing.T) {
 	assert.Equal(t, expected, projectKeys)
 }
 
-
 func TestProjectKeyService_ListWithPagination_ReturnsErrorWhenAPageIsNotPresent(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/test", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -249,7 +246,6 @@ func TestProjectKeyService_ListWithPagination_ReturnsErrorWhenAPageIsNotPresent(
 		}]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	// Kind of abusing the cursor field here. Normally this should always be a query of the form ?&cursor=bla but as
 	// mux.HandleFunc is somewhat stiff in mocking different results for the same path but with different queries
 	// calling the function like this allows us to have the second call return a 404
@@ -262,8 +258,8 @@ func TestProjectKeyService_ListWithPagination_ReturnsErrorWhenAPageIsNotPresent(
 }
 
 func TestProjectKeyService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -305,7 +301,6 @@ func TestProjectKeyService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateProjectKeyParams{
 		Name: "Fabulous Key",
 	}
@@ -333,8 +328,8 @@ func TestProjectKeyService_Create(t *testing.T) {
 }
 
 func TestProjectKeyService_Create_RateLimit(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -432,7 +427,6 @@ func TestProjectKeyService_Create_RateLimit(t *testing.T) {
 		Window: 86400,
 	}
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateProjectKeyParams{
 		Name:      "Fabulous Key",
 		RateLimit: &rateLimit,
@@ -462,8 +456,8 @@ func TestProjectKeyService_Create_RateLimit(t *testing.T) {
 }
 
 func TestProjectKeyService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/befdbf32724c4ae0a3d286717b1f8127/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -505,7 +499,6 @@ func TestProjectKeyService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateProjectKeyParams{
 		Name: "Fabulous Key",
 	}
@@ -533,8 +526,8 @@ func TestProjectKeyService_Update(t *testing.T) {
 }
 
 func TestProjectKeyService_Update_RateLimit(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/befdbf32724c4ae0a3d286717b1f8127/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -588,7 +581,6 @@ func TestProjectKeyService_Update_RateLimit(t *testing.T) {
 		Window: 86400,
 	}
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateProjectKeyParams{
 		Name:      "Fabulous Key",
 		RateLimit: &rateLimit,
@@ -618,14 +610,13 @@ func TestProjectKeyService_Update_RateLimit(t *testing.T) {
 }
 
 func TestProjectKeyService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/keys/befdbf32724c4ae0a3d286717b1f8127/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	_, err := client.ProjectKeys.Delete("the-interstellar-jurisdiction", "pump-station", "befdbf32724c4ae0a3d286717b1f8127")
 	assert.NoError(t, err)
 

@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -8,13 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOrganizationService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationsService_List(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
+	cursor := "1500300636142:0:1"
 	mux.HandleFunc("/api/0/organizations/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
-		assertQuery(t, map[string]string{"cursor": "1500300636142:0:1"}, r)
+		assertQuery(t, map[string]string{"cursor": cursor}, r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `[
 			{
@@ -31,12 +33,12 @@ func TestOrganizationService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	organizations, _, err := client.Organizations.List(&ListOrganizationParams{
-		Cursor: "1500300636142:0:1",
-	})
+	params := &ListOrganizationParams{Cursor: cursor}
+	ctx := context.Background()
+	orgs, _, err := client.Organizations.List(ctx, params)
 	assert.NoError(t, err)
-	expected := []Organization{
+
+	expected := []*Organization{
 		{
 			ID:             "2",
 			Slug:           "the-interstellar-jurisdiction",
@@ -49,12 +51,12 @@ func TestOrganizationService_List(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, organizations)
+	assert.Equal(t, expected, orgs)
 }
 
-func TestOrganizationService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationsService_Get(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -192,9 +194,10 @@ func TestOrganizationService_Get(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	organization, _, err := client.Organizations.Get("the-interstellar-jurisdiction")
+	ctx := context.Background()
+	organization, _, err := client.Organizations.Get(ctx, "the-interstellar-jurisdiction")
 	assert.NoError(t, err)
+
 	expected := &DetailedOrganization{
 		ID:   "2",
 		Slug: "the-interstellar-jurisdiction",
@@ -322,9 +325,9 @@ func TestOrganizationService_Get(t *testing.T) {
 	assert.Equal(t, expected, organization)
 }
 
-func TestOrganizationService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationsService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -340,13 +343,14 @@ func TestOrganizationService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateOrganizationParams{
 		Name: "The Interstellar Jurisdiction",
 		Slug: "the-interstellar-jurisdiction",
 	}
-	organization, _, err := client.Organizations.Create(params)
+	ctx := context.Background()
+	organization, _, err := client.Organizations.Create(ctx, params)
 	assert.NoError(t, err)
+
 	expected := &Organization{
 		ID:   "2",
 		Name: "The Interstellar Jurisdiction",
@@ -355,9 +359,9 @@ func TestOrganizationService_Create(t *testing.T) {
 	assert.Equal(t, expected, organization)
 }
 
-func TestOrganizationService_Create_AgreeTerms(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationsService_Create_AgreeTerms(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -374,14 +378,15 @@ func TestOrganizationService_Create_AgreeTerms(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateOrganizationParams{
 		Name:       "The Interstellar Jurisdiction",
 		Slug:       "the-interstellar-jurisdiction",
 		AgreeTerms: Bool(true),
 	}
-	organization, _, err := client.Organizations.Create(params)
+	ctx := context.Background()
+	organization, _, err := client.Organizations.Create(ctx, params)
 	assert.NoError(t, err)
+
 	expected := &Organization{
 		ID:   "2",
 		Name: "The Interstellar Jurisdiction",
@@ -390,9 +395,9 @@ func TestOrganizationService_Create_AgreeTerms(t *testing.T) {
 	assert.Equal(t, expected, organization)
 }
 
-func TestOrganizationService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationsService_Update(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/badly-misnamed/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -408,13 +413,14 @@ func TestOrganizationService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateOrganizationParams{
 		Name: "Impeccably Designated",
 		Slug: "impeccably-designated",
 	}
-	organization, _, err := client.Organizations.Update("badly-misnamed", params)
+	ctx := context.Background()
+	organization, _, err := client.Organizations.Update(ctx, "badly-misnamed", params)
 	assert.NoError(t, err)
+
 	expected := &Organization{
 		ID:   "2",
 		Name: "Impeccably Designated",
@@ -423,15 +429,15 @@ func TestOrganizationService_Update(t *testing.T) {
 	assert.Equal(t, expected, organization)
 }
 
-func TestOrganizationService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationsService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	_, err := client.Organizations.Delete("the-interstellar-jurisdiction")
+	ctx := context.Background()
+	_, err := client.Organizations.Delete(ctx, "the-interstellar-jurisdiction")
 	assert.NoError(t, err)
 }

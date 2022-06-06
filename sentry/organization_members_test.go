@@ -9,8 +9,8 @@ import (
 )
 
 func TestOrganizationMemberService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -74,7 +74,6 @@ func TestOrganizationMemberService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	members, _, err := client.OrganizationMembers.List("the-interstellar-jurisdiction", &ListOrganizationMemberParams{
 		Cursor: "100:-1:1",
 	})
@@ -128,8 +127,8 @@ func TestOrganizationMemberService_List(t *testing.T) {
 }
 
 func TestOrganizationMemberService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -191,7 +190,6 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 			}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	members, _, err := client.OrganizationMembers.Get("the-interstellar-jurisdiction", "1")
 	assert.NoError(t, err)
 	expected := OrganizationMember{
@@ -242,23 +240,22 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 }
 
 func TestOrganizationMemberService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	resp, err := client.OrganizationMembers.Delete("the-interstellar-jurisdiction", "1")
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), resp.ContentLength)
 }
 
 func TestOrganizationMemberService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -285,7 +282,6 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	createOrganizationMemberParams := CreateOrganizationMemberParams{
 		Email: "test@example.com",
 		Role:  RoleMember,
@@ -318,8 +314,8 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 }
 
 func TestOrganizationMemberService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -345,7 +341,6 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	updateOrganizationMemberParams := UpdateOrganizationMemberParams{
 		Role: RoleMember,
 	}

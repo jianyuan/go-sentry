@@ -9,8 +9,8 @@ import (
 )
 
 func TestTeamService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/teams/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -116,7 +116,6 @@ func TestTeamService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	teams, _, err := client.Teams.List("the-interstellar-jurisdiction")
 	assert.NoError(t, err)
 
@@ -154,8 +153,8 @@ func TestTeamService_List(t *testing.T) {
 }
 
 func TestTeamService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -182,7 +181,6 @@ func TestTeamService_Get(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	team, _, err := client.Teams.Get("the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
@@ -199,8 +197,8 @@ func TestTeamService_Get(t *testing.T) {
 }
 
 func TestTeamService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/teams/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -219,7 +217,6 @@ func TestTeamService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateTeamParams{
 		Name: "Ancient Gabelers",
 	}
@@ -239,8 +236,8 @@ func TestTeamService_Create(t *testing.T) {
 }
 
 func TestTeamService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/the-obese-philosophers/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -259,7 +256,6 @@ func TestTeamService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateTeamParams{
 		Name: "The Inflated Philosophers",
 	}
@@ -278,14 +274,13 @@ func TestTeamService_Update(t *testing.T) {
 }
 
 func TestTeamService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/the-obese-philosophers/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	_, err := client.Teams.Delete("the-interstellar-jurisdiction", "the-obese-philosophers")
 	assert.NoError(t, err)
 
