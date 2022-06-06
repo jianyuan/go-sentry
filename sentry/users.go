@@ -19,13 +19,8 @@ type User struct {
 	LastActive      time.Time   `json:"lastActive"`
 	IsSuperuser     bool        `json:"isSuperuser"`
 	IsStaff         bool        `json:"isStaff"`
-	Avatar          UserAvatar  `json:"avatar"`
+	Avatar          Avatar      `json:"avatar"`
 	Emails          []UserEmail `json:"emails"`
-}
-
-type UserAvatar struct {
-	AvatarType string  `json:"avatarType"`
-	AvatarUUID *string `json:"avatarUuid"`
 }
 
 type UserEmail struct {

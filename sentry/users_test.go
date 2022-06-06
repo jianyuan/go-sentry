@@ -66,9 +66,9 @@ func TestUserUnmarshal(t *testing.T) {
 		LastActive:      mustParseTime("2020-01-03T00:00:00.000000Z"),
 		IsSuperuser:     false,
 		IsStaff:         false,
-		Avatar: UserAvatar{
-			AvatarType: "letter_avatar",
-			AvatarUUID: nil,
+		Avatar: Avatar{
+			Type: "letter_avatar",
+			UUID: nil,
 		},
 		Emails: []UserEmail{
 			{
