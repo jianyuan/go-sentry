@@ -37,7 +37,8 @@ type OrganizationMembersService service
 
 // List organization members.
 func (s *OrganizationMembersService) List(ctx context.Context, organizationSlug string, params *ListCursorParams) ([]*OrganizationMember, *Response, error) {
-	u, err := addQuery(fmt.Sprintf("0/organizations/%v/members/", organizationSlug), params)
+	u := fmt.Sprintf("0/organizations/%v/members/", organizationSlug)
+	u, err := addQuery(u, params)
 	if err != nil {
 		return nil, nil, err
 	}

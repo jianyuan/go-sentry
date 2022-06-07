@@ -45,7 +45,8 @@ type ProjectKeysService service
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
 func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListCursorParams) ([]*ProjectKey, *Response, error) {
-	u, err := addQuery(fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug), params)
+	u := fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug)
+	u, err := addQuery(u, params)
 	if err != nil {
 		return nil, nil, err
 	}
