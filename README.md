@@ -1,4 +1,4 @@
-# go-sentry [![Go Reference](https://pkg.go.dev/badge/github.com/jianyuan/go-sentry/v2.svg)](https://pkg.go.dev/github.com/jianyuan/go-sentry/v2)
+# go-sentry [![Go Reference](https://pkg.go.dev/badge/github.com/jianyuan/go-sentry/v2/sentry.svg)](https://pkg.go.dev/github.com/jianyuan/go-sentry/v2/sentry)
 
 Go library for accessing the [Sentry Web API](https://docs.sentry.io/api/).
 
