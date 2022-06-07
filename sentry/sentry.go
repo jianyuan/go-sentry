@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -14,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dghubble/sling"
 	"github.com/google/go-querystring/query"
 	"github.com/peterhellberg/link"
 )
@@ -43,9 +43,6 @@ type Client struct {
 	// User agent used when communicating with Sentry.
 	UserAgent string
 
-	// TODO: Remove sling
-	sling *sling.Sling
-
 	// Common struct used by all services.
 	common service
 
@@ -73,13 +70,10 @@ func NewClient(httpClient *http.Client) *Client {
 	}
 	baseURL, _ := url.Parse(defaultBaseURL)
 
-	base := sling.New().Client(httpClient)
-
 	c := &Client{
-		sling: base,
-
-		client:  httpClient,
-		BaseURL: baseURL,
+		client:    httpClient,
+		BaseURL:   baseURL,
+		UserAgent: userAgent,
 	}
 	c.common.client = c
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
@@ -293,7 +287,20 @@ func CheckResponse(r *http.Response) error {
 	}
 
 	errorResponse := &ErrorResponse{Response: r}
-	// TODO: Handle API errors
+	data, err := ioutil.ReadAll(r.Body)
+	if err == nil && data != nil {
+		apiError := new(APIError)
+		json.Unmarshal(data, apiError)
+		if apiError.Empty() {
+			errorResponse.Detail = strings.TrimSpace(string(data))
+		} else {
+			errorResponse.Detail = apiError.Detail()
+		}
+	}
+	// Re-populate error response body.
+	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+
+	// TODO: Parse rate limit errors
 
 	return errorResponse
 }

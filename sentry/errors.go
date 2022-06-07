@@ -27,31 +27,25 @@ func (e *APIError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.f)
 }
 
-func (e APIError) Error() string {
+func (e APIError) Detail() string {
 	switch v := e.f.(type) {
 	case map[string]interface{}:
 		if len(v) == 1 {
 			if detail, ok := v["detail"].(string); ok {
-				return fmt.Sprintf("sentry: %s", detail)
+				return detail
 			}
 		}
-		return fmt.Sprintf("sentry: %v", v)
+		return fmt.Sprintf("%v", v)
 	default:
-		return fmt.Sprintf("sentry: %v", v)
+		return fmt.Sprintf("%v", v)
 	}
+}
+
+func (e APIError) Error() string {
+	return fmt.Sprintf("sentry: %s", e.Detail())
 }
 
 // Empty returns true if empty.
 func (e APIError) Empty() bool {
 	return e.f == nil
-}
-
-func relevantError(httpError error, apiError APIError) error {
-	if httpError != nil {
-		return httpError
-	}
-	if !apiError.Empty() {
-		return apiError
-	}
-	return nil
 }

@@ -159,3 +159,91 @@ func TestDo_rateLimit(t *testing.T) {
 	assert.Equal(t, resp.Rate.ConcurrentLimit, 25)
 	assert.Equal(t, resp.Rate.ConcurrentRemaining, 24)
 }
+
+func TestDo(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	type foo struct {
+		A string
+	}
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		fmt.Fprint(w, `{"A":"a"}`)
+	})
+
+	req, _ := client.NewRequest("GET", "/", nil)
+	body := new(foo)
+	ctx := context.Background()
+	client.Do(ctx, req, body)
+
+	expected := &foo{A: "a"}
+
+	assert.Equal(t, expected, body)
+}
+
+func TestDo_nilContext(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	req, _ := client.NewRequest("GET", "/", nil)
+	_, err := client.Do(nil, req, nil)
+
+	assert.Equal(t, errNonNilContext, err)
+}
+
+func TestDo_httpErrorPlainText(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	})
+
+	req, _ := client.NewRequest("GET", ".", nil)
+	ctx := context.Background()
+	resp, err := client.Do(ctx, req, nil)
+
+	assert.Equal(t, &ErrorResponse{Response: resp.Response, Detail: "Bad Request"}, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestDo_apiError(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, `{"detail": "API error message"}`)
+	})
+
+	req, _ := client.NewRequest("GET", ".", nil)
+	ctx := context.Background()
+	resp, err := client.Do(ctx, req, nil)
+
+	assert.Equal(t, &ErrorResponse{Response: resp.Response, Detail: "API error message"}, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestDo_apiError_noDetail(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, `"API error message"`)
+	})
+
+	req, _ := client.NewRequest("GET", ".", nil)
+	ctx := context.Background()
+	resp, err := client.Do(ctx, req, nil)
+
+	assert.Equal(t, &ErrorResponse{Response: resp.Response, Detail: "API error message"}, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
