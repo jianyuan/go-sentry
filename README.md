@@ -6,7 +6,7 @@ Go library for accessing the [Sentry Web API](https://docs.sentry.io/api/).
 go-sentry is compatible with modern Go releases in module mode, with Go installed:
 
 ```sh
-go get github.com/jianyuan/go-sentry/sentry/v2
+go get github.com/jianyuan/go-sentry/v2/sentry
 ```
 
 ## Code structure
