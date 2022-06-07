@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dghubble/sling"
 	"github.com/google/go-querystring/query"
@@ -21,7 +23,12 @@ const (
 	defaultBaseURL = "https://sentry.io/api/"
 	userAgent      = "go-sentry"
 
-	APIVersion = "0"
+	// https://docs.sentry.io/api/ratelimits/
+	headerRateLimit               = "X-Sentry-Rate-Limit-Limit"
+	headerRateRemaining           = "X-Sentry-Rate-Limit-Remaining"
+	headerRateReset               = "X-Sentry-Rate-Limit-Reset"
+	headerRateConcurrentLimit     = "X-Sentry-Rate-Limit-ConcurrentLimit"
+	headerRateConcurrentRemaining = "X-Sentry-Rate-Limit-ConcurrentRemaining"
 )
 
 var errNonNilContext = errors.New("context must be non-nil")
@@ -181,11 +188,12 @@ type Response struct {
 	// Set ListCursorParams.Cursor to this value when calling the endpoint again.
 	Cursor string
 
-	// TODO: Parse rate limit
+	Rate Rate
 }
 
 func newResponse(r *http.Response) *Response {
 	response := &Response{Response: r}
+	response.Rate = parseRate(r)
 	response.populatePaginationCursor()
 	return response
 }
@@ -195,6 +203,30 @@ func (r *Response) populatePaginationCursor() {
 	if nextRel, ok := rels["next"]; ok && nextRel.Extra["results"] == "true" {
 		r.Cursor = nextRel.Extra["cursor"]
 	}
+}
+
+// parseRate parses the rate limit headers.
+func parseRate(r *http.Response) Rate {
+	var rate Rate
+	if limit := r.Header.Get(headerRateLimit); limit != "" {
+		rate.Limit, _ = strconv.Atoi(limit)
+	}
+	if remaining := r.Header.Get(headerRateRemaining); remaining != "" {
+		rate.Remaining, _ = strconv.Atoi(remaining)
+	}
+	if reset := r.Header.Get(headerRateReset); reset != "" {
+		if v, _ := strconv.ParseInt(reset, 10, 64); v != 0 {
+			rate.Reset = time.Unix(v, 0).UTC()
+		}
+	}
+	if concurrentLimit := r.Header.Get(headerRateConcurrentLimit); concurrentLimit != "" {
+		rate.ConcurrentLimit, _ = strconv.Atoi(concurrentLimit)
+	}
+	if concurrentRemaining := r.Header.Get(headerRateConcurrentRemaining); concurrentRemaining != "" {
+		rate.ConcurrentRemaining, _ = strconv.Atoi(concurrentRemaining)
+	}
+
+	return rate
 }
 
 func (c *Client) BareDo(ctx context.Context, req *http.Request) (*Response, error) {
@@ -264,6 +296,24 @@ func CheckResponse(r *http.Response) error {
 	// TODO: Handle API errors
 
 	return errorResponse
+}
+
+// Rate represents the rate limit for the current client.
+type Rate struct {
+	// The maximum number of requests allowed within the window.
+	Limit int
+
+	// The number of requests this caller has left on this endpoint within the current window
+	Remaining int
+
+	// The time when the next rate limit window begins and the count resets, measured in UTC seconds from epoch
+	Reset time.Time
+
+	// The maximum number of concurrent requests allowed within the window
+	ConcurrentLimit int
+
+	// The number of concurrent requests this caller has left on this endpoint within the current window
+	ConcurrentRemaining int
 }
 
 // Avatar represents an avatar.
