@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -8,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProjectService_List(t *testing.T) {
+func TestProjectsService_List(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -137,7 +138,8 @@ func TestProjectService_List(t *testing.T) {
 		]`)
 	})
 
-	projects, _, err := client.Projects.List()
+	ctx := context.Background()
+	projects, _, err := client.Projects.List(ctx)
 	assert.NoError(t, err)
 
 	expectedOrganization := Organization{
@@ -153,7 +155,7 @@ func TestProjectService_List(t *testing.T) {
 			Type: "letter_avatar",
 		},
 	}
-	expected := []Project{
+	expected := []*Project{
 		{
 			ID:          "4",
 			Slug:        "the-spoiled-yoghurt",
@@ -215,7 +217,7 @@ func TestProjectService_List(t *testing.T) {
 	assert.Equal(t, expected, projects)
 }
 
-func TestProjectService_Get(t *testing.T) {
+func TestProjectsService_Get(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -358,7 +360,8 @@ func TestProjectService_Get(t *testing.T) {
 		}`)
 	})
 
-	project, _, err := client.Projects.Get("the-interstellar-jurisdiction", "pump-station")
+	ctx := context.Background()
+	project, _, err := client.Projects.Get(ctx, "the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
 	expected := &Project{
 		ID:          "2",
@@ -426,7 +429,7 @@ func TestProjectService_Get(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_Create(t *testing.T) {
+func TestProjectsService_Create(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -461,7 +464,8 @@ func TestProjectService_Create(t *testing.T) {
 	params := &CreateProjectParams{
 		Name: "The Spoiled Yoghurt",
 	}
-	project, _, err := client.Projects.Create("the-interstellar-jurisdiction", "powerful-abolitionist", params)
+	ctx := context.Background()
+	project, _, err := client.Projects.Create(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist", params)
 	assert.NoError(t, err)
 
 	expected := &Project{
@@ -481,7 +485,7 @@ func TestProjectService_Create(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_Update(t *testing.T) {
+func TestProjectsService_Update(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -534,7 +538,8 @@ func TestProjectService_Update(t *testing.T) {
 			"sentry:origins": "http://example.com\nhttp://example.invalid",
 		},
 	}
-	project, _, err := client.Projects.Update("the-interstellar-jurisdiction", "plain-proxy", params)
+	ctx := context.Background()
+	project, _, err := client.Projects.Update(ctx, "the-interstellar-jurisdiction", "plain-proxy", params)
 	assert.NoError(t, err)
 	expected := &Project{
 		ID:           "5",
@@ -562,7 +567,7 @@ func TestProjectService_Update(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_Delete(t *testing.T) {
+func TestProjectsService_Delete(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -570,12 +575,13 @@ func TestProjectService_Delete(t *testing.T) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	_, err := client.Projects.Delete("the-interstellar-jurisdiction", "plain-proxy")
+	ctx := context.Background()
+	_, err := client.Projects.Delete(ctx, "the-interstellar-jurisdiction", "plain-proxy")
 	assert.NoError(t, err)
 
 }
 
-func TestProjectService_UpdateTeam(t *testing.T) {
+func TestProjectsService_UpdateTeam(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -594,7 +600,8 @@ func TestProjectService_UpdateTeam(t *testing.T) {
 		}`)
 	})
 
-	project, _, err := client.Projects.AddTeam("the-interstellar-jurisdiction", "pump-station", "planet-express")
+	ctx := context.Background()
+	project, _, err := client.Projects.AddTeam(ctx, "the-interstellar-jurisdiction", "pump-station", "planet-express")
 	assert.NoError(t, err)
 	expected := &Project{
 		ID:   "5",
@@ -605,7 +612,7 @@ func TestProjectService_UpdateTeam(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_DeleteTeam(t *testing.T) {
+func TestProjectsService_DeleteTeam(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -613,6 +620,7 @@ func TestProjectService_DeleteTeam(t *testing.T) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	_, err := client.Projects.RemoveTeam("the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
+	ctx := context.Background()
+	_, err := client.Projects.RemoveTeam(ctx, "the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
 	assert.NoError(t, err)
 }
