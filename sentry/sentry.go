@@ -258,7 +258,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	case io.Writer:
 		_, err = io.Copy(v, resp.Body)
 	default:
-		decErr := json.NewDecoder(resp.Body).Decode(v)
+		dec := json.NewDecoder(resp.Body)
+		dec.UseNumber()
+		decErr := dec.Decode(v)
 		if decErr == io.EOF {
 			decErr = nil
 		}
@@ -323,8 +325,11 @@ type Rate struct {
 	ConcurrentRemaining int
 }
 
-// Avatar represents an avatar.
-type Avatar struct {
-	UUID *string `json:"avatarUuid"`
-	Type string  `json:"avatarType"`
-}
+// Bool returns a pointer to the bool value passed in.
+func Bool(v bool) *bool { return &v }
+
+// Int returns a pointer to the int value passed in.
+func Int(v int) *int { return &v }
+
+// String returns a pointer to the string value passed in.
+func String(v string) *string { return &v }

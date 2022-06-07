@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -557,7 +558,7 @@ func TestProjectsService_Update(t *testing.T) {
 		Status: "active",
 		Options: map[string]interface{}{
 			"sentry:origins":     "http://example.com\nhttp://example.invalid",
-			"sentry:resolve_age": float64(720),
+			"sentry:resolve_age": json.Number("720"),
 		},
 		DigestsMinDelay: 300,
 		DigestsMaxDelay: 1800,

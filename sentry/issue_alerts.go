@@ -10,25 +10,44 @@ import (
 // IssueAlert represents an issue alert configured for this project.
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/rule.py#L131-L155
 type IssueAlert struct {
-	ID          string          `json:"id"`
-	ActionMatch string          `json:"actionMatch"`
-	FilterMatch string          `json:"filterMatch"`
-	Environment *string         `json:"environment,omitempty"`
-	Frequency   int             `json:"frequency"`
-	Name        string          `json:"name"`
-	Conditions  []ConditionType `json:"conditions"`
-	Actions     []ActionType    `json:"actions"`
-	Filters     []FilterType    `json:"filters"`
-	Created     time.Time       `json:"dateCreated"`
-	TaskUUID    string          `json:"uuid,omitempty"` // This is actually the UUID of the async task that can be spawned to create the rule
+	ID          *string                `json:"id,omitempty"`
+	Conditions  []*IssueAlertCondition `json:"conditions,omitempty"`
+	Filters     []*IssueAlertFilter    `json:"filters,omitempty"`
+	Actions     []*IssueAlertAction    `json:"actions,omitempty"`
+	ActionMatch *string                `json:"actionMatch,omitempty"`
+	FilterMatch *string                `json:"filterMatch,omitempty"`
+	Frequency   *int                   `json:"frequency,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	DateCreated *time.Time             `json:"dateCreated,omitempty"`
+	Owner       *string                `json:"owner,omitempty"`
+	CreatedBy   *IssueAlertCreatedBy   `json:"createdBy,omitempty"`
+	Environment *string                `json:"environment,omitempty"`
+	Projects    []string               `json:"projects,omitempty"`
+	TaskUUID    *string                `json:"uuid,omitempty"` // This is actually the UUID of the async task that can be spawned to create the rule
 }
+
+// IssueAlertCreatedBy for defining the rule creator.
+type IssueAlertCreatedBy struct {
+	ID    *int    `json:"id,omitempty"`
+	Name  *string `json:"name,omitempty"`
+	Email *string `json:"email,omitempty"`
+}
+
+// IssueAlertCondition for defining conditions.
+type IssueAlertCondition map[string]interface{}
+
+// IssueAlertAction for defining actions.
+type IssueAlertAction map[string]interface{}
+
+// IssueAlertFilter for defining actions.
+type IssueAlertFilter map[string]interface{}
 
 // IssueAlertTaskDetail represents the inline struct Sentry defines for task details
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/endpoints/project_rule_task_details.py#L29
 type IssueAlertTaskDetail struct {
-	Status string     `json:"status"`
-	Rule   IssueAlert `json:"rule"`
-	Error  string     `json:"error"`
+	Status *string     `json:"status,omitempty"`
+	Rule   *IssueAlert `json:"rule,omitempty"`
+	Error  *string     `json:"error,omitempty"`
 }
 
 // IssueAlertsService provides methods for accessing Sentry project
@@ -37,8 +56,13 @@ type IssueAlertTaskDetail struct {
 type IssueAlertsService service
 
 // List issue alerts configured for a project.
-func (s *IssueAlertsService) List(ctx context.Context, organizationSlug string, projectSlug string) ([]*IssueAlert, *Response, error) {
+func (s *IssueAlertsService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListCursorParams) ([]*IssueAlert, *Response, error) {
 	u := fmt.Sprintf("0/projects/%v/%v/rules/", organizationSlug, projectSlug)
+	u, err := addQuery(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -52,42 +76,49 @@ func (s *IssueAlertsService) List(ctx context.Context, organizationSlug string, 
 	return alerts, resp, nil
 }
 
-// ConditionType for defining conditions.
-type ConditionType map[string]interface{}
+// Get details on an issue alert.
+func (s *IssueAlertsService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*IssueAlert, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/rules/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// ActionType for defining actions.
-type ActionType map[string]interface{}
-
-// FilterType for defining actions.
-type FilterType map[string]interface{}
+	alert := new(IssueAlert)
+	resp, err := s.client.Do(ctx, req, alert)
+	if err != nil {
+		return nil, resp, err
+	}
+	return alert, resp, nil
+}
 
 // CreateIssueAlertParams are the parameters for IssueAlertsService.Create.
 type CreateIssueAlertParams struct {
-	ActionMatch string          `json:"actionMatch"`
-	FilterMatch string          `json:"filterMatch"`
-	Environment string          `json:"environment,omitempty"`
-	Frequency   int             `json:"frequency"`
-	Name        string          `json:"name"`
-	Conditions  []ConditionType `json:"conditions"`
-	Actions     []ActionType    `json:"actions"`
-	Filters     []FilterType    `json:"filters"`
+	ActionMatch *string                `json:"actionMatch,omitempty"`
+	FilterMatch *string                `json:"filterMatch,omitempty"`
+	Environment *string                `json:"environment,omitempty"`
+	Frequency   *int                   `json:"frequency,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	Conditions  []*IssueAlertCondition `json:"conditions,omitempty"`
+	Actions     []*IssueAlertAction    `json:"actions,omitempty"`
+	Filters     []*IssueAlertFilter    `json:"filters,omitempty"`
 }
 
 // CreateIssueAlertActionParams models the actions when creating the action for the rule.
 type CreateIssueAlertActionParams struct {
-	ID        string `json:"id"`
-	Tags      string `json:"tags"`
-	Channel   string `json:"channel"`
-	Workspace string `json:"workspace"`
+	ID        *string `json:"id,omitempty"`
+	Tags      *string `json:"tags,omitempty"`
+	Channel   *string `json:"channel,omitempty"`
+	Workspace *string `json:"workspace,omitempty"`
 }
 
 // CreateIssueAlertConditionParams models the conditions when creating the action for the rule.
 type CreateIssueAlertConditionParams struct {
-	ID       string `json:"id"`
-	Interval string `json:"interval"`
-	Value    int    `json:"value"`
-	Level    int    `json:"level"`
-	Match    string `json:"match"`
+	ID       *string `json:"id,omitempty"`
+	Interval *string `json:"interval,omitempty"`
+	Value    *int    `json:"value,omitempty"`
+	Level    *int    `json:"level,omitempty"`
+	Match    *string `json:"match,omitempty"`
 }
 
 // Create a new issue alert bound to a project.
@@ -105,8 +136,11 @@ func (s *IssueAlertsService) Create(ctx context.Context, organizationSlug string
 	}
 
 	if resp.StatusCode == 202 {
+		if alert.TaskUUID == nil {
+			return nil, resp, errors.New("missing task uuid")
+		}
 		// We just received a reference to an async task, we need to check another endpoint to retrieve the issue alert we created
-		return s.getIssueAlertFromTaskDetail(ctx, organizationSlug, projectSlug, alert.TaskUUID)
+		return s.getIssueAlertFromTaskDetail(ctx, organizationSlug, projectSlug, *alert.TaskUUID)
 	}
 
 	return alert, resp, nil
@@ -115,8 +149,8 @@ func (s *IssueAlertsService) Create(ctx context.Context, organizationSlug string
 // getIssueAlertFromTaskDetail is called when Sentry offloads the issue alert creation process to an async task and sends us back the task's uuid.
 // It usually doesn't happen, but when creating Slack notification rules, it seemed to be sometimes the case. During testing it
 // took very long for a task to finish (10+ seconds) which is why this method can take long to return.
-func (s *IssueAlertsService) getIssueAlertFromTaskDetail(ctx context.Context, organizationSlug string, projectSlug string, taskUuid string) (*IssueAlert, *Response, error) {
-	u := fmt.Sprintf("0/projects/%v/%v/rule-task/%v/", organizationSlug, projectSlug, taskUuid)
+func (s *IssueAlertsService) getIssueAlertFromTaskDetail(ctx context.Context, organizationSlug string, projectSlug string, taskUUID string) (*IssueAlert, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/rule-task/%v/", organizationSlug, projectSlug, taskUUID)
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -133,12 +167,19 @@ func (s *IssueAlertsService) getIssueAlertFromTaskDetail(ctx context.Context, or
 			return nil, resp, err
 		}
 
-		if taskDetail.Status == "success" {
-			return &taskDetail.Rule, resp, err
-		} else if taskDetail.Status == "failed" {
-			return &taskDetail.Rule, resp, errors.New(taskDetail.Error)
-		} else if resp.StatusCode == 404 {
-			return nil, resp, fmt.Errorf("couldn't find the issue alert creation task for uuid %v in Sentry (HTTP 404)", taskUuid)
+		if resp.StatusCode == 404 {
+			return nil, resp, fmt.Errorf("cannot find issue alert creation task with UUID %v", taskUUID)
+		}
+		if taskDetail.Status != nil && taskDetail.Rule != nil {
+			if *taskDetail.Status == "success" {
+				return taskDetail.Rule, resp, err
+			} else if *taskDetail.Status == "failed" {
+				if taskDetail != nil {
+					return taskDetail.Rule, resp, errors.New(*taskDetail.Error)
+				}
+
+				return taskDetail.Rule, resp, errors.New("error while running the issue alert creation task")
+			}
 		}
 	}
 	return nil, resp, errors.New("getting the status of the issue alert creation from Sentry took too long")
@@ -161,8 +202,8 @@ func (s *IssueAlertsService) Update(ctx context.Context, organizationSlug string
 }
 
 // Delete an issue alert.
-func (s *IssueAlertsService) Delete(ctx context.Context, organizationSlug string, projectSlug string, issueAlertID string) (*Response, error) {
-	u := fmt.Sprintf("0/projects/%v/%v/rules/%v/", organizationSlug, projectSlug, issueAlertID)
+func (s *IssueAlertsService) Delete(ctx context.Context, organizationSlug string, projectSlug string, id string) (*Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/rules/%v/", organizationSlug, projectSlug, id)
 	req, err := s.client.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return nil, err

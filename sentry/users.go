@@ -23,8 +23,15 @@ type User struct {
 	Emails          []UserEmail `json:"emails"`
 }
 
+// UserEmail represents a user's email and its verified status.
 type UserEmail struct {
 	ID         string `json:"id"`
 	Email      string `json:"email"`
 	IsVerified bool   `json:"is_verified"`
+}
+
+// Avatar represents an avatar.
+type Avatar struct {
+	UUID *string `json:"avatarUuid"`
+	Type string  `json:"avatarType"`
 }
