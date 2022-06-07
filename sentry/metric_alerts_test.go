@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,9 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAlertRuleService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestMetricAlertService_List(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -62,12 +63,12 @@ func TestAlertRuleService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	alertRules, _, err := client.AlertRules.List("the-interstellar-jurisdiction", "pump-station")
+	ctx := context.Background()
+	alertRules, _, err := client.MetricAlerts.List(ctx, "the-interstellar-jurisdiction", "pump-station")
 	require.NoError(t, err)
 
 	environment := "production"
-	expected := []AlertRule{
+	expected := []*MetricAlert{
 		{
 			ID:               "12345",
 			Name:             "pump-station-alert",
@@ -110,9 +111,9 @@ func TestAlertRuleService_List(t *testing.T) {
 	require.Equal(t, expected, alertRules)
 }
 
-func TestAlertRuleService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestMetricAlertService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -162,7 +163,6 @@ func TestAlertRuleService_Create(t *testing.T) {
 		`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	environment := "production"
 	params := CreateAlertRuleParams{
 		Name:             "pump-station-alert",
@@ -190,10 +190,11 @@ func TestAlertRuleService_Create(t *testing.T) {
 		Projects: []string{"pump-station"},
 		Owner:    "pump-station:12345",
 	}
-	alertRule, _, err := client.AlertRules.Create("the-interstellar-jurisdiction", "pump-station", &params)
+	ctx := context.Background()
+	alertRule, _, err := client.MetricAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", &params)
 	require.NoError(t, err)
 
-	expected := &AlertRule{
+	expected := &MetricAlert{
 		ID:               "12345",
 		Name:             "pump-station-alert",
 		Environment:      &environment,
@@ -235,12 +236,12 @@ func TestAlertRuleService_Create(t *testing.T) {
 	require.Equal(t, expected, alertRule)
 }
 
-func TestAlertRuleService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestMetricAlertService_Update(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	environment := "production"
-	params := &AlertRule{
+	params := &MetricAlert{
 		ID:               "12345",
 		Name:             "pump-station-alert",
 		Environment:      &environment,
@@ -338,11 +339,11 @@ func TestAlertRuleService_Update(t *testing.T) {
 		`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	alertRule, _, err := client.AlertRules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
+	ctx := context.Background()
+	alertRule, _, err := client.MetricAlerts.Update(ctx, "the-interstellar-jurisdiction", "pump-station", "12345", params)
 	assert.NoError(t, err)
 
-	expected := &AlertRule{
+	expected := &MetricAlert{
 		ID:               "12345",
 		Name:             "pump-station-alert",
 		Environment:      &environment,
@@ -383,15 +384,15 @@ func TestAlertRuleService_Update(t *testing.T) {
 	require.Equal(t, expected, alertRule)
 }
 
-func TestAlertRuleService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestMetricAlertService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/12345/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	_, err := client.AlertRules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
+	ctx := context.Background()
+	_, err := client.MetricAlerts.Delete(ctx, "the-interstellar-jurisdiction", "pump-station", "12345")
 	require.NoError(t, err)
 }

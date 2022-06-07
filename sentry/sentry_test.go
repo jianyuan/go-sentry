@@ -13,19 +13,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// testServer returns an http Client, ServeMux, and Server. The client proxies
-// requests to the server and handlers can be registered on the mux to handle
-// requests. The caller must close the test server.
-func testServer() (*http.Client, *http.ServeMux, *httptest.Server) {
-	mux := http.NewServeMux()
+func setup() (client *Client, mux *http.ServeMux, serverURL string, teardown func()) {
+	mux = http.NewServeMux()
 	server := httptest.NewServer(mux)
-	transport := &RewriteTransport{&http.Transport{
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			return url.Parse(server.URL)
-		},
-	}}
-	client := &http.Client{Transport: transport}
-	return client, mux, server
+	client = NewClient(nil)
+	url, _ := url.Parse(server.URL + "/api/")
+	client.BaseURL = url
+	return client, mux, server.URL, server.Close
 }
 
 // RewriteTransport rewrites https requests to http to avoid TLS cert issues
@@ -91,13 +85,12 @@ func mustParseTime(value string) time.Time {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewClient(nil, nil, "")
-	req, _ := c.sling.New().Request()
+	c := NewClient(nil)
 
-	assert.Equal(t, "https://sentry.io/api/0/", req.URL.String())
+	assert.Equal(t, "https://sentry.io/api/", c.BaseURL.String())
 }
 
-func TestNewClient_withBaseURL(t *testing.T) {
+func TestNewOnPremiseClient(t *testing.T) {
 	testCases := []struct {
 		baseURL string
 	}{
@@ -108,12 +101,10 @@ func TestNewClient_withBaseURL(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.baseURL, func(t *testing.T) {
-			baseURL, _ := url.Parse(tc.baseURL)
+			c, err := NewOnPremiseClient(tc.baseURL, nil)
 
-			c := NewClient(nil, baseURL, "")
-			req, _ := c.sling.New().Request()
-
-			assert.Equal(t, "https://example.com/api/0/", req.URL.String())
+			assert.NoError(t, err)
+			assert.Equal(t, "https://example.com/api/", c.BaseURL.String())
 		})
 	}
 

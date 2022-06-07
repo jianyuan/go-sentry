@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,9 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRulesService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestIssueAlertsService_List(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -46,12 +47,13 @@ func TestRulesService_List(t *testing.T) {
 			}
 		]`)
 	})
-	client := NewClient(httpClient, nil, "")
-	rules, _, err := client.Rules.List("the-interstellar-jurisdiction", "pump-station")
+
+	ctx := context.Background()
+	alerts, _, err := client.IssueAlerts.List(ctx, "the-interstellar-jurisdiction", "pump-station")
 	require.NoError(t, err)
 
 	environment := "production"
-	expected := []Rule{
+	expected := []*IssueAlert{
 		{
 			ID:          "12345",
 			ActionMatch: "any",
@@ -79,13 +81,13 @@ func TestRulesService_List(t *testing.T) {
 			Created: mustParseTime("2019-08-24T18:12:16.321Z"),
 		},
 	}
-	require.Equal(t, expected, rules)
+	require.Equal(t, expected, alerts)
 
 }
 
-func TestRulesService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestIssueAlertsService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -143,7 +145,7 @@ func TestRulesService_Create(t *testing.T) {
 		}`)
 	})
 
-	params := &CreateRuleParams{
+	params := &CreateIssueAlertParams{
 		ActionMatch: "all",
 		Environment: "production",
 		Frequency:   30,
@@ -167,13 +169,12 @@ func TestRulesService_Create(t *testing.T) {
 			},
 		},
 	}
-
-	client := NewClient(httpClient, nil, "")
-	rules, _, err := client.Rules.Create("the-interstellar-jurisdiction", "pump-station", params)
+	ctx := context.Background()
+	alerts, _, err := client.IssueAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
 	environment := "production"
-	expected := &Rule{
+	expected := &IssueAlert{
 		ID:          "123456",
 		ActionMatch: "all",
 		Environment: &environment,
@@ -199,13 +200,13 @@ func TestRulesService_Create(t *testing.T) {
 		},
 		Created: mustParseTime("2019-08-24T18:12:16.321Z"),
 	}
-	require.Equal(t, expected, rules)
+	require.Equal(t, expected, alerts)
 
 }
 
-func TestRulesService_Create_With_Async_Task(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rule-task/fakeuuid/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -273,7 +274,7 @@ func TestRulesService_Create_With_Async_Task(t *testing.T) {
 
 	})
 
-	params := &CreateRuleParams{
+	params := &CreateIssueAlertParams{
 		ActionMatch: "all",
 		Environment: "production",
 		Frequency:   30,
@@ -297,13 +298,12 @@ func TestRulesService_Create_With_Async_Task(t *testing.T) {
 			},
 		},
 	}
-
-	client := NewClient(httpClient, nil, "")
-	rule, _, err := client.Rules.Create("the-interstellar-jurisdiction", "pump-station", params)
+	ctx := context.Background()
+	alert, _, err := client.IssueAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
 	environment := "production"
-	expected := &Rule{
+	expected := &IssueAlert{
 		ID:          "123456",
 		ActionMatch: "all",
 		Environment: &environment,
@@ -329,16 +329,16 @@ func TestRulesService_Create_With_Async_Task(t *testing.T) {
 		},
 		Created: mustParseTime("2019-08-24T18:12:16.321Z"),
 	}
-	require.Equal(t, expected, rule)
+	require.Equal(t, expected, alert)
 
 }
 
-func TestRulesService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestIssueAlertsService_Update(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	environment := "staging"
-	params := &Rule{
+	params := &IssueAlert{
 		ID:          "12345",
 		ActionMatch: "all",
 		FilterMatch: "any",
@@ -448,12 +448,11 @@ func TestRulesService_Update(t *testing.T) {
 			"dateCreated": "2019-08-24T18:12:16.321Z"
 		}`)
 	})
-
-	client := NewClient(httpClient, nil, "")
-	rules, _, err := client.Rules.Update("the-interstellar-jurisdiction", "pump-station", "12345", params)
+	ctx := context.Background()
+	alerts, _, err := client.IssueAlerts.Update(ctx, "the-interstellar-jurisdiction", "pump-station", "12345", params)
 	assert.NoError(t, err)
 
-	expected := &Rule{
+	expected := &IssueAlert{
 		ID:          "12345",
 		ActionMatch: "any",
 		Environment: &environment,
@@ -477,19 +476,19 @@ func TestRulesService_Update(t *testing.T) {
 		},
 		Created: mustParseTime("2019-08-24T18:12:16.321Z"),
 	}
-	require.Equal(t, expected, rules)
+	require.Equal(t, expected, alerts)
 
 }
 
-func TestRuleService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestIssueAlertsService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/12345/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	_, err := client.Rules.Delete("the-interstellar-jurisdiction", "pump-station", "12345")
+	ctx := context.Background()
+	_, err := client.IssueAlerts.Delete(ctx, "the-interstellar-jurisdiction", "pump-station", "12345")
 	require.NoError(t, err)
 }

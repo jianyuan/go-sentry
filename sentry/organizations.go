@@ -1,10 +1,9 @@
 package sentry
 
 import (
-	"net/http"
+	"context"
+	"fmt"
 	"time"
-
-	"github.com/dghubble/sling"
 )
 
 // OrganizationStatus represents a Sentry organization's status.
@@ -87,17 +86,9 @@ type DetailedOrganization struct {
 	// TODO: onboardingTasks
 }
 
-// OrganizationService provides methods for accessing Sentry organization API endpoints.
+// OrganizationsService provides methods for accessing Sentry organization API endpoints.
 // https://docs.sentry.io/api/organizations/
-type OrganizationService struct {
-	sling *sling.Sling
-}
-
-func newOrganizationService(sling *sling.Sling) *OrganizationService {
-	return &OrganizationService{
-		sling: sling.Path("organizations/"),
-	}
-}
+type OrganizationsService service
 
 // ListOrganizationParams are the parameters for OrganizationService.List.
 type ListOrganizationParams struct {
@@ -106,11 +97,40 @@ type ListOrganizationParams struct {
 
 // List organizations available to the authenticated session.
 // https://docs.sentry.io/api/organizations/list-your-organizations/
-func (s *OrganizationService) List(params *ListOrganizationParams) ([]Organization, *http.Response, error) {
-	organizations := new([]Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("").QueryStruct(params).Receive(organizations, apiError)
-	return *organizations, resp, relevantError(err, *apiError)
+func (s *OrganizationsService) List(ctx context.Context, params *ListOrganizationParams) ([]*Organization, *Response, error) {
+	u, err := addQuery("0/organizations/", params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	orgs := []*Organization{}
+	resp, err := s.client.Do(ctx, req, &orgs)
+	if err != nil {
+		return nil, resp, err
+	}
+	return orgs, resp, nil
+}
+
+// Get a Sentry organization.
+// https://docs.sentry.io/api/organizations/retrieve-an-organization/
+func (s *OrganizationsService) Get(ctx context.Context, slug string) (*DetailedOrganization, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/", slug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	org := new(DetailedOrganization)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
+	return org, resp, nil
 }
 
 // CreateOrganizationParams are the parameters for OrganizationService.Create.
@@ -120,21 +140,20 @@ type CreateOrganizationParams struct {
 	AgreeTerms *bool  `json:"agreeTerms,omitempty"`
 }
 
-// Get a Sentry organization.
-// https://docs.sentry.io/api/organizations/retrieve-an-organization/
-func (s *OrganizationService) Get(slug string) (*DetailedOrganization, *http.Response, error) {
-	org := new(DetailedOrganization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get(slug+"/").Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
-}
-
 // Create a new Sentry organization.
-func (s *OrganizationService) Create(params *CreateOrganizationParams) (*Organization, *http.Response, error) {
+func (s *OrganizationsService) Create(ctx context.Context, params *CreateOrganizationParams) (*Organization, *Response, error) {
+	u := "0/organizations/"
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	org := new(Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("").BodyJSON(params).Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
+	return org, resp, nil
 }
 
 // UpdateOrganizationParams are the parameters for OrganizationService.Update.
@@ -145,16 +164,28 @@ type UpdateOrganizationParams struct {
 
 // Update a Sentry organization.
 // https://docs.sentry.io/api/organizations/update-an-organization/
-func (s *OrganizationService) Update(slug string, params *UpdateOrganizationParams) (*Organization, *http.Response, error) {
+func (s *OrganizationsService) Update(ctx context.Context, slug string, params *UpdateOrganizationParams) (*Organization, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/", slug)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	org := new(Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Put(slug+"/").BodyJSON(params).Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
+	return org, resp, nil
 }
 
 // Delete a Sentry organization.
-func (s *OrganizationService) Delete(slug string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Delete(slug+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+func (s *OrganizationsService) Delete(ctx context.Context, slug string) (*Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/", slug)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

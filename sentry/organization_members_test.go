@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -8,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOrganizationMemberService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationMembersService_List(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -74,12 +75,12 @@ func TestOrganizationMemberService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	members, _, err := client.OrganizationMembers.List("the-interstellar-jurisdiction", &ListOrganizationMemberParams{
+	ctx := context.Background()
+	members, _, err := client.OrganizationMembers.List(ctx, "the-interstellar-jurisdiction", &ListOrganizationMemberParams{
 		Cursor: "100:-1:1",
 	})
 	assert.NoError(t, err)
-	expected := []OrganizationMember{
+	expected := []*OrganizationMember{
 		{
 			ID:    "1",
 			Email: "test@example.com",
@@ -99,9 +100,9 @@ func TestOrganizationMemberService_List(t *testing.T) {
 				LastActive:      mustParseTime("2020-01-03T00:00:00.000000Z"),
 				IsSuperuser:     false,
 				IsStaff:         false,
-				Avatar: UserAvatar{
-					AvatarType: "letter_avatar",
-					AvatarUUID: nil,
+				Avatar: Avatar{
+					Type: "letter_avatar",
+					UUID: nil,
 				},
 				Emails: []UserEmail{
 					{
@@ -127,9 +128,9 @@ func TestOrganizationMemberService_List(t *testing.T) {
 	assert.Equal(t, expected, members)
 }
 
-func TestOrganizationMemberService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationMembersService_Get(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -191,8 +192,8 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 			}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	members, _, err := client.OrganizationMembers.Get("the-interstellar-jurisdiction", "1")
+	ctx := context.Background()
+	members, _, err := client.OrganizationMembers.Get(ctx, "the-interstellar-jurisdiction", "1")
 	assert.NoError(t, err)
 	expected := OrganizationMember{
 		ID:    "1",
@@ -213,9 +214,9 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 			LastActive:      mustParseTime("2020-01-03T00:00:00.000000Z"),
 			IsSuperuser:     false,
 			IsStaff:         false,
-			Avatar: UserAvatar{
-				AvatarType: "letter_avatar",
-				AvatarUUID: nil,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+				UUID: nil,
 			},
 			Emails: []UserEmail{
 				{
@@ -241,24 +242,9 @@ func TestOrganizationMemberService_Get(t *testing.T) {
 	assert.Equal(t, &expected, members)
 }
 
-func TestOrganizationMemberService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
-
-	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
-		assertMethod(t, "DELETE", r)
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	client := NewClient(httpClient, nil, "")
-	resp, err := client.OrganizationMembers.Delete("the-interstellar-jurisdiction", "1")
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), resp.ContentLength)
-}
-
-func TestOrganizationMemberService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationMembersService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -285,12 +271,12 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	createOrganizationMemberParams := CreateOrganizationMemberParams{
 		Email: "test@example.com",
 		Role:  RoleMember,
 	}
-	member, _, err := client.OrganizationMembers.Create("the-interstellar-jurisdiction", &createOrganizationMemberParams)
+	ctx := context.Background()
+	member, _, err := client.OrganizationMembers.Create(ctx, "the-interstellar-jurisdiction", &createOrganizationMemberParams)
 	assert.NoError(t, err)
 
 	inviterName := "John Doe"
@@ -317,9 +303,9 @@ func TestOrganizationMemberService_Create(t *testing.T) {
 	assert.Equal(t, &expected, member)
 }
 
-func TestOrganizationMemberService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestOrganizationMembersService_Update(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -345,11 +331,11 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	updateOrganizationMemberParams := UpdateOrganizationMemberParams{
 		Role: RoleMember,
 	}
-	member, _, err := client.OrganizationMembers.Update("the-interstellar-jurisdiction", "1", &updateOrganizationMemberParams)
+	ctx := context.Background()
+	member, _, err := client.OrganizationMembers.Update(ctx, "the-interstellar-jurisdiction", "1", &updateOrganizationMemberParams)
 	assert.NoError(t, err)
 
 	inviterName := "John Doe"
@@ -374,4 +360,19 @@ func TestOrganizationMemberService_Update(t *testing.T) {
 	}
 
 	assert.Equal(t, &expected, member)
+}
+
+func TestOrganizationMembersService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/members/1/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	ctx := context.Background()
+	resp, err := client.OrganizationMembers.Delete(ctx, "the-interstellar-jurisdiction", "1")
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), resp.ContentLength)
 }

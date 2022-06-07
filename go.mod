@@ -1,4 +1,4 @@
-module github.com/jianyuan/go-sentry
+module github.com/jianyuan/go-sentry/v2
 
 go 1.18
 

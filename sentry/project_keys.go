@@ -1,12 +1,9 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
-	"net/http"
 	"time"
-
-	"github.com/dghubble/sling"
-	"github.com/tomnomnom/linkheader"
 )
 
 // ProjectKeyRateLimit represents a project key's rate limit.
@@ -40,49 +37,35 @@ type ProjectKey struct {
 	DateCreated time.Time            `json:"dateCreated"`
 }
 
-// ProjectKeyService provides methods for accessing Sentry project
+// ProjectKeysService provides methods for accessing Sentry project
 // client key API endpoints.
 // https://docs.sentry.io/api/projects/
-type ProjectKeyService struct {
-	sling *sling.Sling
-}
+type ProjectKeysService service
 
-func newProjectKeyService(sling *sling.Sling) *ProjectKeyService {
-	return &ProjectKeyService{
-		sling: sling,
-	}
+// ListProjectKeyParams are the parameters for OrganizationService.List.
+type ListProjectKeyParams struct {
+	Cursor string `url:"cursor,omitempty"`
 }
 
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
-func (s *ProjectKeyService) List(organizationSlug string, projectSlug string) ([]ProjectKey, *http.Response, error) {
-	cursor := ""
-	return s.listPerPage(organizationSlug, projectSlug, cursor)
-}
-
-// https://docs.sentry.io/api/projects/get-project-keys/
-func (s *ProjectKeyService) listPerPage(organizationSlug string, projectSlug string, cursor string) ([]ProjectKey, *http.Response, error) {
-	projectKeys := new([]ProjectKey)
-	apiError := new(APIError)
-
-	URL := "projects/"+organizationSlug+"/"+projectSlug+"/keys/" + cursor
-	resp, err := s.sling.New().Get(URL).Receive(projectKeys, apiError)
-	if resp != nil && resp.StatusCode == 200 {
-		linkHeaders := linkheader.Parse(resp.Header.Get("Link"))
-		// If the next Link has results query it as well
-		nextLink := linkHeaders[len(linkHeaders) - 1]
-
-		if nextLink.Param("results") == "true" {
-			c := fmt.Sprintf("?&cursor=%s", nextLink.Param("cursor"))
-			pagedProjectKeys, pagedResp, err2 := s.listPerPage(organizationSlug, projectSlug, c)
-			if err2 != nil {
-				return nil, pagedResp, relevantError(err2, *apiError)
-			}
-			*projectKeys = append(*projectKeys, pagedProjectKeys...)
-		}
+func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListProjectKeyParams) ([]*ProjectKey, *Response, error) {
+	u, err := addQuery(fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug), params)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return *projectKeys, resp, relevantError(err, *apiError)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	projectKeys := []*ProjectKey{}
+	resp, err := s.client.Do(ctx, req, &projectKeys)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectKeys, resp, nil
 }
 
 // CreateProjectKeyParams are the parameters for ProjectKeyService.Create.
@@ -93,25 +76,19 @@ type CreateProjectKeyParams struct {
 
 // Create a new client key bound to a project.
 // https://docs.sentry.io/api/projects/post-project-keys/
-func (s *ProjectKeyService) Create(organizationSlug string, projectSlug string, params *CreateProjectKeyParams) (*ProjectKey, *http.Response, error) {
-	projectKey := new(ProjectKey)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("projects/"+organizationSlug+"/"+projectSlug+"/keys/").BodyJSON(params).Receive(projectKey, apiError)
-
+func (s *ProjectKeysService) Create(ctx context.Context, organizationSlug string, projectSlug string, params *CreateProjectKeyParams) (*ProjectKey, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug)
+	req, err := s.client.NewRequest("POST", u, params)
 	if err != nil {
-		return projectKey, resp, relevantError(err, *apiError)
+		return nil, nil, err
 	}
 
-	// Hack as currently the API does not support setting rate limits on Create
-	if params.RateLimit != nil {
-		updateParams := &UpdateProjectKeyParams{
-			Name:      params.Name,
-			RateLimit: params.RateLimit,
-		}
-		projectKey, resp, err = s.Update(organizationSlug, projectSlug, projectKey.ID, updateParams)
+	projectKey := new(ProjectKey)
+	resp, err := s.client.Do(ctx, req, projectKey)
+	if err != nil {
+		return nil, resp, err
 	}
-
-	return projectKey, resp, relevantError(err, *apiError)
+	return projectKey, resp, nil
 }
 
 // UpdateProjectKeyParams are the parameters for ProjectKeyService.Update.
@@ -122,17 +99,29 @@ type UpdateProjectKeyParams struct {
 
 // Update a client key.
 // https://docs.sentry.io/api/projects/put-project-key-details/
-func (s *ProjectKeyService) Update(organizationSlug string, projectSlug string, keyID string, params *UpdateProjectKeyParams) (*ProjectKey, *http.Response, error) {
+func (s *ProjectKeysService) Update(ctx context.Context, organizationSlug string, projectSlug string, keyID string, params *UpdateProjectKeyParams) (*ProjectKey, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/keys/%v/", organizationSlug, projectSlug, keyID)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	projectKey := new(ProjectKey)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+projectSlug+"/keys/"+keyID+"/").BodyJSON(params).Receive(projectKey, apiError)
-	return projectKey, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, projectKey)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectKey, resp, nil
 }
 
 // Delete a project.
 // https://docs.sentry.io/api/projects/delete-project-details/
-func (s *ProjectKeyService) Delete(organizationSlug string, projectSlug string, keyID string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+projectSlug+"/keys/"+keyID+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+func (s *ProjectKeysService) Delete(ctx context.Context, organizationSlug string, projectSlug string, keyID string) (*Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/keys/%v/", organizationSlug, projectSlug, keyID)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
