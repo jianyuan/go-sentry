@@ -109,3 +109,29 @@ func TestNewOnPremiseClient(t *testing.T) {
 	}
 
 }
+
+func TestResponse_populatePaginationCursor_hasNextResults(t *testing.T) {
+	r := &http.Response{
+		Header: http.Header{
+			"Link": {`<https://sentry.io/api/0/organizations/terraform-provider-sentry/members/?&cursor=100:-1:1>; rel="previous"; results="false"; cursor="100:-1:1", ` +
+				`<https://sentry.io/api/0/organizations/terraform-provider-sentry/members/?&cursor=100:1:0>; rel="next"; results="true"; cursor="100:1:0"`,
+			},
+		},
+	}
+
+	response := newResponse(r)
+	assert.Equal(t, response.Cursor, "100:1:0")
+}
+
+func TestResponse_populatePaginationCursor_noNextResults(t *testing.T) {
+	r := &http.Response{
+		Header: http.Header{
+			"Link": {`<https://sentry.io/api/0/organizations/terraform-provider-sentry/members/?&cursor=100:-1:1>; rel="previous"; results="false"; cursor="100:-1:1", ` +
+				`<https://sentry.io/api/0/organizations/terraform-provider-sentry/members/?&cursor=100:1:0>; rel="next"; results="false"; cursor="100:1:0"`,
+			},
+		},
+	}
+
+	response := newResponse(r)
+	assert.Equal(t, response.Cursor, "")
+}

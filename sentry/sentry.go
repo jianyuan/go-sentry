@@ -14,6 +14,7 @@ import (
 
 	"github.com/dghubble/sling"
 	"github.com/google/go-querystring/query"
+	"github.com/peterhellberg/link"
 )
 
 const (
@@ -108,6 +109,12 @@ func NewOnPremiseClient(baseURL string, httpClient *http.Client) (*Client, error
 	return c, nil
 }
 
+type ListCursorParams struct {
+	// A cursor, as given in the Link header.
+	// If specified, the query continues the search using this cursor.
+	Cursor string `url:"cursor,omitempty"`
+}
+
 func addQuery(s string, params interface{}) (string, error) {
 	v := reflect.ValueOf(params)
 	if v.Kind() == reflect.Ptr && v.IsNil() {
@@ -169,12 +176,25 @@ func (c *Client) NewRequest(method, urlRef string, body interface{}) (*http.Requ
 type Response struct {
 	*http.Response
 
+	// For APIs that support cursor pagination, the following field will be populated
+	// to point to the next page if more results are available.
+	// Set ListCursorParams.Cursor to this value when calling the endpoint again.
+	Cursor string
+
 	// TODO: Parse rate limit
 }
 
 func newResponse(r *http.Response) *Response {
 	response := &Response{Response: r}
+	response.populatePaginationCursor()
 	return response
+}
+
+func (r *Response) populatePaginationCursor() {
+	rels := link.ParseResponse(r.Response)
+	if nextRel, ok := rels["next"]; ok && nextRel.Extra["results"] == "true" {
+		r.Cursor = nextRel.Extra["cursor"]
+	}
 }
 
 func (c *Client) BareDo(ctx context.Context, req *http.Request) (*Response, error) {

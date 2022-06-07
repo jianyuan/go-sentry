@@ -35,13 +35,8 @@ const (
 // OrganizationMembersService provides methods for accessing Sentry membership API endpoints.
 type OrganizationMembersService service
 
-// ListOrganizationMemberParams are the parameters for OrganizationMemberService.List.
-type ListOrganizationMemberParams struct {
-	Cursor string `url:"cursor,omitempty"`
-}
-
 // List organization members.
-func (s *OrganizationMembersService) List(ctx context.Context, organizationSlug string, params *ListOrganizationMemberParams) ([]*OrganizationMember, *Response, error) {
+func (s *OrganizationMembersService) List(ctx context.Context, organizationSlug string, params *ListCursorParams) ([]*OrganizationMember, *Response, error) {
 	u, err := addQuery(fmt.Sprintf("0/organizations/%v/members/", organizationSlug), params)
 	if err != nil {
 		return nil, nil, err

@@ -76,7 +76,7 @@ func TestOrganizationMembersService_List(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	members, _, err := client.OrganizationMembers.List(ctx, "the-interstellar-jurisdiction", &ListOrganizationMemberParams{
+	members, _, err := client.OrganizationMembers.List(ctx, "the-interstellar-jurisdiction", &ListCursorParams{
 		Cursor: "100:-1:1",
 	})
 	assert.NoError(t, err)
