@@ -47,7 +47,7 @@ type Client struct {
 	OrganizationMembers *OrganizationMembersService
 	Organizations       *OrganizationsService
 	Ownership           *ProjectOwnershipService
-	ProjectKeys         *ProjectKeyService
+	ProjectKeys         *ProjectKeysService
 	ProjectPlugins      *ProjectPluginService
 	Projects            *ProjectsService
 	Teams               *TeamsService
@@ -73,7 +73,6 @@ func NewClient(httpClient *http.Client) *Client {
 		client:  httpClient,
 		BaseURL: baseURL,
 
-		ProjectKeys:    newProjectKeyService(base.New()),
 		ProjectPlugins: newProjectPluginService(base.New()),
 		AlertRules:     newAlertRuleService(base.New()),
 		Ownership:      newProjectOwnershipService(base.New()),
@@ -82,6 +81,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
+	c.ProjectKeys = (*ProjectKeysService)(&c.common)
 	c.Projects = (*ProjectsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
 	return c
