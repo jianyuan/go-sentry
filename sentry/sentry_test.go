@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -134,4 +135,27 @@ func TestResponse_populatePaginationCursor_noNextResults(t *testing.T) {
 
 	response := newResponse(r)
 	assert.Equal(t, response.Cursor, "")
+}
+
+func TestDo_rateLimit(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(headerRateLimit, "40")
+		w.Header().Set(headerRateRemaining, "39")
+		w.Header().Set(headerRateReset, "1654566542")
+		w.Header().Set(headerRateConcurrentLimit, "25")
+		w.Header().Set(headerRateConcurrentRemaining, "24")
+	})
+
+	req, _ := client.NewRequest("GET", "/", nil)
+	ctx := context.Background()
+	resp, err := client.Do(ctx, req, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, resp.Rate.Limit, 40)
+	assert.Equal(t, resp.Rate.Remaining, 39)
+	assert.Equal(t, resp.Rate.Reset, time.Date(2022, time.June, 7, 1, 49, 2, 0, time.UTC))
+	assert.Equal(t, resp.Rate.ConcurrentLimit, 25)
+	assert.Equal(t, resp.Rate.ConcurrentRemaining, 24)
 }
