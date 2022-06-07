@@ -90,14 +90,9 @@ type DetailedOrganization struct {
 // https://docs.sentry.io/api/organizations/
 type OrganizationsService service
 
-// ListOrganizationParams are the parameters for OrganizationService.List.
-type ListOrganizationParams struct {
-	Cursor string `url:"cursor,omitempty"`
-}
-
 // List organizations available to the authenticated session.
 // https://docs.sentry.io/api/organizations/list-your-organizations/
-func (s *OrganizationsService) List(ctx context.Context, params *ListOrganizationParams) ([]*Organization, *Response, error) {
+func (s *OrganizationsService) List(ctx context.Context, params *ListCursorParams) ([]*Organization, *Response, error) {
 	u, err := addQuery("0/organizations/", params)
 	if err != nil {
 		return nil, nil, err

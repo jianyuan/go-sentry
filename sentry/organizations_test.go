@@ -33,7 +33,7 @@ func TestOrganizationsService_List(t *testing.T) {
 		]`)
 	})
 
-	params := &ListOrganizationParams{Cursor: cursor}
+	params := &ListCursorParams{Cursor: cursor}
 	ctx := context.Background()
 	orgs, _, err := client.Organizations.List(ctx, params)
 	assert.NoError(t, err)

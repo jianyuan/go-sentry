@@ -42,14 +42,9 @@ type ProjectKey struct {
 // https://docs.sentry.io/api/projects/
 type ProjectKeysService service
 
-// ListProjectKeyParams are the parameters for OrganizationService.List.
-type ListProjectKeyParams struct {
-	Cursor string `url:"cursor,omitempty"`
-}
-
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
-func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListProjectKeyParams) ([]*ProjectKey, *Response, error) {
+func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListCursorParams) ([]*ProjectKey, *Response, error) {
 	u, err := addQuery(fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug), params)
 	if err != nil {
 		return nil, nil, err

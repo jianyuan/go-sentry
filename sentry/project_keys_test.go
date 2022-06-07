@@ -52,9 +52,8 @@ func TestProjectKeysService_List(t *testing.T) {
 		}]`)
 	})
 
-	params := &ListProjectKeyParams{}
 	ctx := context.Background()
-	projectKeys, _, err := client.ProjectKeys.List(ctx, "the-interstellar-jurisdiction", "pump-station", params)
+	projectKeys, _, err := client.ProjectKeys.List(ctx, "the-interstellar-jurisdiction", "pump-station", nil)
 	assert.NoError(t, err)
 
 	expected := []*ProjectKey{
