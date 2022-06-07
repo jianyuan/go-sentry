@@ -1,10 +1,9 @@
 package sentry
 
 import (
+	"context"
 	"encoding/json"
-	"net/http"
-
-	"github.com/dghubble/sling"
+	"fmt"
 )
 
 // ProjectPluginAsset represents an asset of a plugin.
@@ -43,32 +42,40 @@ type ProjectPlugin struct {
 	Config     []ProjectPluginConfig  `json:"config"`
 }
 
-// ProjectPluginService provides methods for accessing Sentry project
+// ProjectPluginsService provides methods for accessing Sentry project
 // plugin API endpoints.
-type ProjectPluginService struct {
-	sling *sling.Sling
-}
-
-func newProjectPluginService(sling *sling.Sling) *ProjectPluginService {
-	return &ProjectPluginService{
-		sling: sling,
-	}
-}
+type ProjectPluginsService service
 
 // List plugins bound to a project.
-func (s *ProjectPluginService) List(organizationSlug string, projectSlug string) ([]ProjectPlugin, *http.Response, error) {
-	projectPlugins := new([]ProjectPlugin)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+projectSlug+"/plugins/").Receive(projectPlugins, apiError)
-	return *projectPlugins, resp, relevantError(err, *apiError)
+func (s *ProjectPluginsService) List(ctx context.Context, organizationSlug string, projectSlug string) ([]*ProjectPlugin, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/plugins/", organizationSlug, projectSlug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	projectPlugins := []*ProjectPlugin{}
+	resp, err := s.client.Do(ctx, req, &projectPlugins)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectPlugins, resp, nil
 }
 
 // Get details of a project plugin.
-func (s *ProjectPluginService) Get(organizationSlug string, projectSlug string, id string) (*ProjectPlugin, *http.Response, error) {
+func (s *ProjectPluginsService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*ProjectPlugin, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/plugins/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	projectPlugin := new(ProjectPlugin)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+projectSlug+"/plugins/"+id+"/").Receive(projectPlugin, apiError)
-	return projectPlugin, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, projectPlugin)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectPlugin, resp, nil
 }
 
 // UpdateProjectPluginParams are the parameters for TeamService.Update.
@@ -76,23 +83,39 @@ type UpdateProjectPluginParams map[string]interface{}
 
 // Update settings for a given team.
 // https://docs.sentry.io/api/teams/put-team-details/
-func (s *ProjectPluginService) Update(organizationSlug string, projectSlug string, id string, params UpdateProjectPluginParams) (*ProjectPlugin, *http.Response, error) {
+func (s *ProjectPluginsService) Update(ctx context.Context, organizationSlug string, projectSlug string, id string, params UpdateProjectPluginParams) (*ProjectPlugin, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/plugins/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	projectPlugin := new(ProjectPlugin)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+projectSlug+"/plugins/"+id+"/").BodyJSON(params).Receive(projectPlugin, apiError)
-	return projectPlugin, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, projectPlugin)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectPlugin, resp, nil
 }
 
 // Enable a project plugin.
-func (s *ProjectPluginService) Enable(organizationSlug string, projectSlug string, id string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("projects/"+organizationSlug+"/"+projectSlug+"/plugins/"+id+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+func (s *ProjectPluginsService) Enable(ctx context.Context, organizationSlug string, projectSlug string, id string) (*Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/plugins/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("POST", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
 
 // Disable a project plugin.
-func (s *ProjectPluginService) Disable(organizationSlug string, projectSlug string, id string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+projectSlug+"/plugins/"+id+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+func (s *ProjectPluginsService) Disable(ctx context.Context, organizationSlug string, projectSlug string, id string) (*Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/plugins/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
