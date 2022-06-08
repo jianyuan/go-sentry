@@ -43,6 +43,9 @@ type Client struct {
 	// User agent used when communicating with Sentry.
 	UserAgent string
 
+	// Latest rate limit
+	rate Rate
+
 	// Common struct used by all services.
 	common service
 
@@ -228,6 +231,14 @@ func (c *Client) BareDo(ctx context.Context, req *http.Request) (*Response, erro
 		return nil, errNonNilContext
 	}
 
+	// Check rate limit
+	if err := c.checkRateLimit(req); err != nil {
+		return &Response{
+			Response: err.Response,
+			Rate:     err.Rate,
+		}, err
+	}
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		// If we got an error, and the context has been canceled,
@@ -242,8 +253,30 @@ func (c *Client) BareDo(ctx context.Context, req *http.Request) (*Response, erro
 
 	response := newResponse(resp)
 
+	c.rate = response.Rate
+
 	err = CheckResponse(resp)
+
 	return response, err
+}
+
+func (c *Client) checkRateLimit(req *http.Request) *RateLimitError {
+	if !c.rate.Reset.IsZero() && c.rate.Remaining == 0 && time.Now().Before(c.rate.Reset) {
+		resp := &http.Response{
+			Status:     http.StatusText(http.StatusTooManyRequests),
+			StatusCode: http.StatusTooManyRequests,
+			Request:    req,
+			Header:     http.Header{},
+			Body:       ioutil.NopCloser(strings.NewReader("")),
+		}
+		return &RateLimitError{
+			Rate:     c.rate,
+			Response: resp,
+			Detail: fmt.Sprintf("API rate limit of %v and concurrent limit of %v still exceeded until %v, not making remote request.",
+				c.rate.Limit, c.rate.ConcurrentLimit, c.rate.Reset),
+		}
+	}
+	return nil
 }
 
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
@@ -271,6 +304,17 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	return resp, err
 }
 
+// matchHTTPResponse compares two http.Response objects. Currently, only StatusCode is checked.
+func matchHTTPResponse(r1, r2 *http.Response) bool {
+	if r1 == nil && r2 == nil {
+		return true
+	}
+	if r1 != nil && r2 != nil {
+		return r1.StatusCode == r2.StatusCode
+	}
+	return false
+}
+
 type ErrorResponse struct {
 	Response *http.Response
 	Detail   string `json:"detail"`
@@ -281,6 +325,41 @@ func (r *ErrorResponse) Error() string {
 		"%v %v: %d %v",
 		r.Response.Request.Method, r.Response.Request.URL,
 		r.Response.StatusCode, r.Detail)
+}
+
+func (r *ErrorResponse) Is(target error) bool {
+	v, ok := target.(*ErrorResponse)
+	if !ok {
+		return false
+	}
+	if r.Detail != v.Detail ||
+		!matchHTTPResponse(r.Response, v.Response) {
+		return false
+	}
+	return true
+}
+
+type RateLimitError struct {
+	Rate     Rate
+	Response *http.Response
+	Detail   string
+}
+
+func (r *RateLimitError) Error() string {
+	return fmt.Sprintf(
+		"%v %v: %d %v %v",
+		r.Response.Request.Method, r.Response.Request.URL,
+		r.Response.StatusCode, r.Detail, fmt.Sprintf("[rate reset in %v]", time.Until(r.Rate.Reset)))
+}
+
+func (r *RateLimitError) Is(target error) bool {
+	v, ok := target.(*RateLimitError)
+	if !ok {
+		return false
+	}
+	return r.Rate == v.Rate &&
+		r.Detail == v.Detail &&
+		matchHTTPResponse(r.Response, v.Response)
 }
 
 func CheckResponse(r *http.Response) error {
@@ -302,7 +381,15 @@ func CheckResponse(r *http.Response) error {
 	// Re-populate error response body.
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 
-	// TODO: Parse rate limit errors
+	switch {
+	case r.StatusCode == http.StatusTooManyRequests &&
+		(r.Header.Get(headerRateRemaining) == "0" || r.Header.Get(headerRateConcurrentRemaining) == "0"):
+		return &RateLimitError{
+			Rate:     parseRate(r),
+			Response: errorResponse.Response,
+			Detail:   errorResponse.Detail,
+		}
+	}
 
 	return errorResponse
 }

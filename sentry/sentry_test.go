@@ -2,14 +2,15 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
-
-	"encoding/json"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -137,6 +138,29 @@ func TestResponse_populatePaginationCursor_noNextResults(t *testing.T) {
 	assert.Equal(t, response.Cursor, "")
 }
 
+func TestDo(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	type foo struct {
+		A string
+	}
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		fmt.Fprint(w, `{"A":"a"}`)
+	})
+
+	req, _ := client.NewRequest("GET", "/", nil)
+	body := new(foo)
+	ctx := context.Background()
+	client.Do(ctx, req, body)
+
+	expected := &foo{A: "a"}
+
+	assert.Equal(t, expected, body)
+}
+
 func TestDo_rateLimit(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -160,27 +184,42 @@ func TestDo_rateLimit(t *testing.T) {
 	assert.Equal(t, resp.Rate.ConcurrentRemaining, 24)
 }
 
-func TestDo(t *testing.T) {
+func TestDo_rateLimit_noNetworkCall(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
-	type foo struct {
-		A string
-	}
+	reset := time.Now().UTC().Add(time.Minute).Round(time.Second)
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		assertMethod(t, "GET", r)
-		fmt.Fprint(w, `{"A":"a"}`)
+	mux.HandleFunc("/first", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(headerRateLimit, "40")
+		w.Header().Set(headerRateRemaining, "0")
+		w.Header().Set(headerRateReset, fmt.Sprint(reset.Unix()))
+		w.WriteHeader(http.StatusTooManyRequests)
+		fmt.Fprint(w, `{"detail": "Rate limit exceeded"}`)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
-	body := new(foo)
+	madeNetworkCall := false
+	mux.HandleFunc("/second", func(w http.ResponseWriter, r *http.Request) {
+		madeNetworkCall = true
+	})
+
+	// First request to determine the rate limit.
+	req, _ := client.NewRequest("GET", "/first", nil)
 	ctx := context.Background()
-	client.Do(ctx, req, body)
+	client.Do(ctx, req, nil)
 
-	expected := &foo{A: "a"}
+	// Second request should not make a network call.
+	req, _ = client.NewRequest("GET", "/second", nil)
+	_, err := client.Do(ctx, req, nil)
 
-	assert.Equal(t, expected, body)
+	assert.False(t, madeNetworkCall)
+	assert.Error(t, err)
+
+	if rateLimitErr, ok := err.(*RateLimitError); assert.True(t, ok) {
+		assert.Equal(t, 40, rateLimitErr.Rate.Limit)
+		assert.Equal(t, 0, rateLimitErr.Rate.Remaining)
+		assert.Equal(t, reset, rateLimitErr.Rate.Reset)
+	}
 }
 
 func TestDo_nilContext(t *testing.T) {
@@ -246,4 +285,84 @@ func TestDo_apiError_noDetail(t *testing.T) {
 
 	assert.Equal(t, &ErrorResponse{Response: resp.Response, Detail: "API error message"}, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestCheckResponse(t *testing.T) {
+	testcases := []struct {
+		description string
+		body        string
+	}{
+		{
+			description: "JSON object",
+			body:        `{"detail": "Error message"}`,
+		},
+		{
+			description: "JSON string",
+			body:        `"Error message"`,
+		},
+		{
+			description: "plain text",
+			body:        `Error message`,
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			res := &http.Response{
+				Request:    &http.Request{},
+				StatusCode: http.StatusBadRequest,
+				Body:       ioutil.NopCloser(strings.NewReader(tc.body)),
+			}
+
+			err := CheckResponse(res)
+
+			expected := &ErrorResponse{
+				Response: res,
+				Detail:   "Error message",
+			}
+			assert.ErrorIs(t, err, expected)
+		})
+	}
+
+}
+
+func TestCheckResponse_rateLimit(t *testing.T) {
+	testcases := []struct {
+		description string
+		addHeaders  func(res *http.Response)
+	}{
+		{
+			description: "headerRateRemaining",
+			addHeaders: func(res *http.Response) {
+				res.Header.Set(headerRateRemaining, "0")
+				res.Header.Set(headerRateReset, "123456")
+			},
+		},
+		{
+			description: "headerRateConcurrentRemaining",
+			addHeaders: func(res *http.Response) {
+				res.Header.Set(headerRateConcurrentRemaining, "0")
+				res.Header.Set(headerRateReset, "123456")
+			},
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			res := &http.Response{
+				Request:    &http.Request{},
+				StatusCode: http.StatusTooManyRequests,
+				Header:     http.Header{},
+				Body:       ioutil.NopCloser(strings.NewReader(`{"detail": "Rate limit exceeded"}`)),
+			}
+			tc.addHeaders(res)
+
+			err := CheckResponse(res)
+
+			expected := &RateLimitError{
+				Rate:     parseRate(res),
+				Response: res,
+				Detail:   "Rate limit exceeded",
+			}
+			assert.ErrorIs(t, err, expected)
+		})
+	}
 }
