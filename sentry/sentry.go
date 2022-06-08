@@ -43,6 +43,9 @@ type Client struct {
 	// User agent used when communicating with Sentry.
 	UserAgent string
 
+	// Latest rate limit
+	rate Rate
+
 	// Common struct used by all services.
 	common service
 
@@ -228,6 +231,14 @@ func (c *Client) BareDo(ctx context.Context, req *http.Request) (*Response, erro
 		return nil, errNonNilContext
 	}
 
+	// Check rate limit
+	if err := c.checkRateLimit(req); err != nil {
+		return &Response{
+			Response: err.Response,
+			Rate:     err.Rate,
+		}, err
+	}
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		// If we got an error, and the context has been canceled,
@@ -242,8 +253,30 @@ func (c *Client) BareDo(ctx context.Context, req *http.Request) (*Response, erro
 
 	response := newResponse(resp)
 
+	c.rate = response.Rate
+
 	err = CheckResponse(resp)
+
 	return response, err
+}
+
+func (c *Client) checkRateLimit(req *http.Request) *RateLimitError {
+	if !c.rate.Reset.IsZero() && c.rate.Remaining == 0 && time.Now().Before(c.rate.Reset) {
+		resp := &http.Response{
+			Status:     http.StatusText(http.StatusTooManyRequests),
+			StatusCode: http.StatusTooManyRequests,
+			Request:    req,
+			Header:     http.Header{},
+			Body:       ioutil.NopCloser(strings.NewReader("")),
+		}
+		return &RateLimitError{
+			Rate:     c.rate,
+			Response: resp,
+			Detail: fmt.Sprintf("API rate limit of %v and concurrent limit of %v still exceeded until %v, not making remote request.",
+				c.rate.Limit, c.rate.ConcurrentLimit, c.rate.Reset),
+		}
+	}
+	return nil
 }
 
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
@@ -269,10 +302,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		}
 	}
 	return resp, err
-}
-
-func (c *Client) checkRateLimit() *RateLimitError {
-	return nil
 }
 
 // matchHTTPResponse compares two http.Response objects. Currently, only StatusCode is checked.
