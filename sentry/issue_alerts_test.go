@@ -52,7 +52,6 @@ func TestIssueAlertsService_List(t *testing.T) {
 	alerts, _, err := client.IssueAlerts.List(ctx, "the-interstellar-jurisdiction", "pump-station", nil)
 	require.NoError(t, err)
 
-	ti := mustParseTime("2019-08-24T18:12:16.321Z")
 	expected := []*IssueAlert{
 		{
 			ID:          String("12345"),
@@ -78,7 +77,7 @@ func TestIssueAlertsService_List(t *testing.T) {
 					"workspace":  "1234",
 				},
 			},
-			DateCreated: &ti,
+			DateCreated: Time(mustParseTime("2019-08-24T18:12:16.321Z")),
 		},
 	}
 	require.Equal(t, expected, alerts)
@@ -220,7 +219,6 @@ func TestIssueAlertsService_Get(t *testing.T) {
 	alerts, _, err := client.IssueAlerts.Get(ctx, "the-interstellar-jurisdiction", "pump-station", "11185158")
 	require.NoError(t, err)
 
-	ti := mustParseTime("2022-05-23T19:54:30.860115Z")
 	expected := &IssueAlert{
 		ID: String("11185158"),
 		Conditions: []*IssueAlertCondition{
@@ -330,7 +328,7 @@ func TestIssueAlertsService_Get(t *testing.T) {
 		FilterMatch: String("any"),
 		Frequency:   Int(30),
 		Name:        String("My Rule Name"),
-		DateCreated: &ti,
+		DateCreated: Time(mustParseTime("2022-05-23T19:54:30.860115Z")),
 		Owner:       String("team:1322366"),
 		CreatedBy: &IssueAlertCreatedBy{
 			ID:    Int(94401),
@@ -431,7 +429,6 @@ func TestIssueAlertsService_Create(t *testing.T) {
 	alerts, _, err := client.IssueAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
-	ti := mustParseTime("2019-08-24T18:12:16.321Z")
 	expected := &IssueAlert{
 		ID:          String("123456"),
 		ActionMatch: String("all"),
@@ -456,7 +453,7 @@ func TestIssueAlertsService_Create(t *testing.T) {
 				"workspace":  "1234",
 			},
 		},
-		DateCreated: &ti,
+		DateCreated: Time(mustParseTime("2019-08-24T18:12:16.321Z")),
 	}
 	require.Equal(t, expected, alerts)
 
@@ -560,7 +557,6 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 	alert, _, err := client.IssueAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
-	ti := mustParseTime("2019-08-24T18:12:16.321Z")
 	expected := &IssueAlert{
 		ID:          String("123456"),
 		ActionMatch: String("all"),
@@ -585,7 +581,7 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 				"workspace":  "1234",
 			},
 		},
-		DateCreated: &ti,
+		DateCreated: Time(mustParseTime("2019-08-24T18:12:16.321Z")),
 	}
 	require.Equal(t, expected, alert)
 
@@ -595,7 +591,6 @@ func TestIssueAlertsService_Update(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
-	ti := mustParseTime("2019-08-24T18:12:16.321Z")
 	params := &IssueAlert{
 		ID:          String("12345"),
 		ActionMatch: String("all"),
@@ -634,7 +629,7 @@ func TestIssueAlertsService_Update(t *testing.T) {
 				"value":     "test",
 			},
 		},
-		DateCreated: &ti,
+		DateCreated: Time(mustParseTime("2019-08-24T18:12:16.321Z")),
 	}
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/rules/12345/", func(w http.ResponseWriter, r *http.Request) {
@@ -732,7 +727,7 @@ func TestIssueAlertsService_Update(t *testing.T) {
 				"workspace":  "1234",
 			},
 		},
-		DateCreated: &ti,
+		DateCreated: Time(mustParseTime("2019-08-24T18:12:16.321Z")),
 	}
 	require.Equal(t, expected, alerts)
 

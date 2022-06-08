@@ -333,3 +333,6 @@ func Int(v int) *int { return &v }
 
 // String returns a pointer to the string value passed in.
 func String(v string) *string { return &v }
+
+// Time returns a pointer to the time.Time value passed in.
+func Time(v time.Time) *time.Time { return &v }

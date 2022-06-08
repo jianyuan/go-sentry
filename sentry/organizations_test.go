@@ -40,12 +40,12 @@ func TestOrganizationsService_List(t *testing.T) {
 
 	expected := []*Organization{
 		{
-			ID:             "2",
-			Slug:           "the-interstellar-jurisdiction",
-			Name:           "The Interstellar Jurisdiction",
-			DateCreated:    mustParseTime("2017-07-17T14:10:36.141Z"),
-			IsEarlyAdopter: false,
-			Avatar: Avatar{
+			ID:             String("2"),
+			Slug:           String("the-interstellar-jurisdiction"),
+			Name:           String("The Interstellar Jurisdiction"),
+			DateCreated:    Time(mustParseTime("2017-07-17T14:10:36.141Z")),
+			IsEarlyAdopter: Bool(false),
+			Avatar: &Avatar{
 				UUID: nil,
 				Type: "letter_avatar",
 			},
@@ -198,19 +198,19 @@ func TestOrganizationsService_Get(t *testing.T) {
 	organization, _, err := client.Organizations.Get(ctx, "the-interstellar-jurisdiction")
 	assert.NoError(t, err)
 
-	expected := &DetailedOrganization{
-		ID:   "2",
-		Slug: "the-interstellar-jurisdiction",
-		Status: OrganizationStatus{
-			ID:   "active",
-			Name: "active",
+	expected := &Organization{
+		ID:   String("2"),
+		Slug: String("the-interstellar-jurisdiction"),
+		Status: &OrganizationStatus{
+			ID:   String("active"),
+			Name: String("active"),
 		},
-		Name:                     "The Interstellar Jurisdiction",
-		DateCreated:              mustParseTime("2022-06-05T17:31:31.170029Z"),
-		IsEarlyAdopter:           false,
-		Require2FA:               false,
-		RequireEmailVerification: false,
-		Avatar: Avatar{
+		Name:                     String("The Interstellar Jurisdiction"),
+		DateCreated:              Time(mustParseTime("2022-06-05T17:31:31.170029Z")),
+		IsEarlyAdopter:           Bool(false),
+		Require2FA:               Bool(false),
+		RequireEmailVerification: Bool(false),
+		Avatar: &Avatar{
 			Type: "letter_avatar",
 		},
 		Features: []string{
@@ -251,51 +251,51 @@ func TestOrganizationsService_Get(t *testing.T) {
 			"mobile-app",
 			"minute-resolution-sessions",
 		},
-		Quota: OrganizationQuota{
-			MaxRate:         0,
-			MaxRateInterval: 60,
-			AccountLimit:    0,
-			ProjectLimit:    100,
+		Quota: &OrganizationQuota{
+			MaxRate:         nil,
+			MaxRateInterval: Int(60),
+			AccountLimit:    Int(0),
+			ProjectLimit:    Int(100),
 		},
-		IsDefault:   false,
-		DefaultRole: "member",
+		IsDefault:   Bool(false),
+		DefaultRole: String("member"),
 		AvailableRoles: []OrganizationAvailableRole{
 			{
-				ID:   "billing",
-				Name: "Billing",
+				ID:   String("billing"),
+				Name: String("Billing"),
 			},
 			{
-				ID:   "member",
-				Name: "Member",
+				ID:   String("member"),
+				Name: String("Member"),
 			},
 			{
-				ID:   "admin",
-				Name: "Admin",
+				ID:   String("admin"),
+				Name: String("Admin"),
 			},
 			{
-				ID:   "manager",
-				Name: "Manager",
+				ID:   String("manager"),
+				Name: String("Manager"),
 			},
 			{
-				ID:   "owner",
-				Name: "Owner",
+				ID:   String("owner"),
+				Name: String("Owner"),
 			},
 		},
-		OpenMembership:       true,
-		AllowSharedIssues:    true,
-		EnhancedPrivacy:      false,
-		DataScrubber:         false,
-		DataScrubberDefaults: false,
+		OpenMembership:       Bool(true),
+		AllowSharedIssues:    Bool(true),
+		EnhancedPrivacy:      Bool(false),
+		DataScrubber:         Bool(false),
+		DataScrubberDefaults: Bool(false),
 		SensitiveFields:      []string{},
 		SafeFields:           []string{},
-		StoreCrashReports:    0,
-		AttachmentsRole:      "member",
-		DebugFilesRole:       "admin",
-		EventsMemberAdmin:    true,
-		AlertsMemberWrite:    true,
-		ScrubIPAddresses:     false,
-		ScrapeJavaScript:     true,
-		AllowJoinRequests:    true,
+		StoreCrashReports:    Int(0),
+		AttachmentsRole:      String("member"),
+		DebugFilesRole:       String("admin"),
+		EventsMemberAdmin:    Bool(true),
+		AlertsMemberWrite:    Bool(true),
+		ScrubIPAddresses:     Bool(false),
+		ScrapeJavaScript:     Bool(true),
+		AllowJoinRequests:    Bool(true),
 		RelayPiiConfig:       nil,
 		Access: []string{
 			"org:write",
@@ -319,8 +319,8 @@ func TestOrganizationsService_Get(t *testing.T) {
 			"org:read",
 			"team:read",
 		},
-		Role:                  "owner",
-		PendingAccessRequests: 0,
+		Role:                  String("owner"),
+		PendingAccessRequests: Int(0),
 	}
 	assert.Equal(t, expected, organization)
 }
@@ -344,17 +344,17 @@ func TestOrganizationsService_Create(t *testing.T) {
 	})
 
 	params := &CreateOrganizationParams{
-		Name: "The Interstellar Jurisdiction",
-		Slug: "the-interstellar-jurisdiction",
+		Name: String("The Interstellar Jurisdiction"),
+		Slug: String("the-interstellar-jurisdiction"),
 	}
 	ctx := context.Background()
 	organization, _, err := client.Organizations.Create(ctx, params)
 	assert.NoError(t, err)
 
 	expected := &Organization{
-		ID:   "2",
-		Name: "The Interstellar Jurisdiction",
-		Slug: "the-interstellar-jurisdiction",
+		ID:   String("2"),
+		Name: String("The Interstellar Jurisdiction"),
+		Slug: String("the-interstellar-jurisdiction"),
 	}
 	assert.Equal(t, expected, organization)
 }
@@ -379,8 +379,8 @@ func TestOrganizationsService_Create_AgreeTerms(t *testing.T) {
 	})
 
 	params := &CreateOrganizationParams{
-		Name:       "The Interstellar Jurisdiction",
-		Slug:       "the-interstellar-jurisdiction",
+		Name:       String("The Interstellar Jurisdiction"),
+		Slug:       String("the-interstellar-jurisdiction"),
 		AgreeTerms: Bool(true),
 	}
 	ctx := context.Background()
@@ -388,9 +388,9 @@ func TestOrganizationsService_Create_AgreeTerms(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := &Organization{
-		ID:   "2",
-		Name: "The Interstellar Jurisdiction",
-		Slug: "the-interstellar-jurisdiction",
+		ID:   String("2"),
+		Name: String("The Interstellar Jurisdiction"),
+		Slug: String("the-interstellar-jurisdiction"),
 	}
 	assert.Equal(t, expected, organization)
 }
@@ -414,17 +414,17 @@ func TestOrganizationsService_Update(t *testing.T) {
 	})
 
 	params := &UpdateOrganizationParams{
-		Name: "Impeccably Designated",
-		Slug: "impeccably-designated",
+		Name: String("Impeccably Designated"),
+		Slug: String("impeccably-designated"),
 	}
 	ctx := context.Background()
 	organization, _, err := client.Organizations.Update(ctx, "badly-misnamed", params)
 	assert.NoError(t, err)
 
 	expected := &Organization{
-		ID:   "2",
-		Name: "Impeccably Designated",
-		Slug: "impeccably-designated",
+		ID:   String("2"),
+		Name: String("Impeccably Designated"),
+		Slug: String("impeccably-designated"),
 	}
 	assert.Equal(t, expected, organization)
 }

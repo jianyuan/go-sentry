@@ -144,15 +144,17 @@ func TestProjectsService_List(t *testing.T) {
 	assert.NoError(t, err)
 
 	expectedOrganization := Organization{
-		ID:   "2",
-		Slug: "the-interstellar-jurisdiction",
-		Status: OrganizationStatus{
-			ID:   "active",
-			Name: "active",
+		ID:   String("2"),
+		Slug: String("the-interstellar-jurisdiction"),
+		Status: &OrganizationStatus{
+			ID:   String("active"),
+			Name: String("active"),
 		},
-		Name:        "The Interstellar Jurisdiction",
-		DateCreated: mustParseTime("2018-09-20T15:47:52.908Z"),
-		Avatar: Avatar{
+		Name:           String("The Interstellar Jurisdiction"),
+		DateCreated:    Time(mustParseTime("2018-09-20T15:47:52.908Z")),
+		IsEarlyAdopter: Bool(false),
+		Require2FA:     Bool(false),
+		Avatar: &Avatar{
 			Type: "letter_avatar",
 		},
 	}
@@ -364,6 +366,22 @@ func TestProjectsService_Get(t *testing.T) {
 	ctx := context.Background()
 	project, _, err := client.Projects.Get(ctx, "the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
+
+	expectedOrganization := Organization{
+		ID:   String("2"),
+		Slug: String("the-interstellar-jurisdiction"),
+		Status: &OrganizationStatus{
+			ID:   String("active"),
+			Name: String("active"),
+		},
+		Name:           String("The Interstellar Jurisdiction"),
+		DateCreated:    Time(mustParseTime("2018-10-02T14:19:09.817Z")),
+		IsEarlyAdopter: Bool(false),
+		Require2FA:     Bool(false),
+		Avatar: &Avatar{
+			Type: "letter_avatar",
+		},
+	}
 	expected := &Project{
 		ID:          "2",
 		Slug:        "pump-station",
@@ -401,19 +419,7 @@ func TestProjectsService_Get(t *testing.T) {
 		SubjectTemplate:      "$shortID - $title",
 		SecurityToken:        "320e3180c64e11e8b61e0242ac110002",
 		ScrapeJavaScript:     true,
-		Organization: Organization{
-			ID:   "2",
-			Slug: "the-interstellar-jurisdiction",
-			Status: OrganizationStatus{
-				ID:   "active",
-				Name: "active",
-			},
-			Name:        "The Interstellar Jurisdiction",
-			DateCreated: mustParseTime("2018-10-02T14:19:09.817Z"),
-			Avatar: Avatar{
-				Type: "letter_avatar",
-			},
-		},
+		Organization:         expectedOrganization,
 		Team: Team{
 			ID:   "2",
 			Slug: "powerful-abolitionist",
