@@ -92,37 +92,8 @@ func (s *IssueAlertsService) Get(ctx context.Context, organizationSlug string, p
 	return alert, resp, nil
 }
 
-// CreateIssueAlertParams are the parameters for IssueAlertsService.Create.
-type CreateIssueAlertParams struct {
-	ActionMatch *string                `json:"actionMatch,omitempty"`
-	FilterMatch *string                `json:"filterMatch,omitempty"`
-	Environment *string                `json:"environment,omitempty"`
-	Frequency   *int                   `json:"frequency,omitempty"`
-	Name        *string                `json:"name,omitempty"`
-	Conditions  []*IssueAlertCondition `json:"conditions,omitempty"`
-	Actions     []*IssueAlertAction    `json:"actions,omitempty"`
-	Filters     []*IssueAlertFilter    `json:"filters,omitempty"`
-}
-
-// CreateIssueAlertActionParams models the actions when creating the action for the rule.
-type CreateIssueAlertActionParams struct {
-	ID        *string `json:"id,omitempty"`
-	Tags      *string `json:"tags,omitempty"`
-	Channel   *string `json:"channel,omitempty"`
-	Workspace *string `json:"workspace,omitempty"`
-}
-
-// CreateIssueAlertConditionParams models the conditions when creating the action for the rule.
-type CreateIssueAlertConditionParams struct {
-	ID       *string `json:"id,omitempty"`
-	Interval *string `json:"interval,omitempty"`
-	Value    *int    `json:"value,omitempty"`
-	Level    *int    `json:"level,omitempty"`
-	Match    *string `json:"match,omitempty"`
-}
-
 // Create a new issue alert bound to a project.
-func (s *IssueAlertsService) Create(ctx context.Context, organizationSlug string, projectSlug string, params *CreateIssueAlertParams) (*IssueAlert, *Response, error) {
+func (s *IssueAlertsService) Create(ctx context.Context, organizationSlug string, projectSlug string, params *IssueAlert) (*IssueAlert, *Response, error) {
 	u := fmt.Sprintf("0/projects/%v/%v/rules/", organizationSlug, projectSlug)
 	req, err := s.client.NewRequest("POST", u, params)
 	if err != nil {

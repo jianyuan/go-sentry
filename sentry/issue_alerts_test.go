@@ -403,7 +403,7 @@ func TestIssueAlertsService_Create(t *testing.T) {
 		}`)
 	})
 
-	params := &CreateIssueAlertParams{
+	params := &IssueAlert{
 		ActionMatch: String("all"),
 		Environment: String("production"),
 		Frequency:   Int(30),
@@ -532,7 +532,7 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 
 	})
 
-	params := &CreateIssueAlertParams{
+	params := &IssueAlert{
 		ActionMatch: String("all"),
 		Environment: String("production"),
 		Frequency:   Int(30),
