@@ -421,15 +421,15 @@ func TestProjectsService_Get(t *testing.T) {
 		ScrapeJavaScript:     true,
 		Organization:         expectedOrganization,
 		Team: Team{
-			ID:   "2",
-			Slug: "powerful-abolitionist",
-			Name: "Powerful Abolitionist",
+			ID:   String("2"),
+			Slug: String("powerful-abolitionist"),
+			Name: String("Powerful Abolitionist"),
 		},
 		Teams: []Team{
 			{
-				ID:   "2",
-				Slug: "powerful-abolitionist",
-				Name: "Powerful Abolitionist",
+				ID:   String("2"),
+				Slug: String("powerful-abolitionist"),
+				Name: String("Powerful Abolitionist"),
 			},
 		},
 	}
@@ -614,7 +614,11 @@ func TestProjectsService_UpdateTeam(t *testing.T) {
 		ID:   "5",
 		Slug: "plane-proxy",
 		Name: "Plane Proxy",
-		Team: Team{ID: "420", Slug: "planet-express", Name: "Planet Express"},
+		Team: Team{
+			ID:   String("420"),
+			Slug: String("planet-express"),
+			Name: String("Planet Express"),
+		},
 	}
 	assert.Equal(t, expected, project)
 }

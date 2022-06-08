@@ -123,30 +123,30 @@ func TestTeamsService_List(t *testing.T) {
 
 	expected := []*Team{
 		{
-			ID:          "3",
-			Slug:        "ancient-gabelers",
-			Name:        "Ancient Gabelers",
-			DateCreated: mustParseTime("2017-07-18T19:29:46.305Z"),
-			IsMember:    false,
-			TeamRole:    "admin",
-			HasAccess:   true,
-			IsPending:   false,
-			MemberCount: 1,
-			Avatar: Avatar{
+			ID:          String("3"),
+			Slug:        String("ancient-gabelers"),
+			Name:        String("Ancient Gabelers"),
+			DateCreated: Time(mustParseTime("2017-07-18T19:29:46.305Z")),
+			IsMember:    Bool(false),
+			TeamRole:    String("admin"),
+			HasAccess:   Bool(true),
+			IsPending:   Bool(false),
+			MemberCount: Int(1),
+			Avatar: &Avatar{
 				Type: "letter_avatar",
 			},
 		},
 		{
-			ID:          "2",
-			Slug:        "powerful-abolitionist",
-			Name:        "Powerful Abolitionist",
-			DateCreated: mustParseTime("2017-07-18T19:29:24.743Z"),
-			IsMember:    false,
-			TeamRole:    "admin",
-			HasAccess:   true,
-			IsPending:   false,
-			MemberCount: 1,
-			Avatar: Avatar{
+			ID:          String("2"),
+			Slug:        String("powerful-abolitionist"),
+			Name:        String("Powerful Abolitionist"),
+			DateCreated: Time(mustParseTime("2017-07-18T19:29:24.743Z")),
+			IsMember:    Bool(false),
+			TeamRole:    String("admin"),
+			HasAccess:   Bool(true),
+			IsPending:   Bool(false),
+			MemberCount: Int(1),
+			Avatar: &Avatar{
 				Type: "letter_avatar",
 			},
 		},
@@ -188,13 +188,13 @@ func TestTeamsService_Get(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := &Team{
-		ID:          "2",
-		Slug:        "powerful-abolitionist",
-		Name:        "Powerful Abolitionist",
-		DateCreated: mustParseTime("2017-07-18T19:29:24.743Z"),
-		HasAccess:   true,
-		IsPending:   false,
-		IsMember:    false,
+		ID:          String("2"),
+		Slug:        String("powerful-abolitionist"),
+		Name:        String("Powerful Abolitionist"),
+		DateCreated: Time(mustParseTime("2017-07-18T19:29:24.743Z")),
+		HasAccess:   Bool(true),
+		IsPending:   Bool(false),
+		IsMember:    Bool(false),
 	}
 	assert.Equal(t, expected, team)
 }
@@ -221,20 +221,20 @@ func TestTeamsService_Create(t *testing.T) {
 	})
 
 	params := &CreateTeamParams{
-		Name: "Ancient Gabelers",
+		Name: String("Ancient Gabelers"),
 	}
 	ctx := context.Background()
 	team, _, err := client.Teams.Create(ctx, "the-interstellar-jurisdiction", params)
 	assert.NoError(t, err)
 
 	expected := &Team{
-		ID:          "3",
-		Slug:        "ancient-gabelers",
-		Name:        "Ancient Gabelers",
-		DateCreated: mustParseTime("2017-07-18T19:29:46.305Z"),
-		HasAccess:   true,
-		IsPending:   false,
-		IsMember:    false,
+		ID:          String("3"),
+		Slug:        String("ancient-gabelers"),
+		Name:        String("Ancient Gabelers"),
+		DateCreated: Time(mustParseTime("2017-07-18T19:29:46.305Z")),
+		HasAccess:   Bool(true),
+		IsPending:   Bool(false),
+		IsMember:    Bool(false),
 	}
 	assert.Equal(t, expected, team)
 }
@@ -261,19 +261,19 @@ func TestTeamsService_Update(t *testing.T) {
 	})
 
 	params := &UpdateTeamParams{
-		Name: "The Inflated Philosophers",
+		Name: String("The Inflated Philosophers"),
 	}
 	ctx := context.Background()
 	team, _, err := client.Teams.Update(ctx, "the-interstellar-jurisdiction", "the-obese-philosophers", params)
 	assert.NoError(t, err)
 	expected := &Team{
-		ID:          "4",
-		Slug:        "the-obese-philosophers",
-		Name:        "The Inflated Philosophers",
-		DateCreated: mustParseTime("2017-07-18T19:30:14.736Z"),
-		HasAccess:   true,
-		IsPending:   false,
-		IsMember:    false,
+		ID:          String("4"),
+		Slug:        String("the-obese-philosophers"),
+		Name:        String("The Inflated Philosophers"),
+		DateCreated: Time(mustParseTime("2017-07-18T19:30:14.736Z")),
+		HasAccess:   Bool(true),
+		IsPending:   Bool(false),
+		IsMember:    Bool(false),
 	}
 	assert.Equal(t, expected, team)
 }

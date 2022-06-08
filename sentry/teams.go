@@ -9,16 +9,16 @@ import (
 // Team represents a Sentry team that is bound to an organization.
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/team.py#L109-L119
 type Team struct {
-	ID          string    `json:"id"`
-	Slug        string    `json:"slug"`
-	Name        string    `json:"name"`
-	DateCreated time.Time `json:"dateCreated"`
-	IsMember    bool      `json:"isMember"`
-	TeamRole    string    `json:"teamRole"`
-	HasAccess   bool      `json:"hasAccess"`
-	IsPending   bool      `json:"isPending"`
-	MemberCount int       `json:"memberCount"`
-	Avatar      Avatar    `json:"avatar"`
+	ID          *string    `json:"id,omitempty"`
+	Slug        *string    `json:"slug,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	DateCreated *time.Time `json:"dateCreated,omitempty"`
+	IsMember    *bool      `json:"isMember,omitempty"`
+	TeamRole    *string    `json:"teamRole,omitempty"`
+	HasAccess   *bool      `json:"hasAccess,omitempty"`
+	IsPending   *bool      `json:"isPending,omitempty"`
+	MemberCount *int       `json:"memberCount,omitempty"`
+	Avatar      *Avatar    `json:"avatar,omitempty"`
 	// TODO: externalTeams
 	// TODO: projects
 }
@@ -63,8 +63,8 @@ func (s *TeamsService) Get(ctx context.Context, organizationSlug string, slug st
 
 // CreateTeamParams are the parameters for TeamService.Create.
 type CreateTeamParams struct {
-	Name string `json:"name,omitempty"`
-	Slug string `json:"slug,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Slug *string `json:"slug,omitempty"`
 }
 
 // Create a new Sentry team bound to an organization.
@@ -86,8 +86,8 @@ func (s *TeamsService) Create(ctx context.Context, organizationSlug string, para
 
 // UpdateTeamParams are the parameters for TeamService.Update.
 type UpdateTeamParams struct {
-	Name string `json:"name,omitempty"`
-	Slug string `json:"slug,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Slug *string `json:"slug,omitempty"`
 }
 
 // Update settings for a given team.
