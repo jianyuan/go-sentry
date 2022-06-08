@@ -275,6 +275,17 @@ func (c *Client) checkRateLimit() *RateLimitError {
 	return nil
 }
 
+// matchHTTPResponse compares two http.Response objects. Currently, only StatusCode is checked.
+func matchHTTPResponse(r1, r2 *http.Response) bool {
+	if r1 == nil && r2 == nil {
+		return true
+	}
+	if r1 != nil && r2 != nil {
+		return r1.StatusCode == r2.StatusCode
+	}
+	return false
+}
+
 type ErrorResponse struct {
 	Response *http.Response
 	Detail   string `json:"detail"`
@@ -285,6 +296,18 @@ func (r *ErrorResponse) Error() string {
 		"%v %v: %d %v",
 		r.Response.Request.Method, r.Response.Request.URL,
 		r.Response.StatusCode, r.Detail)
+}
+
+func (r *ErrorResponse) Is(target error) bool {
+	v, ok := target.(*ErrorResponse)
+	if !ok {
+		return false
+	}
+	if r.Detail != v.Detail ||
+		!matchHTTPResponse(r.Response, v.Response) {
+		return false
+	}
+	return true
 }
 
 type RateLimitError struct {
@@ -298,6 +321,16 @@ func (r *RateLimitError) Error() string {
 		"%v %v: %d %v %v",
 		r.Response.Request.Method, r.Response.Request.URL,
 		r.Response.StatusCode, r.Detail, fmt.Sprintf("[rate reset in %v]", time.Until(r.Rate.Reset)))
+}
+
+func (r *RateLimitError) Is(target error) bool {
+	v, ok := target.(*RateLimitError)
+	if !ok {
+		return false
+	}
+	return r.Rate == v.Rate &&
+		r.Detail == v.Detail &&
+		matchHTTPResponse(r.Response, v.Response)
 }
 
 func CheckResponse(r *http.Response) error {

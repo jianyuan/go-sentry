@@ -2,14 +2,15 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
-
-	"encoding/json"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -246,4 +247,84 @@ func TestDo_apiError_noDetail(t *testing.T) {
 
 	assert.Equal(t, &ErrorResponse{Response: resp.Response, Detail: "API error message"}, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestCheckResponse(t *testing.T) {
+	testcases := []struct {
+		description string
+		body        string
+	}{
+		{
+			description: "JSON object",
+			body:        `{"detail": "Error message"}`,
+		},
+		{
+			description: "JSON string",
+			body:        `"Error message"`,
+		},
+		{
+			description: "plain text",
+			body:        `Error message`,
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			res := &http.Response{
+				Request:    &http.Request{},
+				StatusCode: http.StatusBadRequest,
+				Body:       ioutil.NopCloser(strings.NewReader(tc.body)),
+			}
+
+			err := CheckResponse(res)
+
+			expected := &ErrorResponse{
+				Response: res,
+				Detail:   "Error message",
+			}
+			assert.ErrorIs(t, err, expected)
+		})
+	}
+
+}
+
+func TestCheckResponse_rateLimit(t *testing.T) {
+	testcases := []struct {
+		description string
+		addHeaders  func(res *http.Response)
+	}{
+		{
+			description: "headerRateRemaining",
+			addHeaders: func(res *http.Response) {
+				res.Header.Set(headerRateRemaining, "0")
+				res.Header.Set(headerRateReset, "123456")
+			},
+		},
+		{
+			description: "headerRateConcurrentRemaining",
+			addHeaders: func(res *http.Response) {
+				res.Header.Set(headerRateConcurrentRemaining, "0")
+				res.Header.Set(headerRateReset, "123456")
+			},
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			res := &http.Response{
+				Request:    &http.Request{},
+				StatusCode: http.StatusTooManyRequests,
+				Header:     http.Header{},
+				Body:       ioutil.NopCloser(strings.NewReader(`{"detail": "Rate limit exceeded"}`)),
+			}
+			tc.addHeaders(res)
+
+			err := CheckResponse(res)
+
+			expected := &RateLimitError{
+				Rate:     parseRate(res),
+				Response: res,
+				Detail:   "Rate limit exceeded",
+			}
+			assert.ErrorIs(t, err, expected)
+		})
+	}
 }
