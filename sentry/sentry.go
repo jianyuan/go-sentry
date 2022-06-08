@@ -271,6 +271,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	return resp, err
 }
 
+func (c *Client) checkRateLimit() *RateLimitError {
+	return nil
+}
+
 type ErrorResponse struct {
 	Response *http.Response
 	Detail   string `json:"detail"`
@@ -281,6 +285,19 @@ func (r *ErrorResponse) Error() string {
 		"%v %v: %d %v",
 		r.Response.Request.Method, r.Response.Request.URL,
 		r.Response.StatusCode, r.Detail)
+}
+
+type RateLimitError struct {
+	Rate     Rate
+	Response *http.Response
+	Detail   string
+}
+
+func (r *RateLimitError) Error() string {
+	return fmt.Sprintf(
+		"%v %v: %d %v %v",
+		r.Response.Request.Method, r.Response.Request.URL,
+		r.Response.StatusCode, r.Detail, fmt.Sprintf("[rate reset in %v]", time.Until(r.Rate.Reset)))
 }
 
 func CheckResponse(r *http.Response) error {
@@ -302,7 +319,15 @@ func CheckResponse(r *http.Response) error {
 	// Re-populate error response body.
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 
-	// TODO: Parse rate limit errors
+	switch {
+	case r.StatusCode == http.StatusTooManyRequests &&
+		(r.Header.Get(headerRateRemaining) == "0" || r.Header.Get(headerRateConcurrentRemaining) == "0"):
+		return &RateLimitError{
+			Rate:     parseRate(r),
+			Response: errorResponse.Response,
+			Detail:   errorResponse.Detail,
+		}
+	}
 
 	return errorResponse
 }
