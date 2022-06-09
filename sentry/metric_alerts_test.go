@@ -67,19 +67,18 @@ func TestMetricAlertService_List(t *testing.T) {
 	alertRules, _, err := client.MetricAlerts.List(ctx, "the-interstellar-jurisdiction", "pump-station")
 	require.NoError(t, err)
 
-	environment := "production"
 	expected := []*MetricAlert{
 		{
-			ID:               "12345",
-			Name:             "pump-station-alert",
-			Environment:      &environment,
-			DataSet:          "transactions",
-			Query:            "http.url:http://service/unreadmessages",
-			Aggregate:        "p50(transaction.duration)",
-			ThresholdType:    int(0),
-			ResolveThreshold: float64(100.0),
-			TimeWindow:       float64(5.0),
-			Triggers: []Trigger{
+			ID:               String("12345"),
+			Name:             String("pump-station-alert"),
+			Environment:      String("production"),
+			DataSet:          String("transactions"),
+			Query:            String("http.url:http://service/unreadmessages"),
+			Aggregate:        String("p50(transaction.duration)"),
+			ThresholdType:    Int(0),
+			ResolveThreshold: Float64(100.0),
+			TimeWindow:       Float64(5.0),
+			Triggers: []*MetricAlertTrigger{
 				{
 					"id":               "6789",
 					"alertRuleId":      "12345",
@@ -103,12 +102,107 @@ func TestMetricAlertService_List(t *testing.T) {
 					},
 				},
 			},
-			Projects: []string{"pump-station"},
-			Owner:    "pump-station:12345",
-			Created:  mustParseTime("2022-04-07T16:46:48.569571Z"),
+			Projects:    []string{"pump-station"},
+			Owner:       String("pump-station:12345"),
+			DateCreated: Time(mustParseTime("2022-04-07T16:46:48.569571Z")),
 		},
 	}
 	require.Equal(t, expected, alertRules)
+}
+
+func TestMetricAlertService_Get(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/12345/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "GET", r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `
+			{
+				"id": "12345",
+				"name": "pump-station-alert",
+				"environment": "production",
+				"dataset": "transactions",
+				"query": "http.url:http://service/unreadmessages",
+				"aggregate": "p50(transaction.duration)",
+				"timeWindow": 10,
+				"thresholdType": 0,
+				"resolveThreshold": 0,
+				"triggers": [
+				  {
+					"actions": [
+					  {
+						"alertRuleTriggerId": "56789",
+						"dateCreated": "2022-04-15T15:06:01.087054Z",
+						"desc": "Send a Slack notification to #alert-rule-alerts",
+						"id": "12389",
+						"inputChannelId": "C0XXXFKLXXX",
+						"integrationId": 111,
+						"sentryAppId": null,
+						"targetIdentifier": "#alert-rule-alerts",
+						"targetType": "specific",
+						"type": "slack"
+					  }
+					],
+					"alertRuleId": "12345",
+					"alertThreshold": 10000,
+					"dateCreated": "2022-04-15T15:06:01.079598Z",
+					"id": "56789",
+					"label": "critical",
+					"resolveThreshold": 0,
+					"thresholdType": 0
+				  }
+				],
+				"projects": [
+				  "pump-station"
+				],
+				"owner": "pump-station:12345",
+				"dateCreated": "2022-04-15T15:06:01.05618Z"
+			}
+		`)
+	})
+
+	ctx := context.Background()
+	alert, _, err := client.MetricAlerts.Get(ctx, "the-interstellar-jurisdiction", "pump-station", "12345")
+	require.NoError(t, err)
+
+	expected := &MetricAlert{
+		ID:               String("12345"),
+		Name:             String("pump-station-alert"),
+		Environment:      String("production"),
+		DataSet:          String("transactions"),
+		Query:            String("http.url:http://service/unreadmessages"),
+		Aggregate:        String("p50(transaction.duration)"),
+		TimeWindow:       Float64(10),
+		ThresholdType:    Int(0),
+		ResolveThreshold: Float64(0),
+		Triggers: []*MetricAlertTrigger{{
+			"actions": []interface{}{map[string]interface{}{
+				"alertRuleTriggerId": "56789",
+				"dateCreated":        "2022-04-15T15:06:01.087054Z",
+				"desc":               "Send a Slack notification to #alert-rule-alerts",
+				"id":                 "12389",
+				"inputChannelId":     "C0XXXFKLXXX",
+				"integrationId":      json.Number("111"),
+				"sentryAppId":        nil,
+				"targetIdentifier":   "#alert-rule-alerts",
+				"targetType":         "specific",
+				"type":               "slack",
+			},
+			},
+			"alertRuleId":      "12345",
+			"alertThreshold":   json.Number("10000"),
+			"dateCreated":      "2022-04-15T15:06:01.079598Z",
+			"id":               "56789",
+			"label":            "critical",
+			"resolveThreshold": json.Number("0"),
+			"thresholdType":    json.Number("0"),
+		}},
+		Projects:    []string{"pump-station"},
+		Owner:       String("pump-station:12345"),
+		DateCreated: Time(mustParseTime("2022-04-15T15:06:01.05618Z")),
+	}
+	require.Equal(t, expected, alert)
 }
 
 func TestMetricAlertService_Create(t *testing.T) {
@@ -163,17 +257,16 @@ func TestMetricAlertService_Create(t *testing.T) {
 		`)
 	})
 
-	environment := "production"
-	params := CreateAlertRuleParams{
-		Name:             "pump-station-alert",
-		Environment:      &environment,
-		DataSet:          "transactions",
-		Query:            "http.url:http://service/unreadmessages",
-		Aggregate:        "p50(transaction.duration)",
-		TimeWindow:       10.0,
-		ThresholdType:    0,
-		ResolveThreshold: 0,
-		Triggers: []Trigger{{
+	params := &MetricAlert{
+		Name:             String("pump-station-alert"),
+		Environment:      String("production"),
+		DataSet:          String("transactions"),
+		Query:            String("http.url:http://service/unreadmessages"),
+		Aggregate:        String("p50(transaction.duration)"),
+		TimeWindow:       Float64(10.0),
+		ThresholdType:    Int(0),
+		ResolveThreshold: Float64(0),
+		Triggers: []*MetricAlertTrigger{{
 			"actions": []interface{}{map[string]interface{}{
 				"type":             "slack",
 				"targetType":       "specific",
@@ -188,23 +281,23 @@ func TestMetricAlertService_Create(t *testing.T) {
 			"thresholdType":    0,
 		}},
 		Projects: []string{"pump-station"},
-		Owner:    "pump-station:12345",
+		Owner:    String("pump-station:12345"),
 	}
 	ctx := context.Background()
-	alertRule, _, err := client.MetricAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", &params)
+	alertRule, _, err := client.MetricAlerts.Create(ctx, "the-interstellar-jurisdiction", "pump-station", params)
 	require.NoError(t, err)
 
 	expected := &MetricAlert{
-		ID:               "12345",
-		Name:             "pump-station-alert",
-		Environment:      &environment,
-		DataSet:          "transactions",
-		Query:            "http.url:http://service/unreadmessages",
-		Aggregate:        "p50(transaction.duration)",
-		ThresholdType:    int(0),
-		ResolveThreshold: float64(0),
-		TimeWindow:       float64(10.0),
-		Triggers: []Trigger{
+		ID:               String("12345"),
+		Name:             String("pump-station-alert"),
+		Environment:      String("production"),
+		DataSet:          String("transactions"),
+		Query:            String("http.url:http://service/unreadmessages"),
+		Aggregate:        String("p50(transaction.duration)"),
+		ThresholdType:    Int(0),
+		ResolveThreshold: Float64(0),
+		TimeWindow:       Float64(10.0),
+		Triggers: []*MetricAlertTrigger{
 			{
 				"id":               "56789",
 				"alertRuleId":      "12345",
@@ -228,9 +321,9 @@ func TestMetricAlertService_Create(t *testing.T) {
 				},
 			},
 		},
-		Projects: []string{"pump-station"},
-		Owner:    "pump-station:12345",
-		Created:  mustParseTime("2022-04-15T15:06:01.05618Z"),
+		Projects:    []string{"pump-station"},
+		Owner:       String("pump-station:12345"),
+		DateCreated: Time(mustParseTime("2022-04-15T15:06:01.05618Z")),
 	}
 
 	require.Equal(t, expected, alertRule)
@@ -240,18 +333,17 @@ func TestMetricAlertService_Update(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
-	environment := "production"
 	params := &MetricAlert{
-		ID:               "12345",
-		Name:             "pump-station-alert",
-		Environment:      &environment,
-		DataSet:          "transactions",
-		Query:            "http.url:http://service/unreadmessages",
-		Aggregate:        "p50(transaction.duration)",
-		TimeWindow:       10,
-		ThresholdType:    0,
-		ResolveThreshold: 0,
-		Triggers: []Trigger{{
+		ID:               String("12345"),
+		Name:             String("pump-station-alert"),
+		Environment:      String("production"),
+		DataSet:          String("transactions"),
+		Query:            String("http.url:http://service/unreadmessages"),
+		Aggregate:        String("p50(transaction.duration)"),
+		TimeWindow:       Float64(10),
+		ThresholdType:    Int(0),
+		ResolveThreshold: Float64(0),
+		Triggers: []*MetricAlertTrigger{{
 			"actions":          []interface{}{map[string]interface{}{}},
 			"alertRuleId":      "12345",
 			"alertThreshold":   json.Number("10000"),
@@ -261,8 +353,8 @@ func TestMetricAlertService_Update(t *testing.T) {
 			"resolveThreshold": json.Number("0"),
 			"thresholdType":    json.Number("0"),
 		}},
-		Owner:   "pump-station:12345",
-		Created: mustParseTime("2022-04-15T15:06:01.079598Z"),
+		Owner:       String("pump-station:12345"),
+		DateCreated: Time(mustParseTime("2022-04-15T15:06:01.079598Z")),
 	}
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/12345/", func(w http.ResponseWriter, r *http.Request) {
@@ -270,7 +362,7 @@ func TestMetricAlertService_Update(t *testing.T) {
 		assertPostJSON(t, map[string]interface{}{
 			"id":               "12345",
 			"name":             "pump-station-alert",
-			"environment":      environment,
+			"environment":      "production",
 			"dataset":          "transactions",
 			"query":            "http.url:http://service/unreadmessages",
 			"aggregate":        "p50(transaction.duration)",
@@ -344,16 +436,16 @@ func TestMetricAlertService_Update(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := &MetricAlert{
-		ID:               "12345",
-		Name:             "pump-station-alert",
-		Environment:      &environment,
-		DataSet:          "transactions",
-		Query:            "http.url:http://service/unreadmessages",
-		Aggregate:        "p50(transaction.duration)",
-		ThresholdType:    int(0),
-		ResolveThreshold: float64(0),
-		TimeWindow:       float64(10.0),
-		Triggers: []Trigger{
+		ID:               String("12345"),
+		Name:             String("pump-station-alert"),
+		Environment:      String("production"),
+		DataSet:          String("transactions"),
+		Query:            String("http.url:http://service/unreadmessages"),
+		Aggregate:        String("p50(transaction.duration)"),
+		ThresholdType:    Int(0),
+		ResolveThreshold: Float64(0),
+		TimeWindow:       Float64(10.0),
+		Triggers: []*MetricAlertTrigger{
 			{
 				"id":               "56789",
 				"alertRuleId":      "12345",
@@ -376,9 +468,9 @@ func TestMetricAlertService_Update(t *testing.T) {
 				}},
 			},
 		},
-		Projects: []string{"pump-station"},
-		Owner:    "pump-station:12345",
-		Created:  mustParseTime("2022-04-15T15:06:01.05618Z"),
+		Projects:    []string{"pump-station"},
+		Owner:       String("pump-station:12345"),
+		DateCreated: Time(mustParseTime("2022-04-15T15:06:01.05618Z")),
 	}
 
 	require.Equal(t, expected, alertRule)

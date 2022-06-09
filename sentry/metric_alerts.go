@@ -9,22 +9,22 @@ import (
 type MetricAlertsService service
 
 type MetricAlert struct {
-	ID               string    `json:"id"`
-	Name             string    `json:"name"`
-	Environment      *string   `json:"environment,omitempty"`
-	DataSet          string    `json:"dataset"`
-	Query            string    `json:"query"`
-	Aggregate        string    `json:"aggregate"`
-	TimeWindow       float64   `json:"timeWindow"`
-	ThresholdType    int       `json:"thresholdType"`
-	ResolveThreshold float64   `json:"resolveThreshold"`
-	Triggers         []Trigger `json:"triggers"`
-	Projects         []string  `json:"projects"`
-	Owner            string    `json:"owner"`
-	Created          time.Time `json:"dateCreated"`
+	ID               *string               `json:"id"`
+	Name             *string               `json:"name"`
+	Environment      *string               `json:"environment,omitempty"`
+	DataSet          *string               `json:"dataset"`
+	Query            *string               `json:"query"`
+	Aggregate        *string               `json:"aggregate"`
+	TimeWindow       *float64              `json:"timeWindow"`
+	ThresholdType    *int                  `json:"thresholdType"`
+	ResolveThreshold *float64              `json:"resolveThreshold"`
+	Triggers         []*MetricAlertTrigger `json:"triggers"`
+	Projects         []string              `json:"projects"`
+	Owner            *string               `json:"owner"`
+	DateCreated      *time.Time            `json:"dateCreated"`
 }
 
-type Trigger map[string]interface{}
+type MetricAlertTrigger map[string]interface{}
 
 // List Alert Rules configured for a project
 func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string, projectSlug string) ([]*MetricAlert, *Response, error) {
@@ -34,42 +34,44 @@ func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string,
 		return nil, nil, err
 	}
 
-	metricAlerts := []*MetricAlert{}
-	resp, err := s.client.Do(ctx, req, &metricAlerts)
+	alerts := []*MetricAlert{}
+	resp, err := s.client.Do(ctx, req, &alerts)
 	if err != nil {
 		return nil, resp, err
 	}
-	return metricAlerts, resp, nil
+	return alerts, resp, nil
 }
 
-type CreateAlertRuleParams struct {
-	Name             string    `json:"name"`
-	Environment      *string   `json:"environment,omitempty"`
-	DataSet          string    `json:"dataset"`
-	Query            string    `json:"query"`
-	Aggregate        string    `json:"aggregate"`
-	TimeWindow       float64   `json:"timeWindow"`
-	ThresholdType    int       `json:"thresholdType"`
-	ResolveThreshold float64   `json:"resolveThreshold"`
-	Triggers         []Trigger `json:"triggers"`
-	Projects         []string  `json:"projects"`
-	Owner            string    `json:"owner"`
+// Get details on an issue alert.
+func (s *MetricAlertsService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*MetricAlert, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/alert-rules/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	alert := new(MetricAlert)
+	resp, err := s.client.Do(ctx, req, alert)
+	if err != nil {
+		return nil, resp, err
+	}
+	return alert, resp, nil
 }
 
 // Create a new Alert Rule bound to a project.
-func (s *MetricAlertsService) Create(ctx context.Context, organizationSlug string, projectSlug string, params *CreateAlertRuleParams) (*MetricAlert, *Response, error) {
+func (s *MetricAlertsService) Create(ctx context.Context, organizationSlug string, projectSlug string, params *MetricAlert) (*MetricAlert, *Response, error) {
 	u := fmt.Sprintf("0/projects/%v/%v/alert-rules/", organizationSlug, projectSlug)
 	req, err := s.client.NewRequest("POST", u, params)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	alertRule := new(MetricAlert)
-	resp, err := s.client.Do(ctx, req, alertRule)
+	alert := new(MetricAlert)
+	resp, err := s.client.Do(ctx, req, alert)
 	if err != nil {
 		return nil, resp, err
 	}
-	return alertRule, resp, nil
+	return alert, resp, nil
 }
 
 // Update an Alert Rule.
@@ -80,12 +82,12 @@ func (s *MetricAlertsService) Update(ctx context.Context, organizationSlug strin
 		return nil, nil, err
 	}
 
-	alertRule := new(MetricAlert)
-	resp, err := s.client.Do(ctx, req, alertRule)
+	alert := new(MetricAlert)
+	resp, err := s.client.Do(ctx, req, alert)
 	if err != nil {
 		return nil, resp, err
 	}
-	return alertRule, resp, nil
+	return alert, resp, nil
 }
 
 // Delete an Alert Rule.

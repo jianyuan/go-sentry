@@ -436,6 +436,20 @@ func IntValue(v *int) int {
 	return 0
 }
 
+// Float64 returns a pointer to the float64 value passed in.
+func Float64(v float64) *float64 {
+	return &v
+}
+
+// Float64Value returns the value of the float64 pointer passed in or
+// 0 if the pointer is nil.
+func Float64Value(v *float64) float64 {
+	if v != nil {
+		return *v
+	}
+	return 0
+}
+
 // String returns a pointer to the string value passed in.
 func String(v string) *string { return &v }
 
