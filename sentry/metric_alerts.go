@@ -53,8 +53,13 @@ type MetricAlertTriggerAction struct {
 }
 
 // List Alert Rules configured for a project
-func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string, projectSlug string) ([]*MetricAlert, *Response, error) {
+func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListCursorParams) ([]*MetricAlert, *Response, error) {
 	u := fmt.Sprintf("0/projects/%v/%v/alert-rules/", organizationSlug, projectSlug)
+	u, err := addQuery(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
