@@ -42,6 +42,7 @@ type DashboardWidgetsService service
 
 type DashboardWidgetErrors map[string][]string
 
+// Validate a dashboard widget configuration.
 func (s *DashboardWidgetsService) Validate(ctx context.Context, organizationSlug string, widget *DashboardWidget) (DashboardWidgetErrors, *Response, error) {
 	u := fmt.Sprintf("0/organizations/%v/dashboards/widgets/", organizationSlug)
 
