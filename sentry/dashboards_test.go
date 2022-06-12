@@ -138,3 +138,40 @@ func TestDashboardsService_Get(t *testing.T) {
 	assert.Equal(t, expected, dashboard)
 	assert.NoError(t, err)
 }
+
+func TestDashboardsService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/dashboards/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "POST", r)
+		assertPostJSONValue(t, map[string]interface{}{
+			"title":   "General",
+			"widgets": map[string]interface{}{},
+		}, r)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{
+			"id": "12072",
+			"title": "General",
+			"dateCreated": "2022-06-07T16:48:26.255520Z",
+			"widgets": []
+		}`)
+	})
+
+	params := &Dashboard{
+		Title:   String("General"),
+		Widgets: []*DashboardWidget{},
+	}
+	ctx := context.Background()
+	dashboard, _, err := client.Dashboards.Create(ctx, "the-interstellar-jurisdiction", params)
+
+	expected := &Dashboard{
+		ID:          String("12072"),
+		Title:       String("General"),
+		DateCreated: Time(mustParseTime("2022-06-07T16:48:26.255520Z")),
+		Widgets:     []*DashboardWidget{},
+	}
+	assert.Equal(t, expected, dashboard)
+	assert.NoError(t, err)
+}

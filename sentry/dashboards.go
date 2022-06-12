@@ -53,3 +53,19 @@ func (s *DashboardsService) Get(ctx context.Context, organizationSlug string, id
 	}
 	return dashboard, resp, nil
 }
+
+// Create a dashboard.
+func (s *DashboardsService) Create(ctx context.Context, organizationSlug string, params *Dashboard) (*Dashboard, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/dashboards/", organizationSlug)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dashboard := new(Dashboard)
+	resp, err := s.client.Do(ctx, req, dashboard)
+	if err != nil {
+		return nil, resp, err
+	}
+	return dashboard, resp, nil
+}
