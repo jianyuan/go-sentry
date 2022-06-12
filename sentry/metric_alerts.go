@@ -24,7 +24,33 @@ type MetricAlert struct {
 	DateCreated      *time.Time            `json:"dateCreated"`
 }
 
-type MetricAlertTrigger map[string]interface{}
+// MetricAlertTrigger represents a metric alert trigger.
+// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/alert_rule_trigger.py#L35-L47
+type MetricAlertTrigger struct {
+	ID               *string                     `json:"id,omitempty"`
+	AlertRuleID      *string                     `json:"alertRuleId,omitempty"`
+	Label            *string                     `json:"label,omitempty"`
+	ThresholdType    *int                        `json:"thresholdType,omitempty"`
+	AlertThreshold   *float64                    `json:"alertThreshold,omitempty"`
+	ResolveThreshold *float64                    `json:"resolveThreshold,omitempty"`
+	DateCreated      *time.Time                  `json:"dateCreated,omitempty"`
+	Actions          []*MetricAlertTriggerAction `json:"actions,omitempty"`
+}
+
+// MetricAlertTriggerAction represents a metric alert trigger action.
+// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/alert_rule_trigger_action.py#L42-L66
+type MetricAlertTriggerAction struct {
+	ID                 *string    `json:"id,omitempty"`
+	AlertRuleTriggerID *string    `json:"alertRuleTriggerId,omitempty"`
+	Type               *string    `json:"type,omitempty"`
+	TargetType         *string    `json:"targetType,omitempty"`
+	TargetIdentifier   *string    `json:"targetIdentifier,omitempty"`
+	InputChannelID     *string    `json:"inputChannelId,omitempty"`
+	IntegrationID      *int       `json:"integrationId,omitempty"`
+	SentryAppID        *string    `json:"sentryAppId,omitempty"`
+	DateCreated        *time.Time `json:"dateCreated,omitempty"`
+	Description        *string    `json:"desc,omitempty"`
+}
 
 // List Alert Rules configured for a project
 func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string, projectSlug string) ([]*MetricAlert, *Response, error) {
