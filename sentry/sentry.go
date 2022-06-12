@@ -50,6 +50,7 @@ type Client struct {
 	common service
 
 	// Services
+	DashboardWidgets    *DashboardWidgetsService
 	IssueAlerts         *IssueAlertsService
 	MetricAlerts        *MetricAlertsService
 	OrganizationMembers *OrganizationMembersService
@@ -79,6 +80,7 @@ func NewClient(httpClient *http.Client) *Client {
 		UserAgent: userAgent,
 	}
 	c.common.client = c
+	c.DashboardWidgets = (*DashboardWidgetsService)(&c.common)
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
 	c.MetricAlerts = (*MetricAlertsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
