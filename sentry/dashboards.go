@@ -85,3 +85,14 @@ func (s *DashboardsService) Update(ctx context.Context, organizationSlug string,
 	}
 	return dashboard, resp, nil
 }
+
+// Delete a dashboard.
+func (s *DashboardsService) Delete(ctx context.Context, organizationSlug string, id string) (*Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/dashboards/%v/", organizationSlug, id)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

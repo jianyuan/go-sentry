@@ -214,3 +214,16 @@ func TestDashboardsService_Update(t *testing.T) {
 	assert.Equal(t, expected, dashboard)
 	assert.NoError(t, err)
 }
+
+func TestDashboardsService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/dashboards/12072/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "DELETE", r)
+	})
+
+	ctx := context.Background()
+	_, err := client.Dashboards.Delete(ctx, "the-interstellar-jurisdiction", "12072")
+	assert.NoError(t, err)
+}
