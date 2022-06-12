@@ -37,3 +37,19 @@ func (s *DashboardsService) List(ctx context.Context, organizationSlug string, p
 	}
 	return dashboards, resp, nil
 }
+
+// Get details on a dashboard.
+func (s *DashboardsService) Get(ctx context.Context, organizationSlug string, id string) (*Dashboard, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/dashboards/%v/", organizationSlug, id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dashboard := new(Dashboard)
+	resp, err := s.client.Do(ctx, req, dashboard)
+	if err != nil {
+		return nil, resp, err
+	}
+	return dashboard, resp, nil
+}
