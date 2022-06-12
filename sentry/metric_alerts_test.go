@@ -64,7 +64,7 @@ func TestMetricAlertService_List(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	alertRules, _, err := client.MetricAlerts.List(ctx, "the-interstellar-jurisdiction", "pump-station")
+	alertRules, _, err := client.MetricAlerts.List(ctx, "the-interstellar-jurisdiction", "pump-station", nil)
 	require.NoError(t, err)
 
 	expected := []*MetricAlert{
