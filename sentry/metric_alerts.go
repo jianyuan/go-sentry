@@ -9,19 +9,19 @@ import (
 type MetricAlertsService service
 
 type MetricAlert struct {
-	ID               *string               `json:"id"`
-	Name             *string               `json:"name"`
+	ID               *string               `json:"id,omitempty"`
+	Name             *string               `json:"name,omitempty"`
 	Environment      *string               `json:"environment,omitempty"`
-	DataSet          *string               `json:"dataset"`
-	Query            *string               `json:"query"`
-	Aggregate        *string               `json:"aggregate"`
-	TimeWindow       *float64              `json:"timeWindow"`
-	ThresholdType    *int                  `json:"thresholdType"`
-	ResolveThreshold *float64              `json:"resolveThreshold"`
-	Triggers         []*MetricAlertTrigger `json:"triggers"`
-	Projects         []string              `json:"projects"`
-	Owner            *string               `json:"owner"`
-	DateCreated      *time.Time            `json:"dateCreated"`
+	DataSet          *string               `json:"dataset,omitempty"`
+	Query            *string               `json:"query,omitempty"`
+	Aggregate        *string               `json:"aggregate,omitempty"`
+	TimeWindow       *float64              `json:"timeWindow,omitempty"`
+	ThresholdType    *int                  `json:"thresholdType,omitempty"`
+	ResolveThreshold *float64              `json:"resolveThreshold,omitempty"`
+	Triggers         []*MetricAlertTrigger `json:"triggers,omitempty"`
+	Projects         []string              `json:"projects,omitempty"`
+	Owner            *string               `json:"owner,omitempty"`
+	DateCreated      *time.Time            `json:"dateCreated,omitempty"`
 }
 
 // MetricAlertTrigger represents a metric alert trigger.
@@ -34,7 +34,7 @@ type MetricAlertTrigger struct {
 	AlertThreshold   *float64                    `json:"alertThreshold,omitempty"`
 	ResolveThreshold *float64                    `json:"resolveThreshold,omitempty"`
 	DateCreated      *time.Time                  `json:"dateCreated,omitempty"`
-	Actions          []*MetricAlertTriggerAction `json:"actions,omitempty"`
+	Actions          []*MetricAlertTriggerAction `json:"actions"` // Must always be present.
 }
 
 // MetricAlertTriggerAction represents a metric alert trigger action.

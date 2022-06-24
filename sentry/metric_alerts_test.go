@@ -392,9 +392,9 @@ func TestMetricAlertService_Update(t *testing.T) {
 					"alertThreshold":   json.Number("55501"),
 					"resolveThreshold": json.Number("100"),
 					"dateCreated":      "2022-04-07T16:46:48.607583Z",
+					"actions":          []interface{}{},
 				},
 			},
-			"projects":    interface{}(nil),
 			"owner":       "pump-station:12345",
 			"dateCreated": "2022-04-15T15:06:01.079598Z",
 		}, r)
