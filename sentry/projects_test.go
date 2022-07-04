@@ -1,6 +1,8 @@
 package sentry
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -8,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProjectService_List(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_List(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -138,24 +140,26 @@ func TestProjectService_List(t *testing.T) {
 		]`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	projects, _, err := client.Projects.List()
+	ctx := context.Background()
+	projects, _, err := client.Projects.List(ctx)
 	assert.NoError(t, err)
 
 	expectedOrganization := Organization{
-		ID:   "2",
-		Slug: "the-interstellar-jurisdiction",
-		Status: OrganizationStatus{
-			ID:   "active",
-			Name: "active",
+		ID:   String("2"),
+		Slug: String("the-interstellar-jurisdiction"),
+		Status: &OrganizationStatus{
+			ID:   String("active"),
+			Name: String("active"),
 		},
-		Name:        "The Interstellar Jurisdiction",
-		DateCreated: mustParseTime("2018-09-20T15:47:52.908Z"),
-		Avatar: Avatar{
+		Name:           String("The Interstellar Jurisdiction"),
+		DateCreated:    Time(mustParseTime("2018-09-20T15:47:52.908Z")),
+		IsEarlyAdopter: Bool(false),
+		Require2FA:     Bool(false),
+		Avatar: &Avatar{
 			Type: "letter_avatar",
 		},
 	}
-	expected := []Project{
+	expected := []*Project{
 		{
 			ID:          "4",
 			Slug:        "the-spoiled-yoghurt",
@@ -219,9 +223,9 @@ func TestProjectService_List(t *testing.T) {
 	assert.Equal(t, expected, projects)
 }
 
-func TestProjectService_Get(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_Get(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -363,9 +367,25 @@ func TestProjectService_Get(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	project, _, err := client.Projects.Get("the-interstellar-jurisdiction", "pump-station")
+	ctx := context.Background()
+	project, _, err := client.Projects.Get(ctx, "the-interstellar-jurisdiction", "pump-station")
 	assert.NoError(t, err)
+
+	expectedOrganization := Organization{
+		ID:   String("2"),
+		Slug: String("the-interstellar-jurisdiction"),
+		Status: &OrganizationStatus{
+			ID:   String("active"),
+			Name: String("active"),
+		},
+		Name:           String("The Interstellar Jurisdiction"),
+		DateCreated:    Time(mustParseTime("2018-10-02T14:19:09.817Z")),
+		IsEarlyAdopter: Bool(false),
+		Require2FA:     Bool(false),
+		Avatar: &Avatar{
+			Type: "letter_avatar",
+		},
+	}
 	expected := &Project{
 		ID:          "2",
 		Slug:        "pump-station",
@@ -403,29 +423,17 @@ func TestProjectService_Get(t *testing.T) {
 		SubjectTemplate:      "$shortID - $title",
 		SecurityToken:        "320e3180c64e11e8b61e0242ac110002",
 		ScrapeJavaScript:     true,
-		Organization: Organization{
-			ID:   "2",
-			Slug: "the-interstellar-jurisdiction",
-			Status: OrganizationStatus{
-				ID:   "active",
-				Name: "active",
-			},
-			Name:        "The Interstellar Jurisdiction",
-			DateCreated: mustParseTime("2018-10-02T14:19:09.817Z"),
-			Avatar: Avatar{
-				Type: "letter_avatar",
-			},
-		},
+		Organization:         expectedOrganization,
 		Team: Team{
-			ID:   "2",
-			Slug: "powerful-abolitionist",
-			Name: "Powerful Abolitionist",
+			ID:   String("2"),
+			Slug: String("powerful-abolitionist"),
+			Name: String("Powerful Abolitionist"),
 		},
 		Teams: []Team{
 			{
-				ID:   "2",
-				Slug: "powerful-abolitionist",
-				Name: "Powerful Abolitionist",
+				ID:   String("2"),
+				Slug: String("powerful-abolitionist"),
+				Name: String("Powerful Abolitionist"),
 			},
 		},
 
@@ -434,9 +442,9 @@ func TestProjectService_Get(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_Create(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_Create(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/teams/the-interstellar-jurisdiction/powerful-abolitionist/projects/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -466,11 +474,11 @@ func TestProjectService_Create(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &CreateProjectParams{
 		Name: "The Spoiled Yoghurt",
 	}
-	project, _, err := client.Projects.Create("the-interstellar-jurisdiction", "powerful-abolitionist", params)
+	ctx := context.Background()
+	project, _, err := client.Projects.Create(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist", params)
 	assert.NoError(t, err)
 
 	expected := &Project{
@@ -490,9 +498,9 @@ func TestProjectService_Create(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_Update(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_Update(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/plain-proxy/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -537,7 +545,6 @@ func TestProjectService_Update(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
 	params := &UpdateProjectParams{
 		Name: "Plane Proxy",
 		Slug: "plane-proxy",
@@ -545,7 +552,8 @@ func TestProjectService_Update(t *testing.T) {
 			"sentry:origins": "http://example.com\nhttp://example.invalid",
 		},
 	}
-	project, _, err := client.Projects.Update("the-interstellar-jurisdiction", "plain-proxy", params)
+	ctx := context.Background()
+	project, _, err := client.Projects.Update(ctx, "the-interstellar-jurisdiction", "plain-proxy", params)
 	assert.NoError(t, err)
 	expected := &Project{
 		ID:           "5",
@@ -563,7 +571,7 @@ func TestProjectService_Update(t *testing.T) {
 		Status: "active",
 		Options: map[string]interface{}{
 			"sentry:origins":     "http://example.com\nhttp://example.invalid",
-			"sentry:resolve_age": float64(720),
+			"sentry:resolve_age": json.Number("720"),
 		},
 		DigestsMinDelay: 300,
 		DigestsMaxDelay: 1800,
@@ -575,23 +583,23 @@ func TestProjectService_Update(t *testing.T) {
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_Delete(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_Delete(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/plain-proxy/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	_, err := client.Projects.Delete("the-interstellar-jurisdiction", "plain-proxy")
+	ctx := context.Background()
+	_, err := client.Projects.Delete(ctx, "the-interstellar-jurisdiction", "plain-proxy")
 	assert.NoError(t, err)
 
 }
 
-func TestProjectService_UpdateTeam(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_UpdateTeam(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/planet-express/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
@@ -608,27 +616,31 @@ func TestProjectService_UpdateTeam(t *testing.T) {
 		}`)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	project, _, err := client.Projects.AddTeam("the-interstellar-jurisdiction", "pump-station", "planet-express")
+	ctx := context.Background()
+	project, _, err := client.Projects.AddTeam(ctx, "the-interstellar-jurisdiction", "pump-station", "planet-express")
 	assert.NoError(t, err)
 	expected := &Project{
 		ID:   "5",
 		Slug: "plane-proxy",
 		Name: "Plane Proxy",
-		Team: Team{ID: "420", Slug: "planet-express", Name: "Planet Express"},
+		Team: Team{
+			ID:   String("420"),
+			Slug: String("planet-express"),
+			Name: String("Planet Express"),
+		},
 	}
 	assert.Equal(t, expected, project)
 }
 
-func TestProjectService_DeleteTeam(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+func TestProjectsService_DeleteTeam(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/teams/powerful-abolitionist/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "DELETE", r)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	_, err := client.Projects.RemoveTeam("the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
+	ctx := context.Background()
+	_, err := client.Projects.RemoveTeam(ctx, "the-interstellar-jurisdiction", "pump-station", "powerful-abolitionist")
 	assert.NoError(t, err)
 }

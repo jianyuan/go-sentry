@@ -1,89 +1,120 @@
 package sentry
 
 import (
-	"net/http"
+	"context"
+	"fmt"
 	"time"
-
-	"github.com/dghubble/sling"
 )
 
 // Team represents a Sentry team that is bound to an organization.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/team.py#L48
+// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/team.py#L109-L119
 type Team struct {
-	ID          string    `json:"id"`
-	Slug        string    `json:"slug"`
-	Name        string    `json:"name"`
-	DateCreated time.Time `json:"dateCreated"`
-	IsMember    bool      `json:"isMember"`
-	HasAccess   bool      `json:"hasAccess"`
-	IsPending   bool      `json:"isPending"`
-	Avatar      Avatar    `json:"avatar"`
+	ID          *string    `json:"id,omitempty"`
+	Slug        *string    `json:"slug,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	DateCreated *time.Time `json:"dateCreated,omitempty"`
+	IsMember    *bool      `json:"isMember,omitempty"`
+	TeamRole    *string    `json:"teamRole,omitempty"`
+	HasAccess   *bool      `json:"hasAccess,omitempty"`
+	IsPending   *bool      `json:"isPending,omitempty"`
+	MemberCount *int       `json:"memberCount,omitempty"`
+	Avatar      *Avatar    `json:"avatar,omitempty"`
+	// TODO: externalTeams
+	// TODO: projects
 }
 
-// TeamService provides methods for accessing Sentry team API endpoints.
+// TeamsService provides methods for accessing Sentry team API endpoints.
 // https://docs.sentry.io/api/teams/
-type TeamService struct {
-	sling *sling.Sling
-}
-
-func newTeamService(sling *sling.Sling) *TeamService {
-	return &TeamService{
-		sling: sling,
-	}
-}
+type TeamsService service
 
 // List returns a list of teams bound to an organization.
-// https://docs.sentry.io/api/teams/get-organization-teams/
-func (s *TeamService) List(organizationSlug string) ([]Team, *http.Response, error) {
-	teams := new([]Team)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/teams/").Receive(teams, apiError)
-	return *teams, resp, relevantError(err, *apiError)
+// https://docs.sentry.io/api/teams/list-an-organizations-teams/
+func (s *TeamsService) List(ctx context.Context, organizationSlug string) ([]*Team, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/teams/", organizationSlug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	teams := []*Team{}
+	resp, err := s.client.Do(ctx, req, &teams)
+	if err != nil {
+		return nil, resp, err
+	}
+	return teams, resp, nil
 }
 
 // Get details on an individual team of an organization.
-// https://docs.sentry.io/api/teams/get-team-details/
-func (s *TeamService) Get(organizationSlug string, slug string) (*Team, *http.Response, error) {
+// https://docs.sentry.io/api/teams/retrieve-a-team/
+func (s *TeamsService) Get(ctx context.Context, organizationSlug string, slug string) (*Team, *Response, error) {
+	u := fmt.Sprintf("0/teams/%v/%v/", organizationSlug, slug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	team := new(Team)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("teams/"+organizationSlug+"/"+slug+"/").Receive(team, apiError)
-	return team, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, team)
+	if err != nil {
+		return nil, resp, err
+	}
+	return team, resp, nil
 }
 
 // CreateTeamParams are the parameters for TeamService.Create.
 type CreateTeamParams struct {
-	Name string `json:"name,omitempty"`
-	Slug string `json:"slug,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Slug *string `json:"slug,omitempty"`
 }
 
 // Create a new Sentry team bound to an organization.
-// https://docs.sentry.io/api/teams/post-organization-teams/
-func (s *TeamService) Create(organizationSlug string, params *CreateTeamParams) (*Team, *http.Response, error) {
+// https://docs.sentry.io/api/teams/create-a-new-team/
+func (s *TeamsService) Create(ctx context.Context, organizationSlug string, params *CreateTeamParams) (*Team, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/teams/", organizationSlug)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	team := new(Team)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("organizations/"+organizationSlug+"/teams/").BodyJSON(params).Receive(team, apiError)
-	return team, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, team)
+	if err != nil {
+		return nil, resp, err
+	}
+	return team, resp, nil
 }
 
 // UpdateTeamParams are the parameters for TeamService.Update.
 type UpdateTeamParams struct {
-	Name string `json:"name,omitempty"`
-	Slug string `json:"slug,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Slug *string `json:"slug,omitempty"`
 }
 
 // Update settings for a given team.
-// https://docs.sentry.io/api/teams/put-team-details/
-func (s *TeamService) Update(organizationSlug string, slug string, params *UpdateTeamParams) (*Team, *http.Response, error) {
+// https://docs.sentry.io/api/teams/update-a-team/
+func (s *TeamsService) Update(ctx context.Context, organizationSlug string, slug string, params *UpdateTeamParams) (*Team, *Response, error) {
+	u := fmt.Sprintf("0/teams/%v/%v/", organizationSlug, slug)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	team := new(Team)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Put("teams/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(team, apiError)
-	return team, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, team)
+	if err != nil {
+		return nil, resp, err
+	}
+	return team, resp, nil
 }
 
 // Delete a team.
-// https://docs.sentry.io/api/teams/delete-team-details/
-func (s *TeamService) Delete(organizationSlug string, slug string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Delete("teams/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+// https://docs.sentry.io/api/teams/update-a-team/
+func (s *TeamsService) Delete(ctx context.Context, organizationSlug string, slug string) (*Response, error) {
+	u := fmt.Sprintf("0/teams/%v/%v/", organizationSlug, slug)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
