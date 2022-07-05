@@ -1,14 +1,13 @@
 package sentry
 
 import (
-	"net/http"
+	"context"
+	"fmt"
 	"time"
-
-	"github.com/dghubble/sling"
 )
 
 // Project represents a Sentry project.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project.py
+// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/project.py
 type Project struct {
 	ID   string `json:"id"`
 	Slug string `json:"slug"`
@@ -63,7 +62,6 @@ type Project struct {
 }
 
 // ProjectSummary represents the summary of a Sentry project.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project.py#L258
 type ProjectSummary struct {
 	ID           string `json:"id"`
 	Name         string `json:"name"`
@@ -84,41 +82,48 @@ type ProjectSummary struct {
 }
 
 // ProjectSummaryTeam represents a team in a ProjectSummary.
-// https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project.py#L223
 type ProjectSummaryTeam struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 	Slug string `json:"slug"`
 }
 
-// ProjectService provides methods for accessing Sentry project API endpoints.
+// ProjectsService provides methods for accessing Sentry project API endpoints.
 // https://docs.sentry.io/api/projects/
-type ProjectService struct {
-	sling *sling.Sling
-}
-
-func newProjectService(sling *sling.Sling) *ProjectService {
-	return &ProjectService{
-		sling: sling,
-	}
-}
+type ProjectsService service
 
 // List projects available.
-// https://docs.sentry.io/api/projects/get-project-index/
-func (s *ProjectService) List() ([]Project, *http.Response, error) {
-	projects := new([]Project)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("projects/").Receive(projects, apiError)
-	return *projects, resp, relevantError(err, *apiError)
+// https://docs.sentry.io/api/projects/list-your-projects/
+func (s *ProjectsService) List(ctx context.Context) ([]*Project, *Response, error) {
+	u := "0/projects/"
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	projects := []*Project{}
+	resp, err := s.client.Do(ctx, req, &projects)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projects, resp, nil
 }
 
 // Get details on an individual project.
-// https://docs.sentry.io/api/projects/get-project-details/
-func (s *ProjectService) Get(organizationSlug string, slug string) (*Project, *http.Response, error) {
+// https://docs.sentry.io/api/projects/retrieve-a-project/
+func (s *ProjectsService) Get(ctx context.Context, organizationSlug string, slug string) (*Project, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/", organizationSlug, slug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	project := new(Project)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+slug+"/").Receive(project, apiError)
-	return project, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, project)
+	if err != nil {
+		return nil, resp, err
+	}
+	return project, resp, nil
 }
 
 // CreateProjectParams are the parameters for ProjectService.Create.
@@ -129,12 +134,19 @@ type CreateProjectParams struct {
 }
 
 // Create a new project bound to a team.
-// https://docs.sentry.io/api/teams/post-team-project-index/
-func (s *ProjectService) Create(organizationSlug string, teamSlug string, params *CreateProjectParams) (*Project, *http.Response, error) {
+func (s *ProjectsService) Create(ctx context.Context, organizationSlug string, teamSlug string, params *CreateProjectParams) (*Project, *Response, error) {
+	u := fmt.Sprintf("0/teams/%v/%v/projects/", organizationSlug, teamSlug)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	project := new(Project)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("teams/"+organizationSlug+"/"+teamSlug+"/projects/").BodyJSON(params).Receive(project, apiError)
-	return project, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, project)
+	if err != nil {
+		return nil, resp, err
+	}
+	return project, resp, nil
 }
 
 // UpdateProjectParams are the parameters for ProjectService.Update.
@@ -153,33 +165,57 @@ type UpdateProjectParams struct {
 }
 
 // Update various attributes and configurable settings for a given project.
-// https://docs.sentry.io/api/projects/put-project-details/
-func (s *ProjectService) Update(organizationSlug string, slug string, params *UpdateProjectParams) (*Project, *http.Response, error) {
+// https://docs.sentry.io/api/projects/update-a-project/
+func (s *ProjectsService) Update(ctx context.Context, organizationSlug string, slug string, params *UpdateProjectParams) (*Project, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/", organizationSlug, slug)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	project := new(Project)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+slug+"/").BodyJSON(params).Receive(project, apiError)
-	return project, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, project)
+	if err != nil {
+		return nil, resp, err
+	}
+	return project, resp, nil
 }
 
 // Delete a project.
-// https://docs.sentry.io/api/projects/delete-project-details/
-func (s *ProjectService) Delete(organizationSlug string, slug string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+slug+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+// https://docs.sentry.io/api/projects/delete-a-project/
+func (s *ProjectsService) Delete(ctx context.Context, organizationSlug string, slug string) (*Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/", organizationSlug, slug)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
 
 // AddTeam add a team to a project.
-func (s *ProjectService) AddTeam(organizationSlug string, slug string, teamSlug string) (*Project, *http.Response, error) {
+func (s *ProjectsService) AddTeam(ctx context.Context, organizationSlug string, slug string, teamSlug string) (*Project, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/teams/%v/", organizationSlug, slug, teamSlug)
+	req, err := s.client.NewRequest("POST", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	project := new(Project)
-	apiError := new(APIError)
-	res, err := s.sling.New().Post("projects/"+organizationSlug+"/"+slug+"/teams/"+teamSlug+"/").Receive(project, apiError)
-	return project, res, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, project)
+	if err != nil {
+		return nil, resp, err
+	}
+	return project, resp, nil
 }
 
 // RemoveTeam remove a team from a project.
-func (s *ProjectService) RemoveTeam(organizationSlug string, slug string, teamSlug string) (*http.Response, error) {
-	apiError := new(APIError)
-	res, err := s.sling.New().Delete("projects/"+organizationSlug+"/"+slug+"/teams/"+teamSlug+"/").Receive(nil, apiError)
-	return res, relevantError(err, *apiError)
+func (s *ProjectsService) RemoveTeam(ctx context.Context, organizationSlug string, slug string, teamSlug string) (*Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/teams/%v/", organizationSlug, slug, teamSlug)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

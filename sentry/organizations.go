@@ -1,139 +1,170 @@
 package sentry
 
 import (
-	"net/http"
+	"context"
+	"fmt"
 	"time"
-
-	"github.com/dghubble/sling"
 )
 
 // OrganizationStatus represents a Sentry organization's status.
 type OrganizationStatus struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   *string `json:"id"`
+	Name *string `json:"name"`
 }
 
 // OrganizationQuota represents a Sentry organization's quota.
 type OrganizationQuota struct {
-	MaxRate         int `json:"maxRate"`
-	MaxRateInterval int `json:"maxRateInterval"`
-	AccountLimit    int `json:"accountLimit"`
-	ProjectLimit    int `json:"projectLimit"`
+	MaxRate         *int `json:"maxRate"`
+	MaxRateInterval *int `json:"maxRateInterval"`
+	AccountLimit    *int `json:"accountLimit"`
+	ProjectLimit    *int `json:"projectLimit"`
 }
 
 // OrganizationAvailableRole represents a Sentry organization's available role.
 type OrganizationAvailableRole struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   *string `json:"id"`
+	Name *string `json:"name"`
 }
 
-// Organization represents a Sentry organization.
-// Based on https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/organization.py
+// Organization represents detailed information about a Sentry organization.
+// Based on https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/organization.py#L263-L288
 type Organization struct {
-	ID             string             `json:"id"`
-	Slug           string             `json:"slug"`
-	Status         OrganizationStatus `json:"status"`
-	Name           string             `json:"name"`
-	DateCreated    time.Time          `json:"dateCreated"`
-	IsEarlyAdopter bool               `json:"isEarlyAdopter"`
-	Avatar         Avatar             `json:"avatar"`
+	// Basic
+	ID                       *string             `json:"id,omitempty"`
+	Slug                     *string             `json:"slug,omitempty"`
+	Status                   *OrganizationStatus `json:"status,omitempty"`
+	Name                     *string             `json:"name,omitempty"`
+	DateCreated              *time.Time          `json:"dateCreated,omitempty"`
+	IsEarlyAdopter           *bool               `json:"isEarlyAdopter,omitempty"`
+	Require2FA               *bool               `json:"require2FA,omitempty"`
+	RequireEmailVerification *bool               `json:"requireEmailVerification,omitempty"`
+	Avatar                   *Avatar             `json:"avatar,omitempty"`
+	Features                 []string            `json:"features,omitempty"`
 
-	Quota OrganizationQuota `json:"quota"`
-
-	IsDefault            bool                        `json:"isDefault"`
-	DefaultRole          string                      `json:"defaultRole"`
-	AvailableRoles       []OrganizationAvailableRole `json:"availableRoles"`
-	OpenMembership       bool                        `json:"openMembership"`
-	Require2FA           bool                        `json:"require2FA"`
-	AllowSharedIssues    bool                        `json:"allowSharedIssues"`
-	EnhancedPrivacy      bool                        `json:"enhancedPrivacy"`
-	DataScrubber         bool                        `json:"dataScrubber"`
-	DataScrubberDefaults bool                        `json:"dataScrubberDefaults"`
-	SensitiveFields      []string                    `json:"sensitiveFields"`
-	SafeFields           []string                    `json:"safeFields"`
-	ScrubIPAddresses     bool                        `json:"scrubIPAddresses"`
-
-	Access                []string `json:"access"`
-	Features              []string `json:"features"`
-	PendingAccessRequests int      `json:"pendingAccessRequests"`
-
-	AccountRateLimit int `json:"accountRateLimit"`
-	ProjectRateLimit int `json:"projectRateLimit"`
-
-	Teams    []Team           `json:"teams"`
-	Projects []ProjectSummary `json:"projects"`
+	// Detailed
+	// TODO: experiments
+	Quota                *OrganizationQuota          `json:"quota,omitempty"`
+	IsDefault            *bool                       `json:"isDefault,omitempty"`
+	DefaultRole          *string                     `json:"defaultRole,omitempty"`
+	AvailableRoles       []OrganizationAvailableRole `json:"availableRoles,omitempty"`
+	OpenMembership       *bool                       `json:"openMembership,omitempty"`
+	AllowSharedIssues    *bool                       `json:"allowSharedIssues,omitempty"`
+	EnhancedPrivacy      *bool                       `json:"enhancedPrivacy,omitempty"`
+	DataScrubber         *bool                       `json:"dataScrubber,omitempty"`
+	DataScrubberDefaults *bool                       `json:"dataScrubberDefaults,omitempty"`
+	SensitiveFields      []string                    `json:"sensitiveFields,omitempty"`
+	SafeFields           []string                    `json:"safeFields,omitempty"`
+	StoreCrashReports    *int                        `json:"storeCrashReports,omitempty"`
+	AttachmentsRole      *string                     `json:"attachmentsRole,omitempty"`
+	DebugFilesRole       *string                     `json:"debugFilesRole,omitempty"`
+	EventsMemberAdmin    *bool                       `json:"eventsMemberAdmin,omitempty"`
+	AlertsMemberWrite    *bool                       `json:"alertsMemberWrite,omitempty"`
+	ScrubIPAddresses     *bool                       `json:"scrubIPAddresses,omitempty"`
+	ScrapeJavaScript     *bool                       `json:"scrapeJavaScript,omitempty"`
+	AllowJoinRequests    *bool                       `json:"allowJoinRequests,omitempty"`
+	RelayPiiConfig       *string                     `json:"relayPiiConfig,omitempty"`
+	// TODO: trustedRelays
+	Access                []string `json:"access,omitempty"`
+	Role                  *string  `json:"role,omitempty"`
+	PendingAccessRequests *int     `json:"pendingAccessRequests,omitempty"`
 	// TODO: onboardingTasks
 }
 
-// OrganizationService provides methods for accessing Sentry organization API endpoints.
+// OrganizationsService provides methods for accessing Sentry organization API endpoints.
 // https://docs.sentry.io/api/organizations/
-type OrganizationService struct {
-	sling *sling.Sling
-}
-
-func newOrganizationService(sling *sling.Sling) *OrganizationService {
-	return &OrganizationService{
-		sling: sling.Path("organizations/"),
-	}
-}
-
-// ListOrganizationParams are the parameters for OrganizationService.List.
-type ListOrganizationParams struct {
-	Cursor string `url:"cursor,omitempty"`
-}
+type OrganizationsService service
 
 // List organizations available to the authenticated session.
-// https://docs.sentry.io/api/organizations/get-organization-index/
-func (s *OrganizationService) List(params *ListOrganizationParams) ([]Organization, *http.Response, error) {
-	organizations := new([]Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("").QueryStruct(params).Receive(organizations, apiError)
-	return *organizations, resp, relevantError(err, *apiError)
+// https://docs.sentry.io/api/organizations/list-your-organizations/
+func (s *OrganizationsService) List(ctx context.Context, params *ListCursorParams) ([]*Organization, *Response, error) {
+	u, err := addQuery("0/organizations/", params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	orgs := []*Organization{}
+	resp, err := s.client.Do(ctx, req, &orgs)
+	if err != nil {
+		return nil, resp, err
+	}
+	return orgs, resp, nil
+}
+
+// Get a Sentry organization.
+// https://docs.sentry.io/api/organizations/retrieve-an-organization/
+func (s *OrganizationsService) Get(ctx context.Context, slug string) (*Organization, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/", slug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	org := new(Organization)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
+	return org, resp, nil
 }
 
 // CreateOrganizationParams are the parameters for OrganizationService.Create.
 type CreateOrganizationParams struct {
-	Name       string `json:"name,omitempty"`
-	Slug       string `json:"slug,omitempty"`
-	AgreeTerms *bool  `json:"agreeTerms,omitempty"`
-}
-
-// Get a Sentry organization.
-// https://docs.sentry.io/api/organizations/get-organization-details/
-func (s *OrganizationService) Get(slug string) (*Organization, *http.Response, error) {
-	org := new(Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get(slug+"/").Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
+	Name       *string `json:"name,omitempty"`
+	Slug       *string `json:"slug,omitempty"`
+	AgreeTerms *bool   `json:"agreeTerms,omitempty"`
 }
 
 // Create a new Sentry organization.
-// https://docs.sentry.io/api/organizations/post-organization-index/
-func (s *OrganizationService) Create(params *CreateOrganizationParams) (*Organization, *http.Response, error) {
+func (s *OrganizationsService) Create(ctx context.Context, params *CreateOrganizationParams) (*Organization, *Response, error) {
+	u := "0/organizations/"
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	org := new(Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Post("").BodyJSON(params).Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
+	return org, resp, nil
 }
 
 // UpdateOrganizationParams are the parameters for OrganizationService.Update.
 type UpdateOrganizationParams struct {
-	Name string `json:"name,omitempty"`
-	Slug string `json:"slug,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Slug *string `json:"slug,omitempty"`
 }
 
 // Update a Sentry organization.
-// https://docs.sentry.io/api/organizations/put-organization-details/
-func (s *OrganizationService) Update(slug string, params *UpdateOrganizationParams) (*Organization, *http.Response, error) {
+// https://docs.sentry.io/api/organizations/update-an-organization/
+func (s *OrganizationsService) Update(ctx context.Context, slug string, params *UpdateOrganizationParams) (*Organization, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/", slug)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	org := new(Organization)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Put(slug+"/").BodyJSON(params).Receive(org, apiError)
-	return org, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
+	return org, resp, nil
 }
 
 // Delete a Sentry organization.
-func (s *OrganizationService) Delete(slug string) (*http.Response, error) {
-	apiError := new(APIError)
-	resp, err := s.sling.New().Delete(slug+"/").Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+func (s *OrganizationsService) Delete(ctx context.Context, slug string) (*Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/", slug)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

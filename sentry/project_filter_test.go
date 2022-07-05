@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,8 +12,8 @@ import (
 )
 
 func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/powerful-abolitionist/filters/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -20,8 +21,8 @@ func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
 		fmt.Fprint(w, getWithLegacyExtensionHeader)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	filterConfig, _, err := client.ProjectFilter.GetFilterConfig("the-interstellar-jurisdiction", "powerful-abolitionist")
+	ctx := context.Background()
+	filterConfig, _, err := client.ProjectFilter.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
 	expected := FilterConfig{
@@ -32,8 +33,8 @@ func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
 }
 
 func TestProjectFilterService_GetWithoutLegacyExtension(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/powerful-abolitionist/filters/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
@@ -41,8 +42,8 @@ func TestProjectFilterService_GetWithoutLegacyExtension(t *testing.T) {
 		fmt.Fprint(w, getWithoutLegacyExtensionHeader)
 	})
 
-	client := NewClient(httpClient, nil, "")
-	filterConfig, _, err := client.ProjectFilter.GetFilterConfig("the-interstellar-jurisdiction", "powerful-abolitionist")
+	ctx := context.Background()
+	filterConfig, _, err := client.ProjectFilter.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
 	expected := FilterConfig{
@@ -65,8 +66,8 @@ func readRequestBody(r *http.Request) string {
 }
 
 func TestBrowserExtensionFilter(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/test_org/test_project/filters/browser-extensions/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -74,14 +75,15 @@ func TestBrowserExtensionFilter(t *testing.T) {
 		assert.Equal(t, body, `{"active":true}`)
 		w.Header().Set("Content-Type", "application/json")
 	})
-	client := NewClient(httpClient, nil, "")
-	_, err := client.ProjectFilter.UpdateBrowserExtensions("test_org", "test_project", true)
+
+	ctx := context.Background()
+	_, err := client.ProjectFilter.UpdateBrowserExtensions(ctx, "test_org", "test_project", true)
 	assert.NoError(t, err)
 }
 
 func TestLegacyBrowserFilter(t *testing.T) {
-	httpClient, mux, server := testServer()
-	defer server.Close()
+	client, mux, _, teardown := setup()
+	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/test_org/test_project/filters/legacy-browsers/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
@@ -90,9 +92,10 @@ func TestLegacyBrowserFilter(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, "")
 	})
-	client := NewClient(httpClient, nil, "")
+
+	ctx := context.Background()
 	browsers := []string{"ie_pre_9", "ie10"}
-	_, err := client.ProjectFilter.UpdateLegacyBrowser("test_org", "test_project", browsers)
+	_, err := client.ProjectFilter.UpdateLegacyBrowser(ctx, "test_org", "test_project", browsers)
 	assert.NoError(t, err)
 }
 

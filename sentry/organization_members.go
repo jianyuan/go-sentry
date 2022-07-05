@@ -1,14 +1,13 @@
 package sentry
 
 import (
-	"net/http"
+	"context"
+	"fmt"
 	"time"
-
-	"github.com/dghubble/sling"
 )
 
 // OrganizationMember represents a User's membership to the organization.
-// https://github.com/getsentry/sentry/blob/275e6efa0f364ce05d9bfd09386b895b8a5e0671/src/sentry/api/serializers/models/organization_member.py#L12
+// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/organization_member/response.py#L57-L69
 type OrganizationMember struct {
 	ID           string          `json:"id"`
 	Email        string          `json:"email"`
@@ -22,28 +21,103 @@ type OrganizationMember struct {
 	DateCreated  time.Time       `json:"dateCreated"`
 	InviteStatus string          `json:"inviteStatus"`
 	InviterName  *string         `json:"inviterName"`
+	Teams        []string        `json:"teams"`
 }
 
-// OrganizationMemberService provides methods for accessing Sentry membership API endpoints.
-type OrganizationMemberService struct {
-	sling *sling.Sling
-}
+const (
+	RoleMember  string = "member"
+	RoleBilling string = "billing"
+	RoleAdmin   string = "admin"
+	RoleOwner   string = "owner"
+	RoleManager string = "manager"
+)
 
-func newOrganizationMemberService(sling *sling.Sling) *OrganizationMemberService {
-	return &OrganizationMemberService{
-		sling: sling,
-	}
-}
-
-// ListOrganizationMemberParams are the parameters for OrganizationMemberService.List.
-type ListOrganizationMemberParams struct {
-	Cursor string `url:"cursor,omitempty"`
-}
+// OrganizationMembersService provides methods for accessing Sentry membership API endpoints.
+type OrganizationMembersService service
 
 // List organization members.
-func (s *OrganizationMemberService) List(organizationSlug string, params *ListOrganizationMemberParams) ([]OrganizationMember, *http.Response, error) {
-	members := new([]OrganizationMember)
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("organizations/"+organizationSlug+"/members/").QueryStruct(params).Receive(members, apiError)
-	return *members, resp, relevantError(err, *apiError)
+func (s *OrganizationMembersService) List(ctx context.Context, organizationSlug string, params *ListCursorParams) ([]*OrganizationMember, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/", organizationSlug)
+	u, err := addQuery(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	members := []*OrganizationMember{}
+	resp, err := s.client.Do(ctx, req, &members)
+	if err != nil {
+		return nil, resp, err
+	}
+	return members, resp, nil
+}
+
+func (s *OrganizationMembersService) Get(ctx context.Context, organizationSlug string, memberID string) (*OrganizationMember, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/%v/", organizationSlug, memberID)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	member := new(OrganizationMember)
+	resp, err := s.client.Do(ctx, req, member)
+	if err != nil {
+		return nil, resp, err
+	}
+	return member, resp, nil
+}
+
+type CreateOrganizationMemberParams struct {
+	Email string   `json:"email"`
+	Role  string   `json:"role"`
+	Teams []string `json:"teams,omitempty"`
+}
+
+func (s *OrganizationMembersService) Create(ctx context.Context, organizationSlug string, params *CreateOrganizationMemberParams) (*OrganizationMember, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/", organizationSlug)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	member := new(OrganizationMember)
+	resp, err := s.client.Do(ctx, req, member)
+	if err != nil {
+		return nil, resp, err
+	}
+	return member, resp, nil
+}
+
+type UpdateOrganizationMemberParams struct {
+	Role  string   `json:"role"`
+	Teams []string `json:"teams,omitempty"`
+}
+
+func (s *OrganizationMembersService) Update(ctx context.Context, organizationSlug string, memberID string, params *UpdateOrganizationMemberParams) (*OrganizationMember, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/%v/", organizationSlug, memberID)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	member := new(OrganizationMember)
+	resp, err := s.client.Do(ctx, req, member)
+	if err != nil {
+		return nil, resp, err
+	}
+	return member, resp, nil
+}
+
+func (s *OrganizationMembersService) Delete(ctx context.Context, organizationSlug string, memberID string) (*Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/%v/", organizationSlug, memberID)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

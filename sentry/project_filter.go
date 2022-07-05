@@ -1,10 +1,10 @@
 package sentry
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
-
-	"github.com/dghubble/sling"
 )
 
 // ProjectFilter represents inbounding filters applied to a project.
@@ -15,22 +15,23 @@ type ProjectFilter struct {
 
 // ProjectOwnershipService provides methods for accessing Sentry project
 // filters API endpoints.
-type ProjectFilterService struct {
-	sling *sling.Sling
-}
-
-func newProjectFilterService(sling *sling.Sling) *ProjectFilterService {
-	return &ProjectFilterService{
-		sling: sling,
-	}
-}
+type ProjectFilterService service
 
 // Get the filters.
-func (s *ProjectFilterService) Get(organizationSlug string, projectSlug string) ([]*ProjectFilter, *http.Response, error) {
+func (s *ProjectFilterService) Get(ctx context.Context, organizationSlug string, projectSlug string) ([]*ProjectFilter, *Response, error) {
+	url := fmt.Sprintf("0/projects/%v/%v/filters/", organizationSlug, projectSlug)
+	req, err := s.client.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var filters []*ProjectFilter
-	apiError := new(APIError)
-	resp, err := s.sling.New().Get("projects/"+organizationSlug+"/"+projectSlug+"/filters/").Receive(&filters, apiError)
-	return filters, resp, relevantError(err, *apiError)
+	resp, err := s.client.Do(ctx, req, &filters)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return filters, resp, nil
 }
 
 // FilterConfig represents configuration for project filter
@@ -40,8 +41,8 @@ type FilterConfig struct {
 }
 
 // GetFilterConfig retrieves filter configuration.
-func (s *ProjectFilterService) GetFilterConfig(organizationSlug string, projectSlug string) (*FilterConfig, *http.Response, error) {
-	filters, resp, err := s.Get(organizationSlug, projectSlug)
+func (s *ProjectFilterService) GetFilterConfig(ctx context.Context, organizationSlug string, projectSlug string) (*FilterConfig, *Response, error) {
+	filters, resp, err := s.Get(ctx, organizationSlug, projectSlug)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -74,11 +75,15 @@ type BrowserExtensionParams struct {
 }
 
 // UpdateBrowserExtensions updates configuration for browser extension filter
-func (s *ProjectFilterService) UpdateBrowserExtensions(organizationSlug string, projectSlug string, active bool) (*http.Response, error) {
-	apiError := new(APIError)
+func (s *ProjectFilterService) UpdateBrowserExtensions(ctx context.Context, organizationSlug string, projectSlug string, active bool) (*Response, error) {
+	url := fmt.Sprintf("0/projects/%v/%v/filters/browser-extensions/", organizationSlug, projectSlug)
 	params := BrowserExtensionParams{active}
-	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+projectSlug+"/filters/browser-extensions/").BodyJSON(params).Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+	req, err := s.client.NewRequest(http.MethodPut, url, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
 
 // LegactBrowserParams defines parameters for legacy browser request
@@ -87,9 +92,14 @@ type LegactBrowserParams struct {
 }
 
 // UpdateLegacyBrowser updates configuration for legacy browser filters
-func (s *ProjectFilterService) UpdateLegacyBrowser(organizationSlug string, projectSlug string, browsers []string) (*http.Response, error) {
-	apiError := new(APIError)
+func (s *ProjectFilterService) UpdateLegacyBrowser(ctx context.Context, organizationSlug string, projectSlug string, browsers []string) (*Response, error) {
+	url := fmt.Sprintf("0/projects/%v/%v/filters/legacy-browsers/", organizationSlug, projectSlug)
 	params := LegactBrowserParams{browsers}
-	resp, err := s.sling.New().Put("projects/"+organizationSlug+"/"+projectSlug+"/filters/legacy-browsers/").BodyJSON(params).Receive(nil, apiError)
-	return resp, relevantError(err, *apiError)
+
+	req, err := s.client.NewRequest(http.MethodPut, url, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

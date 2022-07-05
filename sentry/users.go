@@ -19,17 +19,19 @@ type User struct {
 	LastActive      time.Time   `json:"lastActive"`
 	IsSuperuser     bool        `json:"isSuperuser"`
 	IsStaff         bool        `json:"isStaff"`
-	Avatar          UserAvatar  `json:"avatar"`
+	Avatar          Avatar      `json:"avatar"`
 	Emails          []UserEmail `json:"emails"`
 }
 
-type UserAvatar struct {
-	AvatarType string  `json:"avatarType"`
-	AvatarUUID *string `json:"avatarUuid"`
-}
-
+// UserEmail represents a user's email and its verified status.
 type UserEmail struct {
 	ID         string `json:"id"`
 	Email      string `json:"email"`
 	IsVerified bool   `json:"is_verified"`
+}
+
+// Avatar represents an avatar.
+type Avatar struct {
+	UUID *string `json:"avatarUuid"`
+	Type string  `json:"avatarType"`
 }
