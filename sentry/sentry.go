@@ -61,7 +61,8 @@ type Client struct {
 	ProjectPlugins      *ProjectPluginsService
 	Projects            *ProjectsService
 	Teams               *TeamsService
-	ProjectFilter       *ProjectFilterService
+
+	ProjectFilter *ProjectFilterService
 }
 
 type service struct {
