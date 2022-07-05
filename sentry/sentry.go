@@ -60,8 +60,8 @@ type Client struct {
 	ProjectOwnerships   *ProjectOwnershipsService
 	ProjectPlugins      *ProjectPluginsService
 	Projects            *ProjectsService
-	Teams               *TeamsService
 	ProjectFilter       *ProjectFilterService
+	Teams               *TeamsService
 }
 
 type service struct {
