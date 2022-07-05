@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 // ProjectFilter represents inbounding filters applied to a project.
@@ -19,7 +20,7 @@ type ProjectFilterService service
 // Get the filters.
 func (s *ProjectFilterService) Get(ctx context.Context, organizationSlug string, projectSlug string) ([]*ProjectFilter, *Response, error) {
 	url := fmt.Sprintf("0/projects/%v/%v/filters/", organizationSlug, projectSlug)
-	req, err := s.client.NewRequest("GET", url, nil)
+	req, err := s.client.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -77,7 +78,7 @@ type BrowserExtensionParams struct {
 func (s *ProjectFilterService) UpdateBrowserExtensions(ctx context.Context, organizationSlug string, projectSlug string, active bool) (*Response, error) {
 	url := fmt.Sprintf("0/projects/%v/%v/filters/browser-extensions/", organizationSlug, projectSlug)
 	params := BrowserExtensionParams{active}
-	req, err := s.client.NewRequest("PUT", url, params)
+	req, err := s.client.NewRequest(http.MethodPut, url, params)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (s *ProjectFilterService) UpdateLegacyBrowser(ctx context.Context, organiza
 	url := fmt.Sprintf("0/projects/%v/%v/filters/legacy-browsers/", organizationSlug, projectSlug)
 	params := LegactBrowserParams{browsers}
 
-	req, err := s.client.NewRequest("PUT", url, params)
+	req, err := s.client.NewRequest(http.MethodPut, url, params)
 	if err != nil {
 		return nil, err
 	}
