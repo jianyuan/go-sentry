@@ -86,15 +86,15 @@ func (s *ProjectFilterService) UpdateBrowserExtensions(ctx context.Context, orga
 	return s.client.Do(ctx, req, nil)
 }
 
-// LegactBrowserParams defines parameters for legacy browser request
-type LegactBrowserParams struct {
+// LegacyBrowserParams defines parameters for legacy browser request
+type LegacyBrowserParams struct {
 	Browsers []string `json:"subfilters"`
 }
 
 // UpdateLegacyBrowser updates configuration for legacy browser filters
 func (s *ProjectFilterService) UpdateLegacyBrowser(ctx context.Context, organizationSlug string, projectSlug string, browsers []string) (*Response, error) {
 	url := fmt.Sprintf("0/projects/%v/%v/filters/legacy-browsers/", organizationSlug, projectSlug)
-	params := LegactBrowserParams{browsers}
+	params := LegacyBrowserParams{browsers}
 
 	req, err := s.client.NewRequest(http.MethodPut, url, params)
 	if err != nil {
