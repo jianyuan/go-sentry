@@ -22,6 +22,10 @@ type MetricAlert struct {
 	Projects         []string              `json:"projects,omitempty"`
 	Owner            *string               `json:"owner,omitempty"`
 	DateCreated      *time.Time            `json:"dateCreated,omitempty"`
+	// Don't `omitempty` because we want to set this to null to force Sentry to register this
+	// metric alert as a static alert when `ComparisonDelta` is empty.
+	// We type this as a float instead of an int because Sentry, server-side, returns a float for this value.
+	ComparisonDelta *float64 `json:"comparisonDelta"`
 }
 
 // MetricAlertTrigger represents a metric alert trigger.

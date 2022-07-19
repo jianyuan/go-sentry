@@ -29,6 +29,7 @@ func TestMetricAlertService_List(t *testing.T) {
 				"thresholdType": 0,
 				"resolveThreshold": 100.0,
 				"timeWindow": 5.0,
+				"comparisonDelta": 10080,
 				"triggers": [
 					{
 						"id": "6789",
@@ -78,6 +79,7 @@ func TestMetricAlertService_List(t *testing.T) {
 			ThresholdType:    Int(0),
 			ResolveThreshold: Float64(100.0),
 			TimeWindow:       Float64(5.0),
+			ComparisonDelta:  Float64(10080),
 			Triggers: []*MetricAlertTrigger{
 				{
 					ID:               String("6789"),
@@ -128,6 +130,7 @@ func TestMetricAlertService_Get(t *testing.T) {
 				"timeWindow": 10,
 				"thresholdType": 0,
 				"resolveThreshold": 0,
+				"comparisonDelta": 10080,
 				"triggers": [
 				  {
 					"actions": [
@@ -174,6 +177,7 @@ func TestMetricAlertService_Get(t *testing.T) {
 		Query:            String("http.url:http://service/unreadmessages"),
 		Aggregate:        String("p50(transaction.duration)"),
 		TimeWindow:       Float64(10),
+		ComparisonDelta:  Float64(10080),
 		ThresholdType:    Int(0),
 		ResolveThreshold: Float64(0),
 		Triggers: []*MetricAlertTrigger{
@@ -225,6 +229,7 @@ func TestMetricAlertService_Create(t *testing.T) {
 				"timeWindow": 10,
 				"thresholdType": 0,
 				"resolveThreshold": 0,
+				"comparisonDelta": 10080,
 				"triggers": [
 				  {
 					"actions": [
@@ -267,6 +272,7 @@ func TestMetricAlertService_Create(t *testing.T) {
 		Aggregate:        String("p50(transaction.duration)"),
 		TimeWindow:       Float64(10.0),
 		ThresholdType:    Int(0),
+		ComparisonDelta:  Float64(10080),
 		ResolveThreshold: Float64(0),
 		Triggers: []*MetricAlertTrigger{
 			{
@@ -308,6 +314,7 @@ func TestMetricAlertService_Create(t *testing.T) {
 		Aggregate:        String("p50(transaction.duration)"),
 		ThresholdType:    Int(0),
 		ResolveThreshold: Float64(0),
+		ComparisonDelta:  Float64(10080),
 		TimeWindow:       Float64(10.0),
 		Triggers: []*MetricAlertTrigger{
 			{
@@ -355,6 +362,7 @@ func TestMetricAlertService_Update(t *testing.T) {
 		TimeWindow:       Float64(10),
 		ThresholdType:    Int(0),
 		ResolveThreshold: Float64(0),
+		ComparisonDelta:  Float64(10080),
 		Triggers: []*MetricAlertTrigger{
 			{
 				ID:               String("6789"),
@@ -383,6 +391,7 @@ func TestMetricAlertService_Update(t *testing.T) {
 			"timeWindow":       json.Number("10"),
 			"thresholdType":    json.Number("0"),
 			"resolveThreshold": json.Number("0"),
+			"comparisonDelta":  json.Number("10080"),
 			"triggers": []interface{}{
 				map[string]interface{}{
 					"id":               "6789",
