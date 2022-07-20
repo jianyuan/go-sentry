@@ -134,6 +134,7 @@ func TestProjectsService_List(t *testing.T) {
 				},
 				"platform": null,
 				"slug": "pump-station",
+				"groupingEnhancements": "pump station grouping enhancement rule",
 				"status": "active"
 			}
 		]`)
@@ -214,7 +215,8 @@ func TestProjectsService_List(t *testing.T) {
 			Avatar: Avatar{
 				Type: "letter_avatar",
 			},
-			Organization: expectedOrganization,
+			Organization:         expectedOrganization,
+			GroupingEnhancements: "pump station grouping enhancement rule",
 		},
 	}
 	assert.Equal(t, expected, projects)
@@ -359,6 +361,7 @@ func TestProjectsService_Get(t *testing.T) {
 				"name": "Powerful Abolitionist",
 				"slug": "powerful-abolitionist"
 			}],
+			"groupingEnhancements": "pump-station grouping enhancement rule",
 			"verifySSL": false
 		}`)
 	})
@@ -414,6 +417,7 @@ func TestProjectsService_Get(t *testing.T) {
 		AllowedDomains:       []string{"*"},
 		DataScrubber:         true,
 		DataScrubberDefaults: true,
+		GroupingEnhancements: "pump-station grouping enhancement rule",
 		SafeFields:           []string{},
 		SensitiveFields:      []string{},
 		SubjectTemplate:      "$shortID - $title",
@@ -534,6 +538,7 @@ func TestProjectsService_Update(t *testing.T) {
 			"callSignReviewed": false,
 			"id": "5",
 			"subjectTemplate": "[$project] ${tag:level}: $title",
+			"groupingEnhancements": "Plane Proxy grouping enhancement rule",
 			"name": "Plane Proxy"
 		}`)
 	})
@@ -566,10 +571,11 @@ func TestProjectsService_Update(t *testing.T) {
 			"sentry:origins":     "http://example.com\nhttp://example.invalid",
 			"sentry:resolve_age": json.Number("720"),
 		},
-		DigestsMinDelay: 300,
-		DigestsMaxDelay: 1800,
-		ResolveAge:      720,
-		SubjectTemplate: "[$project] ${tag:level}: $title",
+		DigestsMinDelay:      300,
+		DigestsMaxDelay:      1800,
+		ResolveAge:           720,
+		SubjectTemplate:      "[$project] ${tag:level}: $title",
+		GroupingEnhancements: "Plane Proxy grouping enhancement rule",
 	}
 	assert.Equal(t, expected, project)
 }
