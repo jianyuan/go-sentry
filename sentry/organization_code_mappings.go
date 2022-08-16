@@ -51,3 +51,56 @@ func (s *OrganizationCodeMappingsService) List(ctx context.Context, organization
 	}
 	return integrations, resp, nil
 }
+
+// https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/organization_code_mappings.py#L26-L35
+type CreateOrganizationCodeMappingParams struct {
+	DefaultBranch string `json:"defaultBranch"`
+	StackRoot     string `json:"stackRoot"`
+	SourceRoot    string `json:"sourceRoot"`
+	RepositoryId  string `json:"repositoryId"`
+	IntegrationId string `json:"integrationId"`
+	ProjectId     string `json:"projectId"`
+}
+
+func (s *OrganizationCodeMappingsService) Create(ctx context.Context, organizationSlug string, params CreateOrganizationCodeMappingParams) (*OrganizationCodeMapping, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/code-mappings/", organizationSlug)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repo := new(OrganizationCodeMapping)
+	resp, err := s.client.Do(ctx, req, repo)
+	if err != nil {
+		return nil, resp, err
+	}
+	return repo, resp, nil
+}
+
+// https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/organization_code_mappings.py#L26-L35
+type UpdateOrganizationCodeMappingParams CreateOrganizationCodeMappingParams
+
+func (s *OrganizationCodeMappingsService) Update(ctx context.Context, organizationSlug string, codeMappingId string, params UpdateOrganizationCodeMappingParams) (*OrganizationCodeMapping, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/code-mappings/%v/", organizationSlug, codeMappingId)
+	req, err := s.client.NewRequest("PUT", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repo := new(OrganizationCodeMapping)
+	resp, err := s.client.Do(ctx, req, repo)
+	if err != nil {
+		return nil, resp, err
+	}
+	return repo, resp, nil
+}
+
+func (s *OrganizationCodeMappingsService) Delete(ctx context.Context, organizationSlug string, codeMappingId string) (*Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/code-mappings/%v/", organizationSlug, codeMappingId)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
