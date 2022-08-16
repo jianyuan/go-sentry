@@ -59,3 +59,36 @@ func (s *OrganizationRepositoriesService) List(ctx context.Context, organization
 	}
 	return repos, resp, nil
 }
+
+// Fields are different for different providers
+type CreateOrganizationRepositoryParams map[string]interface{}
+
+func (s *OrganizationRepositoriesService) Create(ctx context.Context, organizationSlug string, params CreateOrganizationRepositoryParams) (*OrganizationRepository, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/repos/", organizationSlug)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repo := new(OrganizationRepository)
+	resp, err := s.client.Do(ctx, req, repo)
+	if err != nil {
+		return nil, resp, err
+	}
+	return repo, resp, nil
+}
+
+func (s *OrganizationRepositoriesService) Delete(ctx context.Context, organizationSlug string, repoID string) (*OrganizationRepository, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/repos/%v/", organizationSlug, repoID)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repo := new(OrganizationRepository)
+	resp, err := s.client.Do(ctx, req, repo)
+	if err != nil {
+		return nil, resp, err
+	}
+	return repo, resp, nil
+}
