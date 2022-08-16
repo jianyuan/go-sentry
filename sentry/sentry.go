@@ -51,6 +51,7 @@ type Client struct {
 	Dashboards               *DashboardsService
 	IssueAlerts              *IssueAlertsService
 	MetricAlerts             *MetricAlertsService
+	OrganizationCodeMappings *OrganizationCodeMappingsService
 	OrganizationIntegrations *OrganizationIntegrationsService
 	OrganizationMembers      *OrganizationMembersService
 	OrganizationRepositories *OrganizationRepositoriesService
@@ -85,6 +86,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Dashboards = (*DashboardsService)(&c.common)
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
 	c.MetricAlerts = (*MetricAlertsService)(&c.common)
+	c.OrganizationCodeMappings = (*OrganizationCodeMappingsService)(&c.common)
 	c.OrganizationIntegrations = (*OrganizationIntegrationsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
 	c.OrganizationRepositories = (*OrganizationRepositoriesService)(&c.common)
