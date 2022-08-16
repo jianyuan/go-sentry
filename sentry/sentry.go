@@ -53,6 +53,7 @@ type Client struct {
 	MetricAlerts             *MetricAlertsService
 	OrganizationIntegrations *OrganizationIntegrationsService
 	OrganizationMembers      *OrganizationMembersService
+	OrganizationRepositories *OrganizationRepositoriesService
 	Organizations            *OrganizationsService
 	ProjectKeys              *ProjectKeysService
 	ProjectOwnerships        *ProjectOwnershipsService
@@ -86,6 +87,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.MetricAlerts = (*MetricAlertsService)(&c.common)
 	c.OrganizationIntegrations = (*OrganizationIntegrationsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
+	c.OrganizationRepositories = (*OrganizationRepositoriesService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
 	c.ProjectFilter = (*ProjectFilterService)(&c.common)
 	c.ProjectKeys = (*ProjectKeysService)(&c.common)
