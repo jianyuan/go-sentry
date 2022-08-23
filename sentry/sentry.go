@@ -47,18 +47,21 @@ type Client struct {
 	common service
 
 	// Services
-	DashboardWidgets    *DashboardWidgetsService
-	Dashboards          *DashboardsService
-	IssueAlerts         *IssueAlertsService
-	MetricAlerts        *MetricAlertsService
-	OrganizationMembers *OrganizationMembersService
-	Organizations       *OrganizationsService
-	ProjectKeys         *ProjectKeysService
-	ProjectOwnerships   *ProjectOwnershipsService
-	ProjectPlugins      *ProjectPluginsService
-	Projects            *ProjectsService
-	ProjectFilter       *ProjectFilterService
-	Teams               *TeamsService
+	DashboardWidgets         *DashboardWidgetsService
+	Dashboards               *DashboardsService
+	IssueAlerts              *IssueAlertsService
+	MetricAlerts             *MetricAlertsService
+	OrganizationCodeMappings *OrganizationCodeMappingsService
+	OrganizationIntegrations *OrganizationIntegrationsService
+	OrganizationMembers      *OrganizationMembersService
+	OrganizationRepositories *OrganizationRepositoriesService
+	Organizations            *OrganizationsService
+	ProjectKeys              *ProjectKeysService
+	ProjectOwnerships        *ProjectOwnershipsService
+	ProjectPlugins           *ProjectPluginsService
+	Projects                 *ProjectsService
+	ProjectFilter            *ProjectFilterService
+	Teams                    *TeamsService
 }
 
 type service struct {
@@ -83,7 +86,10 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Dashboards = (*DashboardsService)(&c.common)
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
 	c.MetricAlerts = (*MetricAlertsService)(&c.common)
+	c.OrganizationCodeMappings = (*OrganizationCodeMappingsService)(&c.common)
+	c.OrganizationIntegrations = (*OrganizationIntegrationsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
+	c.OrganizationRepositories = (*OrganizationRepositoriesService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
 	c.ProjectFilter = (*ProjectFilterService)(&c.common)
 	c.ProjectKeys = (*ProjectKeysService)(&c.common)
