@@ -87,6 +87,24 @@ type ProjectSummaryTeam struct {
 	Slug string `json:"slug"`
 }
 
+type Event struct {
+	EventID     string      `json:"eventID"`
+	Tags        []Tag       `json:"tags"`
+	DateCreated string      `json:"dateCreated"`
+	User        interface{} `json:"user"`
+	Message     string      `json:"message"`
+	Title       string      `json:"title"`
+	ID          string      `json:"id"`
+	Platform    string      `json:"platform"`
+	EventType   string      `json:"event.type"`
+	GroupID     string      `json:"groupID"`
+}
+
+type Tag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 // ProjectsService provides methods for accessing Sentry project API endpoints.
 // https://docs.sentry.io/api/projects/
 type ProjectsService service
@@ -216,4 +234,34 @@ func (s *ProjectsService) RemoveTeam(ctx context.Context, organizationSlug strin
 	}
 
 	return s.client.Do(ctx, req, nil)
+}
+
+func (s *ProjectsService) ListIssues(ctx context.Context, organizationSlug string, slug string) (*[]Issue, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/issues/", organizationSlug, slug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	issues := new([]Issue)
+	resp, err := s.client.Do(ctx, req, issues)
+	if err != nil {
+		return nil, resp, err
+	}
+	return issues, resp, nil
+}
+
+func (s *ProjectsService) ListEvents(ctx context.Context, organizationSlug string, slug string) (*[]Event, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/events/", organizationSlug, slug)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	events := new([]Event)
+	resp, err := s.client.Do(ctx, req, events)
+	if err != nil {
+		return nil, resp, err
+	}
+	return events, resp, nil
 }
