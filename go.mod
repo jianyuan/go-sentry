@@ -1,6 +1,6 @@
-module github.com/jianyuan/go-sentry/v2
+module github.com/mogagnon/go-sentry/v2
 
-go 1.19
+go 1.18
 
 require (
 	github.com/google/go-querystring v1.1.0

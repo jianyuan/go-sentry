@@ -1,6 +1,9 @@
 package sentry
 
-type IssueService service
+import (
+	"context"
+	"fmt"
+)
 
 type Issue struct {
 	Activity            []Activity           `json:"activity"`
@@ -82,4 +85,21 @@ type WelcomeProject struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 	Slug string `json:"slug"`
+}
+
+type IssueService service
+
+func (s *IssueService) Get(ctx context.Context, issueId string) (*Issue, *Response, error) {
+	u := fmt.Sprintf("0/issues/%v/", issueId)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	issue := new(Issue)
+	resp, err := s.client.Do(ctx, req, issue)
+	if err != nil {
+		return nil, resp, err
+	}
+	return issue, resp, nil
 }
