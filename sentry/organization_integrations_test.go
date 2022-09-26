@@ -65,7 +65,7 @@ func TestOrganizationIntegrationsService_List(t *testing.T) {
 			Icon:        "https://avatars.githubusercontent.com/u/583231?v=4",
 			DomainName:  "github.com/octocat",
 			AccountType: "Organization",
-			Scopes:      &[]string{"read", "write"},
+			Scopes:      []string{"read", "write"},
 			Status:      "active",
 			Provider: OrganizationIntegrationProvider{
 				Key:        "github",

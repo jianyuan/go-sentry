@@ -25,7 +25,7 @@ type OrganizationIntegration struct {
 	Icon        string                          `json:"icon"`
 	DomainName  string                          `json:"domainName"`
 	AccountType string                          `json:"accountType"`
-	Scopes      *[]string                       `json:"scopes"`
+	Scopes      []string                       `json:"scopes"`
 	Status      string                          `json:"status"`
 	Provider    OrganizationIntegrationProvider `json:"provider"`
 
