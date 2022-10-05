@@ -24,7 +24,7 @@ func TestOrganizationIntegrationsService_List(t *testing.T) {
 				"icon": "https://avatars.githubusercontent.com/u/583231?v=4",
 				"domainName": "github.com/octocat",
 				"accountType": "Organization",
-				"scopes": null,
+				"scopes": ["read", "write"],
 				"status": "active",
 				"provider": {
 					"key": "github",
@@ -65,7 +65,7 @@ func TestOrganizationIntegrationsService_List(t *testing.T) {
 			Icon:        "https://avatars.githubusercontent.com/u/583231?v=4",
 			DomainName:  "github.com/octocat",
 			AccountType: "Organization",
-			Scopes:      nil,
+			Scopes:      []string{"read", "write"},
 			Status:      "active",
 			Provider: OrganizationIntegrationProvider{
 				Key:        "github",
