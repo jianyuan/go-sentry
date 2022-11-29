@@ -13,6 +13,7 @@ type MetricAlert struct {
 	Name             *string               `json:"name,omitempty"`
 	Environment      *string               `json:"environment,omitempty"`
 	DataSet          *string               `json:"dataset,omitempty"`
+	EventTypes       []string              `json:"eventTypes,omitempty"`
 	Query            *string               `json:"query,omitempty"`
 	Aggregate        *string               `json:"aggregate,omitempty"`
 	TimeWindow       *float64              `json:"timeWindow,omitempty"`
