@@ -76,7 +76,8 @@ func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string,
 
 // Get details on an issue alert.
 func (s *MetricAlertsService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*MetricAlert, *Response, error) {
-	u := fmt.Sprintf("0/projects/%v/%v/alert-rules/%v/", organizationSlug, projectSlug, id)
+	// TODO: Remove projectSlug argument
+	u := fmt.Sprintf("0/organizations/%v/alert-rules/%v/", organizationSlug, id)
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err

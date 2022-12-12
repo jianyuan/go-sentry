@@ -116,7 +116,7 @@ func TestMetricAlertService_Get(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/12345/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/alert-rules/12345/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `
