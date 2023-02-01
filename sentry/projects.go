@@ -40,6 +40,7 @@ type Project struct {
 	ResolveAge           int      `json:"resolveAge"`
 	DataScrubber         bool     `json:"dataScrubber"`
 	DataScrubberDefaults bool     `json:"dataScrubberDefaults"`
+	FingerprintingRules  string   `json:"fingerprintingRules"`
 	GroupingEnhancements string   `json:"groupingEnhancements"`
 	SafeFields           []string `json:"safeFields"`
 	SensitiveFields      []string `json:"sensitiveFields"`
@@ -159,6 +160,7 @@ type UpdateProjectParams struct {
 	ResolveAge           *int                   `json:"resolveAge,omitempty"`
 	Options              map[string]interface{} `json:"options,omitempty"`
 	AllowedDomains       []string               `json:"allowedDomains,omitempty"`
+	FingerprintingRules  string                 `json:"fingerprintingRules,omitempty"`
 	GroupingEnhancements string                 `json:"groupingEnhancements,omitempty"`
 }
 

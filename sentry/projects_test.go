@@ -134,6 +134,7 @@ func TestProjectsService_List(t *testing.T) {
 				},
 				"platform": null,
 				"slug": "pump-station",
+				"fingerprintingRules": "fingerprinting rule",
 				"groupingEnhancements": "pump station grouping enhancement rule",
 				"status": "active"
 			}
@@ -216,6 +217,7 @@ func TestProjectsService_List(t *testing.T) {
 				Type: "letter_avatar",
 			},
 			Organization:         expectedOrganization,
+			FingerprintingRules:  "fingerprinting rule",
 			GroupingEnhancements: "pump station grouping enhancement rule",
 		},
 	}
@@ -361,6 +363,7 @@ func TestProjectsService_Get(t *testing.T) {
 				"name": "Powerful Abolitionist",
 				"slug": "powerful-abolitionist"
 			}],
+			"fingerprintingRules": "fingerprinting rule",
 			"groupingEnhancements": "pump-station grouping enhancement rule",
 			"verifySSL": false
 		}`)
@@ -417,6 +420,7 @@ func TestProjectsService_Get(t *testing.T) {
 		AllowedDomains:       []string{"*"},
 		DataScrubber:         true,
 		DataScrubberDefaults: true,
+		FingerprintingRules:  "fingerprinting rule",
 		GroupingEnhancements: "pump-station grouping enhancement rule",
 		SafeFields:           []string{},
 		SensitiveFields:      []string{},
@@ -538,6 +542,7 @@ func TestProjectsService_Update(t *testing.T) {
 			"callSignReviewed": false,
 			"id": "5",
 			"subjectTemplate": "[$project] ${tag:level}: $title",
+			"fingerprintingRules": "fingerprinting rule",
 			"groupingEnhancements": "Plane Proxy grouping enhancement rule",
 			"name": "Plane Proxy"
 		}`)
@@ -575,6 +580,7 @@ func TestProjectsService_Update(t *testing.T) {
 		DigestsMaxDelay:      1800,
 		ResolveAge:           720,
 		SubjectTemplate:      "[$project] ${tag:level}: $title",
+		FingerprintingRules:  "fingerprinting rule",
 		GroupingEnhancements: "Plane Proxy grouping enhancement rule",
 	}
 	assert.Equal(t, expected, project)
