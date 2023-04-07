@@ -16,24 +16,28 @@ type OrganizationIntegrationProvider struct {
 	Features   []string `json:"features"`
 }
 
+// IntegrationConfigData for defining integration-specific configuration data.
+type IntegrationConfigData map[string]interface{}
+
 // OrganizationIntegration represents an integration added for the organization.
 // https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/serializers/models/integration.py#L93
 type OrganizationIntegration struct {
 	// https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/serializers/models/integration.py#L35
 	ID          string                          `json:"id"`
 	Name        string                          `json:"name"`
-	Icon        string                          `json:"icon"`
+	Icon        *string                         `json:"icon"`
 	DomainName  string                          `json:"domainName"`
-	AccountType string                          `json:"accountType"`
+	AccountType *string                         `json:"accountType"`
 	Scopes      []string                        `json:"scopes"`
 	Status      string                          `json:"status"`
 	Provider    OrganizationIntegrationProvider `json:"provider"`
 
 	// https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/serializers/models/integration.py#L138
-	ExternalId                    string     `json:"externalId"`
-	OrganizationId                int        `json:"organizationId"`
-	OrganizationIntegrationStatus string     `json:"organizationIntegrationStatus"`
-	GracePeriodEnd                *time.Time `json:"gracePeriodEnd"`
+	ConfigData                    *IntegrationConfigData `json:"configData"`
+	ExternalId                    string                 `json:"externalId"`
+	OrganizationId                int                    `json:"organizationId"`
+	OrganizationIntegrationStatus string                 `json:"organizationIntegrationStatus"`
+	GracePeriodEnd                *time.Time             `json:"gracePeriodEnd"`
 }
 
 // OrganizationIntegrationsService provides methods for accessing Sentry organization integrations API endpoints.
