@@ -37,8 +37,9 @@ type OrganizationIntegration struct {
 }
 
 // OrganizationIntegrationsService provides methods for accessing Sentry organization integrations API endpoints.
-// Paths: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/urls.py#L1236-L1240
+// Paths: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/urls.py#L1236-L1245
 // Endpoints: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/integrations/organization_integrations/index.py
+// Endpoints: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/integrations/organization_integrations/details.py
 type OrganizationIntegrationsService service
 
 type ListOrganizationIntegrationsParams struct {
@@ -65,4 +66,20 @@ func (s *OrganizationIntegrationsService) List(ctx context.Context, organization
 		return nil, resp, err
 	}
 	return integrations, resp, nil
+}
+
+// Get organization integration details.
+func (s *OrganizationIntegrationsService) Get(ctx context.Context, organizationSlug string, integrationID string) (*OrganizationIntegration, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/integrations/%v/", organizationSlug, integrationID)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	integration := new(OrganizationIntegration)
+	resp, err := s.client.Do(ctx, req, integration)
+	if err != nil {
+		return nil, resp, err
+	}
+	return integration, resp, nil
 }
