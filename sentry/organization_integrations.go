@@ -87,3 +87,17 @@ func (s *OrganizationIntegrationsService) Get(ctx context.Context, organizationS
 	}
 	return integration, resp, nil
 }
+
+type UpdateConfigOrganizationIntegrationsParams = IntegrationConfigData
+
+// UpdateConfig - update configData for organization integration.
+// https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/integrations/organization_integrations/details.py#L94-L102
+func (s *OrganizationIntegrationsService) UpdateConfig(ctx context.Context, organizationSlug string, integrationID string, params *UpdateConfigOrganizationIntegrationsParams) (*Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/integrations/%v/", organizationSlug, integrationID)
+	req, err := s.client.NewRequest("POST", u, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

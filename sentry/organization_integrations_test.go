@@ -197,3 +197,32 @@ func TestOrganizationIntegrationsService_Get(t *testing.T) {
 	}
 	assert.Equal(t, &expected, integration)
 }
+
+func TestOrganizationIntegrationsService_UpdateConfig(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/integrations/456789/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, "POST", r)
+		w.Header().Set("Content-Type", "application/json")
+	})
+
+	updateConfigOrganizationIntegrationsParams := UpdateConfigOrganizationIntegrationsParams{
+		"service_table": []interface{}{
+			map[string]interface{}{
+				"service":         "testing123",
+				"integration_key": "abc123xyz",
+				"id":              json.Number("22222"),
+			},
+			map[string]interface{}{
+				"service":         "testing456",
+				"integration_key": "efg456lmn",
+				"id":              "",
+			},
+		},
+	}
+	ctx := context.Background()
+	resp, err := client.OrganizationIntegrations.UpdateConfig(ctx, "the-interstellar-jurisdiction", "456789", &updateConfigOrganizationIntegrationsParams)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), resp.ContentLength)
+}
