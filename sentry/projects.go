@@ -128,9 +128,10 @@ func (s *ProjectsService) Get(ctx context.Context, organizationSlug string, slug
 
 // CreateProjectParams are the parameters for ProjectService.Create.
 type CreateProjectParams struct {
-	Name     string `json:"name,omitempty"`
-	Slug     string `json:"slug,omitempty"`
-	Platform string `json:"platform,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Slug         string `json:"slug,omitempty"`
+	Platform     string `json:"platform,omitempty"`
+	DefaultRules *bool  `json:"default_rules,omitempty"`
 }
 
 // Create a new project bound to a team.
