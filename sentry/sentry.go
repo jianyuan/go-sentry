@@ -63,6 +63,7 @@ type Client struct {
 	ProjectFilter            *ProjectFilterService
 	ReleaseDeployments       *ReleaseDeploymentsService
 	Teams                    *TeamsService
+	TeamMembers              *TeamMembersService
 }
 
 type service struct {
@@ -99,6 +100,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Projects = (*ProjectsService)(&c.common)
 	c.ReleaseDeployments = (*ReleaseDeploymentsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
+	c.TeamMembers = (*TeamMembersService)(&c.common)
 	return c
 }
 
