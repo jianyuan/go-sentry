@@ -24,8 +24,8 @@ type TeamMember struct {
 // TeamMember provides methods for accessing Sentry team member API endpoints.
 type TeamMembersService service
 
-func (s *TeamMembersService) Create(ctx context.Context, organizationSlug string, memberId string, teamSlug string) (*TeamMember, *Response, error) {
-	u := fmt.Sprintf("0/organizations/%v/members/%v/teams/%v/", organizationSlug, memberId, teamSlug)
+func (s *TeamMembersService) Create(ctx context.Context, organizationSlug string, memberID string, teamSlug string) (*TeamMember, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/%v/teams/%v/", organizationSlug, memberID, teamSlug)
 	req, err := s.client.NewRequest("POST", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -39,8 +39,8 @@ func (s *TeamMembersService) Create(ctx context.Context, organizationSlug string
 	return member, resp, nil
 }
 
-func (s *TeamMembersService) Delete(ctx context.Context, organizationSlug string, memberId string, teamSlug string) (*TeamMember, *Response, error) {
-	u := fmt.Sprintf("0/organizations/%v/members/%v/teams/%v/", organizationSlug, memberId, teamSlug)
+func (s *TeamMembersService) Delete(ctx context.Context, organizationSlug string, memberID string, teamSlug string) (*TeamMember, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/members/%v/teams/%v/", organizationSlug, memberID, teamSlug)
 	req, err := s.client.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return nil, nil, err
