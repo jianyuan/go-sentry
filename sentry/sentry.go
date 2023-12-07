@@ -47,8 +47,8 @@ type Client struct {
 	common service
 
 	// Services
-	DashboardWidgets         *DashboardWidgetsService
 	Dashboards               *DashboardsService
+	DashboardWidgets         *DashboardWidgetsService
 	IssueAlerts              *IssueAlertsService
 	MetricAlerts             *MetricAlertsService
 	OrganizationCodeMappings *OrganizationCodeMappingsService
@@ -56,14 +56,15 @@ type Client struct {
 	OrganizationMembers      *OrganizationMembersService
 	OrganizationRepositories *OrganizationRepositoriesService
 	Organizations            *OrganizationsService
+	ProjectFilters           *ProjectFiltersService
 	ProjectKeys              *ProjectKeysService
 	ProjectOwnerships        *ProjectOwnershipsService
 	ProjectPlugins           *ProjectPluginsService
 	Projects                 *ProjectsService
-	ProjectFilters           *ProjectFiltersService
 	ReleaseDeployments       *ReleaseDeploymentsService
-	Teams                    *TeamsService
+	SpikeProtections         *SpikeProtectionsService
 	TeamMembers              *TeamMembersService
+	Teams                    *TeamsService
 }
 
 type service struct {
@@ -84,8 +85,8 @@ func NewClient(httpClient *http.Client) *Client {
 		UserAgent: userAgent,
 	}
 	c.common.client = c
-	c.DashboardWidgets = (*DashboardWidgetsService)(&c.common)
 	c.Dashboards = (*DashboardsService)(&c.common)
+	c.DashboardWidgets = (*DashboardWidgetsService)(&c.common)
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
 	c.MetricAlerts = (*MetricAlertsService)(&c.common)
 	c.OrganizationCodeMappings = (*OrganizationCodeMappingsService)(&c.common)
@@ -99,8 +100,9 @@ func NewClient(httpClient *http.Client) *Client {
 	c.ProjectPlugins = (*ProjectPluginsService)(&c.common)
 	c.Projects = (*ProjectsService)(&c.common)
 	c.ReleaseDeployments = (*ReleaseDeploymentsService)(&c.common)
-	c.Teams = (*TeamsService)(&c.common)
+	c.SpikeProtections = (*SpikeProtectionsService)(&c.common)
 	c.TeamMembers = (*TeamMembersService)(&c.common)
+	c.Teams = (*TeamsService)(&c.common)
 	return c
 }
 
