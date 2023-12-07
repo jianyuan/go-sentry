@@ -3,15 +3,13 @@ package sentry
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
+func TestProjectFiltersService_GetWithLegacyExtension(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -22,7 +20,7 @@ func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	filterConfig, _, err := client.ProjectFilter.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
+	filterConfig, _, err := client.ProjectFilters.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
 	expected := FilterConfig{
@@ -32,7 +30,7 @@ func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
 	assert.Equal(t, &expected, filterConfig)
 }
 
-func TestProjectFilterService_GetWithoutLegacyExtension(t *testing.T) {
+func TestProjectFiltersService_GetWithoutLegacyExtension(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
@@ -43,7 +41,7 @@ func TestProjectFilterService_GetWithoutLegacyExtension(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	filterConfig, _, err := client.ProjectFilter.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
+	filterConfig, _, err := client.ProjectFilters.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
 	expected := FilterConfig{
@@ -53,31 +51,20 @@ func TestProjectFilterService_GetWithoutLegacyExtension(t *testing.T) {
 	assert.Equal(t, &expected, filterConfig)
 }
 
-func readRequestBody(r *http.Request) string {
-	b, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-
-	if err != nil {
-		panic(err)
-	}
-	str := string(b)
-	str = strings.TrimSuffix(str, "\n")
-	return str
-}
-
 func TestBrowserExtensionFilter(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/0/projects/test_org/test_project/filters/browser-extensions/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
-		body := readRequestBody(r)
-		assert.Equal(t, body, `{"active":true}`)
+		assertPostJSON(t, map[string]interface{}{
+			"active": true,
+		}, r)
 		w.Header().Set("Content-Type", "application/json")
 	})
 
 	ctx := context.Background()
-	_, err := client.ProjectFilter.UpdateBrowserExtensions(ctx, "test_org", "test_project", true)
+	_, err := client.ProjectFilters.UpdateBrowserExtensions(ctx, "test_org", "test_project", true)
 	assert.NoError(t, err)
 }
 
@@ -87,15 +74,16 @@ func TestLegacyBrowserFilter(t *testing.T) {
 
 	mux.HandleFunc("/api/0/projects/test_org/test_project/filters/legacy-browsers/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
-		body := readRequestBody(r)
-		assert.Equal(t, body, `{"subfilters":["ie_pre_9","ie10"]}`)
+		assertPostJSON(t, map[string]interface{}{
+			"subfilters": []interface{}{"ie_pre_9", "ie10"},
+		}, r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, "")
 	})
 
 	ctx := context.Background()
 	browsers := []string{"ie_pre_9", "ie10"}
-	_, err := client.ProjectFilter.UpdateLegacyBrowser(ctx, "test_org", "test_project", browsers)
+	_, err := client.ProjectFilters.UpdateLegacyBrowser(ctx, "test_org", "test_project", browsers)
 	assert.NoError(t, err)
 }
 
@@ -161,3 +149,25 @@ var (
 		}
 	]`
 )
+
+func TestProjectFiltersService_Update(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/powerful-abolitionist/filters/filter-id/", func(w http.ResponseWriter, r *http.Request) {
+		assertMethod(t, http.MethodPut, r)
+		assertPostJSON(t, map[string]interface{}{
+			"active":     true,
+			"subfilters": []interface{}{"ie_pre_9", "ie9"},
+		}, r)
+	})
+
+	params := &UpdateProjectFilterParams{
+		Active:     true,
+		Subfilters: []string{"ie_pre_9", "ie9"},
+	}
+	ctx := context.Background()
+	_, err := client.ProjectFilters.Update(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist", "filter-id", params)
+	assert.NoError(t, err)
+
+}
