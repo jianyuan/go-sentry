@@ -13,12 +13,12 @@ type ProjectFilter struct {
 	Active json.RawMessage `json:"active"`
 }
 
-// ProjectOwnershipService provides methods for accessing Sentry project
+// ProjectFiltersService provides methods for accessing Sentry project
 // filters API endpoints.
-type ProjectFilterService service
+type ProjectFiltersService service
 
 // Get the filters.
-func (s *ProjectFilterService) Get(ctx context.Context, organizationSlug string, projectSlug string) ([]*ProjectFilter, *Response, error) {
+func (s *ProjectFiltersService) Get(ctx context.Context, organizationSlug string, projectSlug string) ([]*ProjectFilter, *Response, error) {
 	url := fmt.Sprintf("0/projects/%v/%v/filters/", organizationSlug, projectSlug)
 	req, err := s.client.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -41,7 +41,7 @@ type FilterConfig struct {
 }
 
 // GetFilterConfig retrieves filter configuration.
-func (s *ProjectFilterService) GetFilterConfig(ctx context.Context, organizationSlug string, projectSlug string) (*FilterConfig, *Response, error) {
+func (s *ProjectFiltersService) GetFilterConfig(ctx context.Context, organizationSlug string, projectSlug string) (*FilterConfig, *Response, error) {
 	filters, resp, err := s.Get(ctx, organizationSlug, projectSlug)
 	if err != nil {
 		return nil, resp, err
@@ -75,7 +75,7 @@ type BrowserExtensionParams struct {
 }
 
 // UpdateBrowserExtensions updates configuration for browser extension filter
-func (s *ProjectFilterService) UpdateBrowserExtensions(ctx context.Context, organizationSlug string, projectSlug string, active bool) (*Response, error) {
+func (s *ProjectFiltersService) UpdateBrowserExtensions(ctx context.Context, organizationSlug string, projectSlug string, active bool) (*Response, error) {
 	url := fmt.Sprintf("0/projects/%v/%v/filters/browser-extensions/", organizationSlug, projectSlug)
 	params := BrowserExtensionParams{active}
 	req, err := s.client.NewRequest(http.MethodPut, url, params)
@@ -92,10 +92,25 @@ type LegacyBrowserParams struct {
 }
 
 // UpdateLegacyBrowser updates configuration for legacy browser filters
-func (s *ProjectFilterService) UpdateLegacyBrowser(ctx context.Context, organizationSlug string, projectSlug string, browsers []string) (*Response, error) {
+func (s *ProjectFiltersService) UpdateLegacyBrowser(ctx context.Context, organizationSlug string, projectSlug string, browsers []string) (*Response, error) {
 	url := fmt.Sprintf("0/projects/%v/%v/filters/legacy-browsers/", organizationSlug, projectSlug)
 	params := LegacyBrowserParams{browsers}
 
+	req, err := s.client.NewRequest(http.MethodPut, url, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+type UpdateProjectFilterParams struct {
+	Active     bool     `json:"active"`
+	Subfilters []string `json:"subfilters"`
+}
+
+func (s *ProjectFiltersService) Update(ctx context.Context, organizationSlug string, projectSlug string, filterID string, params *UpdateProjectFilterParams) (*Response, error) {
+	url := fmt.Sprintf("0/projects/%v/%v/filters/%v/", organizationSlug, projectSlug, filterID)
 	req, err := s.client.NewRequest(http.MethodPut, url, params)
 	if err != nil {
 		return nil, err
