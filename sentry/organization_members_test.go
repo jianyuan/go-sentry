@@ -273,7 +273,7 @@ func TestOrganizationMembersService_Create(t *testing.T) {
 
 	createOrganizationMemberParams := CreateOrganizationMemberParams{
 		Email: "test@example.com",
-		Role:  RoleMember,
+		Role:  OrganizationRoleMember,
 	}
 	ctx := context.Background()
 	member, _, err := client.OrganizationMembers.Create(ctx, "the-interstellar-jurisdiction", &createOrganizationMemberParams)
@@ -311,52 +311,321 @@ func TestOrganizationMembersService_Update(t *testing.T) {
 		assertMethod(t, "PUT", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{
-			"id": "1",
-			"email": "test@example.com",
-			"name": "test@example.com",
-			"user": null,
-			"role": "manager",
-			"roleName": "Manager",
-			"pending": true,
+			"id": "57377908164",
+			"email": "sirpenguin@antarcticarocks.com",
+			"name": "Sir Penguin",
+			"user": {
+				"id": "280094367316",
+				"name": "Sir Penguin",
+				"username": "sirpenguin@antarcticarocks.com",
+				"email": "sirpenguin@antarcticarocks.com",
+				"avatarUrl": "https://secure.gravatar.com/avatar/16aeb26c5fdba335c7078e9e9ddb5149?s=32&d=mm",
+				"isActive": true,
+				"hasPasswordAuth": true,
+				"isManaged": false,
+				"dateJoined": "2021-07-06T21:13:58.375239Z",
+				"lastLogin": "2021-08-02T18:25:00.051182Z",
+				"has2fa": false,
+				"lastActive": "2021-08-02T21:32:18.836829Z",
+				"isSuperuser": false,
+				"isStaff": false,
+				"experiments": {},
+				"emails": [
+					{
+						"id": "2153450836",
+						"email": "sirpenguin@antarcticarocks.com",
+						"is_verified": true
+					}
+				],
+				"avatar": {
+					"avatarType": "letter_avatar",
+					"avatarUuid": null
+				},
+				"authenticators": [],
+				"canReset2fa": true
+			},
+			"role": "member",
+			"orgRole": "member",
+			"roleName": "Member",
+			"pending": false,
 			"expired": false,
 			"flags": {
+				"idp:provisioned": false,
+				"idp:role-restricted": false,
 				"sso:linked": false,
 				"sso:invalid": false,
-				"member-limit:restricted": false
+				"member-limit:restricted": false,
+				"partnership:restricted": false
 			},
-			"teams": [],
-			"dateCreated": "2020-01-01T00:00:00.000000Z",
+			"dateCreated": "2021-07-06T21:13:01.120263Z",
 			"inviteStatus": "approved",
-			"inviterName": "John Doe"
+			"inviterName": "maininviter@antarcticarocks.com",
+			"teams": [
+				"cool-team",
+				"ancient-gabelers"
+			],
+			"teamRoles": [
+				{
+					"teamSlug": "ancient-gabelers",
+					"role": "admin"
+				},
+				{
+					"teamSlug": "powerful-abolitionist",
+					"role": "contributor"
+				}
+			],
+			"invite_link": null,
+			"isOnlyOwner": false,
+			"orgRoleList": [
+				{
+					"id": "billing",
+					"name": "Billing",
+					"desc": "Can manage subscription and billing details.",
+					"scopes": [
+						"org:billing"
+					],
+					"allowed": true,
+					"isAllowed": true,
+					"isRetired": false,
+					"is_global": false,
+					"isGlobal": false,
+					"minimumTeamRole": "contributor"
+				},
+				{
+					"id": "member",
+					"name": "Member",
+					"desc": "Members can view and act on events, as well as view most other data within the organization.",
+					"scopes": [
+						"team:read",
+						"project:releases",
+						"org:read",
+						"event:read",
+						"alerts:write",
+						"member:read",
+						"alerts:read",
+						"event:admin",
+						"project:read",
+						"event:write"
+					],
+					"allowed": true,
+					"isAllowed": true,
+					"isRetired": false,
+					"is_global": false,
+					"isGlobal": false,
+					"minimumTeamRole": "contributor"
+				},
+				{
+					"id": "admin",
+					"name": "Admin",
+					"desc": "Admin privileges on any teams of which they're a member. They can create new teams and projects, as well as remove teams and projects on which they already hold membership (or all teams, if open membership is enabled). Additionally, they can manage memberships of teams that they are members of. They cannot invite members to the organization.",
+					"scopes": [
+						"team:admin",
+						"org:integrations",
+						"project:admin",
+						"team:read",
+						"project:releases",
+						"org:read",
+						"team:write",
+						"event:read",
+						"alerts:write",
+						"member:read",
+						"alerts:read",
+						"event:admin",
+						"project:read",
+						"event:write",
+						"project:write"
+					],
+					"allowed": true,
+					"isAllowed": true,
+					"isRetired": true,
+					"is_global": false,
+					"isGlobal": false,
+					"minimumTeamRole": "admin"
+				},
+				{
+					"id": "manager",
+					"name": "Manager",
+					"desc": "Gains admin access on all teams as well as the ability to add and remove members.",
+					"scopes": [
+						"team:admin",
+						"org:integrations",
+						"project:releases",
+						"team:write",
+						"member:read",
+						"org:write",
+						"project:write",
+						"project:admin",
+						"team:read",
+						"org:read",
+						"event:read",
+						"member:write",
+						"alerts:write",
+						"alerts:read",
+						"event:admin",
+						"project:read",
+						"event:write",
+						"member:admin"
+					],
+					"allowed": true,
+					"isAllowed": true,
+					"isRetired": false,
+					"is_global": true,
+					"isGlobal": true,
+					"minimumTeamRole": "admin"
+				},
+				{
+					"id": "owner",
+					"name": "Owner",
+					"desc": "Unrestricted access to the organization, its data, and its settings. Can add, modify, and delete projects and members, as well as make billing and plan changes.",
+					"scopes": [
+						"team:admin",
+						"org:integrations",
+						"project:releases",
+						"org:admin",
+						"team:write",
+						"member:read",
+						"org:write",
+						"project:write",
+						"project:admin",
+						"team:read",
+						"org:read",
+						"event:read",
+						"member:write",
+						"alerts:write",
+						"org:billing",
+						"alerts:read",
+						"event:admin",
+						"project:read",
+						"event:write",
+						"member:admin"
+					],
+					"allowed": true,
+					"isAllowed": true,
+					"isRetired": false,
+					"is_global": true,
+					"isGlobal": true,
+					"minimumTeamRole": "admin"
+				}
+			],
+			"teamRoleList": [
+				{
+					"id": "contributor",
+					"name": "Contributor",
+					"desc": "Contributors can view and act on events, as well as view most other data within the team's projects.",
+					"scopes": [
+						"team:read",
+						"project:releases",
+						"org:read",
+						"event:read",
+						"member:read",
+						"alerts:read",
+						"project:read",
+						"event:write"
+					],
+					"allowed": false,
+					"isAllowed": false,
+					"isRetired": false,
+					"isMinimumRoleFor": null
+				},
+				{
+					"id": "admin",
+					"name": "Team Admin",
+					"desc": "Admin privileges on the team. They can create and remove projects, and can manage the team's memberships. They cannot invite members to the organization.",
+					"scopes": [
+						"team:admin",
+						"org:integrations",
+						"project:admin",
+						"team:read",
+						"project:releases",
+						"org:read",
+						"team:write",
+						"event:read",
+						"alerts:write",
+						"member:read",
+						"alerts:read",
+						"event:admin",
+						"project:read",
+						"event:write",
+						"project:write"
+					],
+					"allowed": false,
+					"isAllowed": false,
+					"isRetired": false,
+					"isMinimumRoleFor": "admin"
+				}
+			]
 		}`)
 	})
 
 	updateOrganizationMemberParams := UpdateOrganizationMemberParams{
-		Role: RoleMember,
+		OrganizationRole: OrganizationRoleMember,
 	}
 	ctx := context.Background()
 	member, _, err := client.OrganizationMembers.Update(ctx, "the-interstellar-jurisdiction", "1", &updateOrganizationMemberParams)
 	assert.NoError(t, err)
 
-	inviterName := "John Doe"
+	inviterName := "maininviter@antarcticarocks.com"
 	expected := OrganizationMember{
-		ID:       "1",
-		Email:    "test@example.com",
-		Name:     "test@example.com",
-		User:     User{},
-		Role:     "manager",
-		RoleName: "Manager",
-		Pending:  true,
-		Expired:  false,
+		ID:    "57377908164",
+		Email: "sirpenguin@antarcticarocks.com",
+		Name:  "Sir Penguin",
+		User: User{
+			ID:              "280094367316",
+			Name:            "Sir Penguin",
+			Username:        "sirpenguin@antarcticarocks.com",
+			Email:           "sirpenguin@antarcticarocks.com",
+			AvatarURL:       "https://secure.gravatar.com/avatar/16aeb26c5fdba335c7078e9e9ddb5149?s=32&d=mm",
+			IsActive:        true,
+			HasPasswordAuth: true,
+			IsManaged:       false,
+			DateJoined:      mustParseTime("2021-07-06T21:13:58.375239Z"),
+			LastLogin:       mustParseTime("2021-08-02T18:25:00.051182Z"),
+			Has2FA:          false,
+			LastActive:      mustParseTime("2021-08-02T21:32:18.836829Z"),
+			IsSuperuser:     false,
+			IsStaff:         false,
+			Avatar: Avatar{
+				Type: "letter_avatar",
+				UUID: nil,
+			},
+			Emails: []UserEmail{
+				{
+					ID:         "2153450836",
+					Email:      "sirpenguin@antarcticarocks.com",
+					IsVerified: true,
+				},
+			},
+		},
+		Role:             "member",
+		RoleName:         "Member",
+		OrganizationRole: OrganizationRoleMember,
+		Pending:          false,
+		Expired:          false,
 		Flags: map[string]bool{
+			"idp:provisioned":         false,
+			"idp:role-restricted":     false,
 			"sso:linked":              false,
 			"sso:invalid":             false,
 			"member-limit:restricted": false,
+			"partnership:restricted":  false,
 		},
-		Teams:        []string{},
-		DateCreated:  mustParseTime("2020-01-01T00:00:00.000000Z"),
+		DateCreated:  mustParseTime("2021-07-06T21:13:01.120263Z"),
 		InviteStatus: "approved",
 		InviterName:  &inviterName,
+		Teams: []string{
+			"cool-team",
+			"ancient-gabelers",
+		},
+		TeamRoles: []TeamRole{
+			{
+				TeamSlug: "ancient-gabelers",
+				Role:     TeamRoleAdmin,
+			},
+			{
+				TeamSlug: "powerful-abolitionist",
+				Role:     TeamRoleContributor,
+			},
+		},
 	}
 
 	assert.Equal(t, &expected, member)
