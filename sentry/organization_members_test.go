@@ -112,10 +112,8 @@ func TestOrganizationMembersService_List(t *testing.T) {
 					},
 				},
 			},
-			Role:     "owner",
-			RoleName: "Owner",
-			Pending:  false,
-			Expired:  false,
+			Pending: false,
+			Expired: false,
 			Flags: map[string]bool{
 				"sso:invalid": false,
 				"sso:linked":  false,
@@ -226,10 +224,8 @@ func TestOrganizationMembersService_Get(t *testing.T) {
 				},
 			},
 		},
-		Role:     "owner",
-		RoleName: "Owner",
-		Pending:  false,
-		Expired:  false,
+		Pending: false,
+		Expired: false,
 		Flags: map[string]bool{
 			"sso:invalid": false,
 			"sso:linked":  false,
@@ -281,14 +277,12 @@ func TestOrganizationMembersService_Create(t *testing.T) {
 
 	inviterName := "John Doe"
 	expected := OrganizationMember{
-		ID:       "1",
-		Email:    "test@example.com",
-		Name:     "test@example.com",
-		User:     User{},
-		Role:     "member",
-		RoleName: "Member",
-		Pending:  true,
-		Expired:  false,
+		ID:      "1",
+		Email:   "test@example.com",
+		Name:    "test@example.com",
+		User:    User{},
+		Pending: true,
+		Expired: false,
 		Flags: map[string]bool{
 			"sso:linked":              false,
 			"sso:invalid":             false,
@@ -596,11 +590,36 @@ func TestOrganizationMembersService_Update(t *testing.T) {
 				},
 			},
 		},
-		Role:             "member",
-		RoleName:         "Member",
 		OrganizationRole: OrganizationRoleMember,
-		Pending:          false,
-		Expired:          false,
+		OrganizationRoleList: []RoleListItem{
+			{
+				ID:        "billing",
+				Name:      "Billing",
+				IsAllowed: true,
+			},
+			{
+				ID:        "member",
+				Name:      "Member",
+				IsAllowed: true,
+			},
+			{
+				ID:        "admin",
+				Name:      "Admin",
+				IsAllowed: true,
+			},
+			{
+				ID:        "manager",
+				Name:      "Manager",
+				IsAllowed: true,
+			},
+			{
+				ID:        "owner",
+				Name:      "Owner",
+				IsAllowed: true,
+			},
+		},
+		Pending: false,
+		Expired: false,
 		Flags: map[string]bool{
 			"idp:provisioned":         false,
 			"idp:role-restricted":     false,
@@ -612,9 +631,17 @@ func TestOrganizationMembersService_Update(t *testing.T) {
 		DateCreated:  mustParseTime("2021-07-06T21:13:01.120263Z"),
 		InviteStatus: "approved",
 		InviterName:  &inviterName,
-		Teams: []string{
-			"cool-team",
-			"ancient-gabelers",
+		TeamRoleList: []RoleListItem{
+			{
+				ID:        "contributor",
+				Name:      "Contributor",
+				IsAllowed: false,
+			},
+			{
+				ID:        "admin",
+				Name:      "Team Admin",
+				IsAllowed: false,
+			},
 		},
 		TeamRoles: []TeamRole{
 			{
@@ -625,6 +652,10 @@ func TestOrganizationMembersService_Update(t *testing.T) {
 				TeamSlug: "powerful-abolitionist",
 				Role:     TeamRoleContributor,
 			},
+		},
+		Teams: []string{
+			"cool-team",
+			"ancient-gabelers",
 		},
 	}
 
