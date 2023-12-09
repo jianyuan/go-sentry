@@ -51,6 +51,7 @@ type Client struct {
 	DashboardWidgets          *DashboardWidgetsService
 	IssueAlerts               *IssueAlertsService
 	MetricAlerts              *MetricAlertsService
+	NotificationActions       *NotificationActionsService
 	OrganizationCodeMappings  *OrganizationCodeMappingsService
 	OrganizationIntegrations  *OrganizationIntegrationsService
 	OrganizationMembers       *OrganizationMembersService
@@ -90,6 +91,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.DashboardWidgets = (*DashboardWidgetsService)(&c.common)
 	c.IssueAlerts = (*IssueAlertsService)(&c.common)
 	c.MetricAlerts = (*MetricAlertsService)(&c.common)
+	c.NotificationActions = (*NotificationActionsService)(&c.common)
 	c.OrganizationCodeMappings = (*OrganizationCodeMappingsService)(&c.common)
 	c.OrganizationIntegrations = (*OrganizationIntegrationsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
@@ -457,4 +459,16 @@ func TimeValue(v *time.Time) time.Time {
 		return *v
 	}
 	return time.Time{}
+}
+
+// JsonNumber returns a pointer to the json.Number value passed in.
+func JsonNumber(v json.Number) *json.Number { return &v }
+
+// JsonNumberValue returns the value of the json.Number pointer passed in or
+// json.Number("") if the pointer is nil.
+func JsonNumberValue(v *json.Number) json.Number {
+	if v != nil {
+		return *v
+	}
+	return json.Number("")
 }
