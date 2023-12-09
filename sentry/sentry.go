@@ -47,24 +47,25 @@ type Client struct {
 	common service
 
 	// Services
-	Dashboards               *DashboardsService
-	DashboardWidgets         *DashboardWidgetsService
-	IssueAlerts              *IssueAlertsService
-	MetricAlerts             *MetricAlertsService
-	OrganizationCodeMappings *OrganizationCodeMappingsService
-	OrganizationIntegrations *OrganizationIntegrationsService
-	OrganizationMembers      *OrganizationMembersService
-	OrganizationRepositories *OrganizationRepositoriesService
-	Organizations            *OrganizationsService
-	ProjectFilters           *ProjectFiltersService
-	ProjectKeys              *ProjectKeysService
-	ProjectOwnerships        *ProjectOwnershipsService
-	ProjectPlugins           *ProjectPluginsService
-	Projects                 *ProjectsService
-	ReleaseDeployments       *ReleaseDeploymentsService
-	SpikeProtections         *SpikeProtectionsService
-	TeamMembers              *TeamMembersService
-	Teams                    *TeamsService
+	Dashboards                *DashboardsService
+	DashboardWidgets          *DashboardWidgetsService
+	IssueAlerts               *IssueAlertsService
+	MetricAlerts              *MetricAlertsService
+	OrganizationCodeMappings  *OrganizationCodeMappingsService
+	OrganizationIntegrations  *OrganizationIntegrationsService
+	OrganizationMembers       *OrganizationMembersService
+	OrganizationRepositories  *OrganizationRepositoriesService
+	Organizations             *OrganizationsService
+	ProjectFilters            *ProjectFiltersService
+	ProjectInboundDataFilters *ProjectInboundDataFiltersService
+	ProjectKeys               *ProjectKeysService
+	ProjectOwnerships         *ProjectOwnershipsService
+	ProjectPlugins            *ProjectPluginsService
+	Projects                  *ProjectsService
+	ReleaseDeployments        *ReleaseDeploymentsService
+	SpikeProtections          *SpikeProtectionsService
+	TeamMembers               *TeamMembersService
+	Teams                     *TeamsService
 }
 
 type service struct {
@@ -95,6 +96,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.OrganizationRepositories = (*OrganizationRepositoriesService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
 	c.ProjectFilters = (*ProjectFiltersService)(&c.common)
+	c.ProjectInboundDataFilters = (*ProjectInboundDataFiltersService)(&c.common)
 	c.ProjectKeys = (*ProjectKeysService)(&c.common)
 	c.ProjectOwnerships = (*ProjectOwnershipsService)(&c.common)
 	c.ProjectPlugins = (*ProjectPluginsService)(&c.common)
