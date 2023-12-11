@@ -63,6 +63,7 @@ type Client struct {
 	ProjectOwnerships         *ProjectOwnershipsService
 	ProjectPlugins            *ProjectPluginsService
 	Projects                  *ProjectsService
+	ProjectSymbolSources      *ProjectSymbolSourcesService
 	ReleaseDeployments        *ReleaseDeploymentsService
 	SpikeProtections          *SpikeProtectionsService
 	TeamMembers               *TeamMembersService
@@ -103,6 +104,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.ProjectOwnerships = (*ProjectOwnershipsService)(&c.common)
 	c.ProjectPlugins = (*ProjectPluginsService)(&c.common)
 	c.Projects = (*ProjectsService)(&c.common)
+	c.ProjectSymbolSources = (*ProjectSymbolSourcesService)(&c.common)
 	c.ReleaseDeployments = (*ReleaseDeploymentsService)(&c.common)
 	c.SpikeProtections = (*SpikeProtectionsService)(&c.common)
 	c.TeamMembers = (*TeamMembersService)(&c.common)
