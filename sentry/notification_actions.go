@@ -60,8 +60,10 @@ func (s *NotificationActionsService) Create(ctx context.Context, organizationSlu
 	return action, resp, nil
 }
 
-func (s *NotificationActionsService) Update(ctx context.Context, organizationSlug string, actionId string, params *CreateNotificationActionParams) (*NotificationAction, *Response, error) {
-	u := fmt.Sprintf("0/organizations/%v/notification/actions/%v/", organizationSlug, actionId)
+type UpdateNotificationActionParams = CreateNotificationActionParams
+
+func (s *NotificationActionsService) Update(ctx context.Context, organizationSlug string, actionId string, params *UpdateNotificationActionParams) (*NotificationAction, *Response, error) {
+	u := fmt.Sprintf("0/organizations/%v/notifications/actions/%v/", organizationSlug, actionId)
 	req, err := s.client.NewRequest(http.MethodPut, u, params)
 	if err != nil {
 		return nil, nil, err
