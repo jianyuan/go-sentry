@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -16,7 +17,7 @@ type IssueAlert struct {
 	Actions     []*IssueAlertAction    `json:"actions,omitempty"`
 	ActionMatch *string                `json:"actionMatch,omitempty"`
 	FilterMatch *string                `json:"filterMatch,omitempty"`
-	Frequency   *int                   `json:"frequency,omitempty"`
+	Frequency   *json.Number           `json:"frequency,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	DateCreated *time.Time             `json:"dateCreated,omitempty"`
 	Owner       *string                `json:"owner,omitempty"`

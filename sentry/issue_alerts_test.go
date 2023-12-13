@@ -57,7 +57,7 @@ func TestIssueAlertsService_List(t *testing.T) {
 			ID:          String("12345"),
 			ActionMatch: String("any"),
 			Environment: String("production"),
-			Frequency:   Int(30),
+			Frequency:   JsonNumber(json.Number("30")),
 			Name:        String("Notify errors"),
 			Conditions: []*IssueAlertCondition{
 				{
@@ -326,7 +326,7 @@ func TestIssueAlertsService_Get(t *testing.T) {
 		},
 		ActionMatch: String("any"),
 		FilterMatch: String("any"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("My Rule Name"),
 		DateCreated: Time(mustParseTime("2022-05-23T19:54:30.860115Z")),
 		Owner:       String("team:1322366"),
@@ -404,7 +404,7 @@ func TestIssueAlertsService_Create(t *testing.T) {
 	params := &IssueAlert{
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
 		Conditions: []*IssueAlertCondition{
 			{
@@ -433,7 +433,7 @@ func TestIssueAlertsService_Create(t *testing.T) {
 		ID:          String("123456"),
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
 		Conditions: []*IssueAlertCondition{
 			{
@@ -532,7 +532,7 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 	params := &IssueAlert{
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
 		Conditions: []*IssueAlertCondition{
 			{
@@ -561,7 +561,7 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 		ID:          String("123456"),
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
 		Conditions: []*IssueAlertCondition{
 			{
@@ -596,7 +596,7 @@ func TestIssueAlertsService_Update(t *testing.T) {
 		ActionMatch: String("all"),
 		FilterMatch: String("any"),
 		Environment: String("staging"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
 		Conditions: []*IssueAlertCondition{
 			{
@@ -709,7 +709,7 @@ func TestIssueAlertsService_Update(t *testing.T) {
 		ID:          String("12345"),
 		ActionMatch: String("any"),
 		Environment: String("staging"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
 		Conditions: []*IssueAlertCondition{
 			{
