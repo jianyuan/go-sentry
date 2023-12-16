@@ -15,6 +15,7 @@ type BoolOrStringSlice struct {
 }
 
 var _ json.Unmarshaler = (*BoolOrStringSlice)(nil)
+var _ json.Marshaler = (*BoolOrStringSlice)(nil)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (bos *BoolOrStringSlice) UnmarshalJSON(data []byte) error {
@@ -40,16 +41,24 @@ func (bos *BoolOrStringSlice) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("unable to unmarshal as bool or string slice: %s", string(data))
 }
 
+func (bos BoolOrStringSlice) MarshalJSON() ([]byte, error) {
+	if bos.IsBool {
+		return json.Marshal(bos.BoolVal)
+	}
+	return json.Marshal(bos.StringSliceVal)
+}
+
 // Int64OrString is a type that can be unmarshaled from either an int64 or a
 // string.
 type Int64OrString struct {
-	IsInt64  bool
-	IsString bool
-	Int64Val int64
-	String   string
+	IsInt64   bool
+	IsString  bool
+	Int64Val  int64
+	StringVal string
 }
 
 var _ json.Unmarshaler = (*Int64OrString)(nil)
+var _ json.Marshaler = (*Int64OrString)(nil)
 
 func (ios *Int64OrString) UnmarshalJSON(data []byte) error {
 	// Try to unmarshal as an int64
@@ -66,10 +75,17 @@ func (ios *Int64OrString) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &stringVal); err == nil {
 		ios.IsInt64 = false
 		ios.IsString = true
-		ios.String = stringVal
+		ios.StringVal = stringVal
 		return nil
 	}
 
 	// If neither worked, return an error
 	return fmt.Errorf("unable to unmarshal as int64 or string: %s", string(data))
+}
+
+func (ios Int64OrString) MarshalJSON() ([]byte, error) {
+	if ios.IsInt64 {
+		return json.Marshal(ios.Int64Val)
+	}
+	return json.Marshal(ios.StringVal)
 }
