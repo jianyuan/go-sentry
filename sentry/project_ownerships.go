@@ -13,7 +13,7 @@ type ProjectOwnership struct {
 	DateCreated        time.Time `json:"dateCreated"`
 	LastUpdated        time.Time `json:"lastUpdated"`
 	IsActive           bool      `json:"isActive"`
-	AutoAssignment     bool      `json:"autoAssignment"`
+	AutoAssignment     string    `json:"autoAssignment"`
 	CodeownersAutoSync *bool     `json:"codeownersAutoSync,omitempty"`
 }
 
@@ -39,10 +39,10 @@ func (s *ProjectOwnershipsService) Get(ctx context.Context, organizationSlug str
 
 // CreateProjectParams are the parameters for ProjectOwnershipService.Update.
 type UpdateProjectOwnershipParams struct {
-	Raw                string `json:"raw,omitempty"`
-	FallThrough        *bool  `json:"fallthrough,omitempty"`
-	AutoAssignment     *bool  `json:"autoAssignment,omitempty"`
-	CodeownersAutoSync *bool  `json:"codeownersAutoSync,omitempty"`
+	Raw                string  `json:"raw,omitempty"`
+	FallThrough        *bool   `json:"fallthrough,omitempty"`
+	AutoAssignment     *string `json:"autoAssignment,omitempty"`
+	CodeownersAutoSync *bool   `json:"codeownersAutoSync,omitempty"`
 }
 
 // Update a Project's Ownership configuration
