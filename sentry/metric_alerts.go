@@ -51,16 +51,16 @@ type MetricAlertTrigger struct {
 // MetricAlertTriggerAction represents a metric alert trigger action.
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/alert_rule_trigger_action.py#L42-L66
 type MetricAlertTriggerAction struct {
-	ID                 *string    `json:"id,omitempty"`
-	AlertRuleTriggerID *string    `json:"alertRuleTriggerId,omitempty"`
-	Type               *string    `json:"type,omitempty"`
-	TargetType         *string    `json:"targetType,omitempty"`
-	TargetIdentifier   *string    `json:"targetIdentifier,omitempty"`
-	InputChannelID     *string    `json:"inputChannelId,omitempty"`
-	IntegrationID      *int       `json:"integrationId,omitempty"`
-	SentryAppID        *string    `json:"sentryAppId,omitempty"`
-	DateCreated        *time.Time `json:"dateCreated,omitempty"`
-	Description        *string    `json:"desc,omitempty"`
+	ID                 *string        `json:"id,omitempty"`
+	AlertRuleTriggerID *string        `json:"alertRuleTriggerId,omitempty"`
+	Type               *string        `json:"type,omitempty"`
+	TargetType         *string        `json:"targetType,omitempty"`
+	TargetIdentifier   *Int64OrString `json:"targetIdentifier,omitempty"`
+	InputChannelID     *string        `json:"inputChannelId,omitempty"`
+	IntegrationID      *int           `json:"integrationId,omitempty"`
+	SentryAppID        *string        `json:"sentryAppId,omitempty"`
+	DateCreated        *time.Time     `json:"dateCreated,omitempty"`
+	Description        *string        `json:"desc,omitempty"`
 }
 
 // List Alert Rules configured for a project

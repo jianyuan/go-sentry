@@ -57,7 +57,7 @@ func TestProjectInboundDataFiltersService_List(t *testing.T) {
 		},
 		{
 			ID:     "legacy-browsers",
-			Active: BoolOrStringSlice{IsBool: false, SliceVal: []string{"ie_pre_9"}},
+			Active: BoolOrStringSlice{IsStringSlice: true, StringSliceVal: []string{"ie_pre_9"}},
 		},
 		{
 			ID:     "localhost",
