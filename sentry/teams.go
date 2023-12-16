@@ -29,8 +29,13 @@ type TeamsService service
 
 // List returns a list of teams bound to an organization.
 // https://docs.sentry.io/api/teams/list-an-organizations-teams/
-func (s *TeamsService) List(ctx context.Context, organizationSlug string) ([]*Team, *Response, error) {
+func (s *TeamsService) List(ctx context.Context, organizationSlug string, params *ListCursorParams) ([]*Team, *Response, error) {
 	u := fmt.Sprintf("0/organizations/%v/teams/", organizationSlug)
+	u, err := addQuery(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err

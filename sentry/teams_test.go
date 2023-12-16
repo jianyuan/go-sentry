@@ -118,7 +118,7 @@ func TestTeamsService_List(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	teams, _, err := client.Teams.List(ctx, "the-interstellar-jurisdiction")
+	teams, _, err := client.Teams.List(ctx, "the-interstellar-jurisdiction", nil)
 	assert.NoError(t, err)
 
 	expected := []*Team{
