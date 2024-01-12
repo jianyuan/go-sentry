@@ -7,7 +7,7 @@ import (
 )
 
 // Team represents a Sentry team that is bound to an organization.
-// https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/team.py#L109-L119
+// https://github.com/getsentry/sentry/blob/23.12.1/src/sentry/api/serializers/models/team.py#L155C7-L190
 type Team struct {
 	ID          *string    `json:"id,omitempty"`
 	Slug        *string    `json:"slug,omitempty"`
@@ -19,6 +19,7 @@ type Team struct {
 	IsPending   *bool      `json:"isPending,omitempty"`
 	MemberCount *int       `json:"memberCount,omitempty"`
 	Avatar      *Avatar    `json:"avatar,omitempty"`
+	OrgRole     *string    `json:"orgRole,omitempty"`
 	// TODO: externalTeams
 	// TODO: projects
 }

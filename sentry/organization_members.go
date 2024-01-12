@@ -6,31 +6,24 @@ import (
 	"time"
 )
 
-// https://github.com/getsentry/sentry/blob/8b683002ec84f9edd338348500937a480e49e61c/src/sentry/api/serializers/models/role.py#L32
-type RoleListItem struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	IsAllowed bool   `json:"isAllowed"`
-}
-
 // OrganizationMember represents a User's membership to the organization.
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/organization_member/response.py#L57-L69
 type OrganizationMember struct {
-	ID                   string          `json:"id"`
-	Email                string          `json:"email"`
-	Name                 string          `json:"name"`
-	User                 User            `json:"user"`
-	OrganizationRole     string          `json:"orgRole"`
-	OrganizationRoleList []RoleListItem  `json:"orgRoleList"`
-	Pending              bool            `json:"pending"`
-	Expired              bool            `json:"expired"`
-	Flags                map[string]bool `json:"flags"`
-	DateCreated          time.Time       `json:"dateCreated"`
-	InviteStatus         string          `json:"inviteStatus"`
-	InviterName          *string         `json:"inviterName"`
-	TeamRoleList         []RoleListItem  `json:"teamRoleList"`
-	TeamRoles            []TeamRole      `json:"teamRoles"`
-	Teams                []string        `json:"teams"`
+	ID           string                     `json:"id"`
+	Email        string                     `json:"email"`
+	Name         string                     `json:"name"`
+	User         User                       `json:"user"`
+	OrgRole      string                     `json:"orgRole"`
+	OrgRoleList  []OrganizationRoleListItem `json:"orgRoleList"`
+	Pending      bool                       `json:"pending"`
+	Expired      bool                       `json:"expired"`
+	Flags        map[string]bool            `json:"flags"`
+	DateCreated  time.Time                  `json:"dateCreated"`
+	InviteStatus string                     `json:"inviteStatus"`
+	InviterName  *string                    `json:"inviterName"`
+	TeamRoleList []TeamRoleListItem         `json:"teamRoleList"`
+	TeamRoles    []TeamRole                 `json:"teamRoles"`
+	Teams        []string                   `json:"teams"`
 }
 
 const (
@@ -104,8 +97,8 @@ func (s *OrganizationMembersService) Create(ctx context.Context, organizationSlu
 }
 
 type TeamRole struct {
-	TeamSlug string `json:"teamSlug"`
-	Role     string `json:"role"`
+	TeamSlug string  `json:"teamSlug"`
+	Role     *string `json:"role"`
 }
 
 type UpdateOrganizationMemberParams struct {
