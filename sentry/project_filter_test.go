@@ -22,7 +22,7 @@ func TestProjectFilterService_GetWithLegacyExtension(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	filterConfig, _, err := client.ProjectFilter.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
+	filterConfig, _, err := client.ProjectFilters.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
 	expected := FilterConfig{
@@ -43,7 +43,7 @@ func TestProjectFilterService_GetWithoutLegacyExtension(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	filterConfig, _, err := client.ProjectFilter.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
+	filterConfig, _, err := client.ProjectFilters.GetFilterConfig(ctx, "the-interstellar-jurisdiction", "powerful-abolitionist")
 	assert.NoError(t, err)
 
 	expected := FilterConfig{
@@ -77,7 +77,7 @@ func TestBrowserExtensionFilter(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	_, err := client.ProjectFilter.UpdateBrowserExtensions(ctx, "test_org", "test_project", true)
+	_, err := client.ProjectFilters.UpdateBrowserExtensions(ctx, "test_org", "test_project", true)
 	assert.NoError(t, err)
 }
 
@@ -95,7 +95,7 @@ func TestLegacyBrowserFilter(t *testing.T) {
 
 	ctx := context.Background()
 	browsers := []string{"ie_pre_9", "ie10"}
-	_, err := client.ProjectFilter.UpdateLegacyBrowser(ctx, "test_org", "test_project", browsers)
+	_, err := client.ProjectFilters.UpdateLegacyBrowser(ctx, "test_org", "test_project", browsers)
 	assert.NoError(t, err)
 }
 

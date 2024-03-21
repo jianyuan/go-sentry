@@ -57,9 +57,9 @@ func TestIssueAlertsService_List(t *testing.T) {
 			ID:          String("12345"),
 			ActionMatch: String("any"),
 			Environment: String("production"),
-			Frequency:   Int(30),
+			Frequency:   JsonNumber(json.Number("30")),
 			Name:        String("Notify errors"),
-			Conditions: []*IssueAlertCondition{
+			Conditions: []map[string]interface{}{
 				{
 					"id":       "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
 					"name":     "An issue is first seen",
@@ -67,7 +67,7 @@ func TestIssueAlertsService_List(t *testing.T) {
 					"interval": "1h",
 				},
 			},
-			Actions: []*IssueAlertAction{
+			Actions: []map[string]interface{}{
 				{
 					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -221,7 +221,7 @@ func TestIssueAlertsService_Get(t *testing.T) {
 
 	expected := &IssueAlert{
 		ID: String("11185158"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"id":   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
 				"name": "A new issue is created",
@@ -256,7 +256,7 @@ func TestIssueAlertsService_Get(t *testing.T) {
 				"name":           "The issue affects more than 100.0 percent of sessions in 1h",
 			},
 		},
-		Filters: []*IssueAlertFilter{
+		Filters: []map[string]interface{}{
 			{
 				"comparison_type": "older",
 				"time":            "minute",
@@ -300,7 +300,7 @@ func TestIssueAlertsService_Get(t *testing.T) {
 				"name":  "The event's level is equal to fatal",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"targetType":       "IssueOwners",
 				"id":               "sentry.mail.actions.NotifyEmailAction",
@@ -326,7 +326,7 @@ func TestIssueAlertsService_Get(t *testing.T) {
 		},
 		ActionMatch: String("any"),
 		FilterMatch: String("any"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("My Rule Name"),
 		DateCreated: Time(mustParseTime("2022-05-23T19:54:30.860115Z")),
 		Owner:       String("team:1322366"),
@@ -404,9 +404,9 @@ func TestIssueAlertsService_Create(t *testing.T) {
 	params := &IssueAlert{
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"interval": "1h",
 				"name":     "The issue is seen more than 10 times in 1h",
@@ -414,7 +414,7 @@ func TestIssueAlertsService_Create(t *testing.T) {
 				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -433,9 +433,9 @@ func TestIssueAlertsService_Create(t *testing.T) {
 		ID:          String("123456"),
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"interval": "1h",
 				"name":     "The issue is seen more than 10 times in 1h",
@@ -443,7 +443,7 @@ func TestIssueAlertsService_Create(t *testing.T) {
 				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -532,9 +532,9 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 	params := &IssueAlert{
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"interval": "1h",
 				"name":     "The issue is seen more than 10 times in 1h",
@@ -542,7 +542,7 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -561,9 +561,9 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 		ID:          String("123456"),
 		ActionMatch: String("all"),
 		Environment: String("production"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"interval": "1h",
 				"name":     "The issue is seen more than 10 times in 1h",
@@ -571,7 +571,7 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -596,16 +596,16 @@ func TestIssueAlertsService_Update(t *testing.T) {
 		ActionMatch: String("all"),
 		FilterMatch: String("any"),
 		Environment: String("staging"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 				"value":    500,
 				"interval": "1h",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
@@ -615,7 +615,7 @@ func TestIssueAlertsService_Update(t *testing.T) {
 				"workspace":  "1234",
 			},
 		},
-		Filters: []*IssueAlertFilter{
+		Filters: []map[string]interface{}{
 			{
 				"id":    "sentry.rules.filters.issue_occurrences.IssueOccurrencesFilter",
 				"name":  "The issue has happened at least 4 times",
@@ -709,15 +709,15 @@ func TestIssueAlertsService_Update(t *testing.T) {
 		ID:          String("12345"),
 		ActionMatch: String("any"),
 		Environment: String("staging"),
-		Frequency:   Int(30),
+		Frequency:   JsonNumber(json.Number("30")),
 		Name:        String("Notify errors"),
-		Conditions: []*IssueAlertCondition{
+		Conditions: []map[string]interface{}{
 			{
 				"id":   "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition",
 				"name": "An issue is first seen",
 			},
 		},
-		Actions: []*IssueAlertAction{
+		Actions: []map[string]interface{}{
 			{
 				"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 				"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",

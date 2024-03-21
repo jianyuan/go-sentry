@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -10,20 +11,20 @@ import (
 // IssueAlert represents an issue alert configured for this project.
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/rule.py#L131-L155
 type IssueAlert struct {
-	ID          *string                `json:"id,omitempty"`
-	Conditions  []*IssueAlertCondition `json:"conditions,omitempty"`
-	Filters     []*IssueAlertFilter    `json:"filters,omitempty"`
-	Actions     []*IssueAlertAction    `json:"actions,omitempty"`
-	ActionMatch *string                `json:"actionMatch,omitempty"`
-	FilterMatch *string                `json:"filterMatch,omitempty"`
-	Frequency   *int                   `json:"frequency,omitempty"`
-	Name        *string                `json:"name,omitempty"`
-	DateCreated *time.Time             `json:"dateCreated,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
-	CreatedBy   *IssueAlertCreatedBy   `json:"createdBy,omitempty"`
-	Environment *string                `json:"environment,omitempty"`
-	Projects    []string               `json:"projects,omitempty"`
-	TaskUUID    *string                `json:"uuid,omitempty"` // This is actually the UUID of the async task that can be spawned to create the rule
+	ID          *string                  `json:"id,omitempty"`
+	Conditions  []map[string]interface{} `json:"conditions,omitempty"`
+	Filters     []map[string]interface{} `json:"filters,omitempty"`
+	Actions     []map[string]interface{} `json:"actions,omitempty"`
+	ActionMatch *string                  `json:"actionMatch,omitempty"`
+	FilterMatch *string                  `json:"filterMatch,omitempty"`
+	Frequency   *json.Number             `json:"frequency,omitempty"`
+	Name        *string                  `json:"name,omitempty"`
+	DateCreated *time.Time               `json:"dateCreated,omitempty"`
+	Owner       *string                  `json:"owner,omitempty"`
+	CreatedBy   *IssueAlertCreatedBy     `json:"createdBy,omitempty"`
+	Environment *string                  `json:"environment,omitempty"`
+	Projects    []string                 `json:"projects,omitempty"`
+	TaskUUID    *string                  `json:"uuid,omitempty"` // This is actually the UUID of the async task that can be spawned to create the rule
 }
 
 // IssueAlertCreatedBy for defining the rule creator.
@@ -32,15 +33,6 @@ type IssueAlertCreatedBy struct {
 	Name  *string `json:"name,omitempty"`
 	Email *string `json:"email,omitempty"`
 }
-
-// IssueAlertCondition for defining conditions.
-type IssueAlertCondition map[string]interface{}
-
-// IssueAlertAction for defining actions.
-type IssueAlertAction map[string]interface{}
-
-// IssueAlertFilter for defining actions.
-type IssueAlertFilter map[string]interface{}
 
 // IssueAlertTaskDetail represents the inline struct Sentry defines for task details
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/endpoints/project_rule_task_details.py#L29

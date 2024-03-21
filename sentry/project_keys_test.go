@@ -63,7 +63,7 @@ func TestProjectKeysService_List(t *testing.T) {
 			Label:     "Fabulous Key",
 			Public:    "cfc7b0341c6e4f6ea1a9d256a30dba00",
 			Secret:    "a07dcd97aa56481f82aeabaed43ca448",
-			ProjectID: 2,
+			ProjectID: json.Number("2"),
 			IsActive:  true,
 			DSN: ProjectKeyDSN{
 				Secret:   "https://cfc7b0341c6e4f6ea1a9d256a30dba00:a07dcd97aa56481f82aeabaed43ca448@sentry.io/2",
@@ -135,7 +135,7 @@ func TestProjectKeysService_Create(t *testing.T) {
 		Label:     "Fabulous Key",
 		Public:    "cfc7b0341c6e4f6ea1a9d256a30dba00",
 		Secret:    "a07dcd97aa56481f82aeabaed43ca448",
-		ProjectID: 2,
+		ProjectID: json.Number("2"),
 		IsActive:  true,
 		DSN: ProjectKeyDSN{
 			Secret:   "https://cfc7b0341c6e4f6ea1a9d256a30dba00:a07dcd97aa56481f82aeabaed43ca448@sentry.io/2",
@@ -206,7 +206,7 @@ func TestProjectKeysService_Update(t *testing.T) {
 		Label:     "Fabulous Key",
 		Public:    "cfc7b0341c6e4f6ea1a9d256a30dba00",
 		Secret:    "a07dcd97aa56481f82aeabaed43ca448",
-		ProjectID: 2,
+		ProjectID: json.Number("2"),
 		IsActive:  true,
 		DSN: ProjectKeyDSN{
 			Secret:   "https://cfc7b0341c6e4f6ea1a9d256a30dba00:a07dcd97aa56481f82aeabaed43ca448@sentry.io/2",
@@ -289,7 +289,7 @@ func TestProjectKeysService_Update_RateLimit(t *testing.T) {
 		Label:     "Fabulous Key",
 		Public:    "cfc7b0341c6e4f6ea1a9d256a30dba00",
 		Secret:    "a07dcd97aa56481f82aeabaed43ca448",
-		ProjectID: 2,
+		ProjectID: json.Number("2"),
 		IsActive:  true,
 		RateLimit: &rateLimit,
 		DSN: ProjectKeyDSN{
