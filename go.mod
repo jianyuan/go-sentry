@@ -1,4 +1,4 @@
-module github.com/canva/go-sentry
+module github.com/canva/go-sentry/v2
 
 go 1.19
 
