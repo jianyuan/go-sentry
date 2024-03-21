@@ -8,10 +8,9 @@ import (
 // APIError represents a Sentry API Error response.
 // Should look like:
 //
-// 	type apiError struct {
-// 		Detail string `json:"detail"`
-// 	}
-//
+//	type apiError struct {
+//		Detail string `json:"detail"`
+//	}
 type APIError struct {
 	f interface{} // unknown
 }

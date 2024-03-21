@@ -40,6 +40,8 @@ type Project struct {
 	ResolveAge           int      `json:"resolveAge"`
 	DataScrubber         bool     `json:"dataScrubber"`
 	DataScrubberDefaults bool     `json:"dataScrubberDefaults"`
+	FingerprintingRules  string   `json:"fingerprintingRules"`
+	GroupingEnhancements string   `json:"groupingEnhancements"`
 	SafeFields           []string `json:"safeFields"`
 	SensitiveFields      []string `json:"sensitiveFields"`
 	SubjectTemplate      string   `json:"subjectTemplate"`
@@ -94,8 +96,13 @@ type ProjectsService service
 
 // List projects available.
 // https://docs.sentry.io/api/projects/list-your-projects/
-func (s *ProjectsService) List(ctx context.Context) ([]*Project, *Response, error) {
+func (s *ProjectsService) List(ctx context.Context, params *ListCursorParams) ([]*Project, *Response, error) {
 	u := "0/projects/"
+	u, err := addQuery(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -128,9 +135,10 @@ func (s *ProjectsService) Get(ctx context.Context, organizationSlug string, slug
 
 // CreateProjectParams are the parameters for ProjectService.Create.
 type CreateProjectParams struct {
-	Name     string `json:"name,omitempty"`
-	Slug     string `json:"slug,omitempty"`
-	Platform string `json:"platform,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Slug         string `json:"slug,omitempty"`
+	Platform     string `json:"platform,omitempty"`
+	DefaultRules *bool  `json:"default_rules,omitempty"`
 }
 
 // Create a new project bound to a team.
@@ -151,17 +159,17 @@ func (s *ProjectsService) Create(ctx context.Context, organizationSlug string, t
 
 // UpdateProjectParams are the parameters for ProjectService.Update.
 type UpdateProjectParams struct {
-	Name            string                 `json:"name,omitempty"`
-	Slug            string                 `json:"slug,omitempty"`
-	Platform        string                 `json:"platform,omitempty"`
-	IsBookmarked    *bool                  `json:"isBookmarked,omitempty"`
-	DigestsMinDelay *int                   `json:"digestsMinDelay,omitempty"`
-	DigestsMaxDelay *int                   `json:"digestsMaxDelay,omitempty"`
-	ResolveAge      *int                   `json:"resolveAge,omitempty"`
-	Options         map[string]interface{} `json:"options,omitempty"`
-	AllowedDomains  []string               `json:"allowedDomains,omitempty"`
-
-	GroupingEnhancements string `json:"groupingEnhancements,omitempty"`
+	Name                 string                 `json:"name,omitempty"`
+	Slug                 string                 `json:"slug,omitempty"`
+	Platform             string                 `json:"platform,omitempty"`
+	IsBookmarked         *bool                  `json:"isBookmarked,omitempty"`
+	DigestsMinDelay      *int                   `json:"digestsMinDelay,omitempty"`
+	DigestsMaxDelay      *int                   `json:"digestsMaxDelay,omitempty"`
+	ResolveAge           *int                   `json:"resolveAge,omitempty"`
+	Options              map[string]interface{} `json:"options,omitempty"`
+	AllowedDomains       []string               `json:"allowedDomains,omitempty"`
+	FingerprintingRules  string                 `json:"fingerprintingRules,omitempty"`
+	GroupingEnhancements string                 `json:"groupingEnhancements,omitempty"`
 }
 
 // Update various attributes and configurable settings for a given project.

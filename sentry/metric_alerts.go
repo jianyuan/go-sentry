@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -13,6 +14,7 @@ type MetricAlert struct {
 	Name             *string               `json:"name,omitempty"`
 	Environment      *string               `json:"environment,omitempty"`
 	DataSet          *string               `json:"dataset,omitempty"`
+	EventTypes       []string              `json:"eventTypes,omitempty"`
 	Query            *string               `json:"query,omitempty"`
 	Aggregate        *string               `json:"aggregate,omitempty"`
 	TimeWindow       *float64              `json:"timeWindow,omitempty"`
@@ -22,10 +24,19 @@ type MetricAlert struct {
 	Projects         []string              `json:"projects,omitempty"`
 	Owner            *string               `json:"owner,omitempty"`
 	DateCreated      *time.Time            `json:"dateCreated,omitempty"`
+	TaskUUID         *string               `json:"uuid,omitempty"` // This is actually the UUID of the async task that can be spawned to create the metric
 	// Don't `omitempty` because we want to set this to null to force Sentry to register this
 	// metric alert as a static alert when `ComparisonDelta` is empty.
 	// We type this as a float instead of an int because Sentry, server-side, returns a float for this value.
 	ComparisonDelta *float64 `json:"comparisonDelta"`
+}
+
+// MetricAlertTaskDetail represents the inline struct Sentry defines for task details
+// https://github.com/getsentry/sentry/blob/22.12.0/src/sentry/incidents/endpoints/project_alert_rule_task_details.py#L31
+type MetricAlertTaskDetail struct {
+	Status    *string      `json:"status,omitempty"`
+	AlertRule *MetricAlert `json:"alertRule,omitempty"`
+	Error     *string      `json:"error,omitempty"`
 }
 
 // MetricAlertTrigger represents a metric alert trigger.
@@ -44,16 +55,16 @@ type MetricAlertTrigger struct {
 // MetricAlertTriggerAction represents a metric alert trigger action.
 // https://github.com/getsentry/sentry/blob/22.5.0/src/sentry/api/serializers/models/alert_rule_trigger_action.py#L42-L66
 type MetricAlertTriggerAction struct {
-	ID                 *string    `json:"id,omitempty"`
-	AlertRuleTriggerID *string    `json:"alertRuleTriggerId,omitempty"`
-	Type               *string    `json:"type,omitempty"`
-	TargetType         *string    `json:"targetType,omitempty"`
-	TargetIdentifier   *string    `json:"targetIdentifier,omitempty"`
-	InputChannelID     *string    `json:"inputChannelId,omitempty"`
-	IntegrationID      *int       `json:"integrationId,omitempty"`
-	SentryAppID        *string    `json:"sentryAppId,omitempty"`
-	DateCreated        *time.Time `json:"dateCreated,omitempty"`
-	Description        *string    `json:"desc,omitempty"`
+	ID                 *string        `json:"id,omitempty"`
+	AlertRuleTriggerID *string        `json:"alertRuleTriggerId,omitempty"`
+	Type               *string        `json:"type,omitempty"`
+	TargetType         *string        `json:"targetType,omitempty"`
+	TargetIdentifier   *Int64OrString `json:"targetIdentifier,omitempty"`
+	InputChannelID     *string        `json:"inputChannelId,omitempty"`
+	IntegrationID      *int           `json:"integrationId,omitempty"`
+	SentryAppID        *string        `json:"sentryAppId,omitempty"`
+	DateCreated        *time.Time     `json:"dateCreated,omitempty"`
+	Description        *string        `json:"desc,omitempty"`
 }
 
 // List Alert Rules configured for a project
@@ -79,7 +90,8 @@ func (s *MetricAlertsService) List(ctx context.Context, organizationSlug string,
 
 // Get details on an issue alert.
 func (s *MetricAlertsService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*MetricAlert, *Response, error) {
-	u := fmt.Sprintf("0/projects/%v/%v/alert-rules/%v/", organizationSlug, projectSlug, id)
+	// TODO: Remove projectSlug argument
+	u := fmt.Sprintf("0/organizations/%v/alert-rules/%v/", organizationSlug, id)
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -106,6 +118,15 @@ func (s *MetricAlertsService) Create(ctx context.Context, organizationSlug strin
 	if err != nil {
 		return nil, resp, err
 	}
+
+	if resp.StatusCode == 202 {
+		if alert.TaskUUID == nil {
+			return nil, resp, errors.New("missing task uuid")
+		}
+		// We just received a reference to an async task, we need to check another endpoint to retrieve the metric alert we created
+		return s.getMetricAlertFromMetricAlertTaskDetail(ctx, organizationSlug, projectSlug, *alert.TaskUUID)
+	}
+
 	return alert, resp, nil
 }
 
@@ -122,7 +143,51 @@ func (s *MetricAlertsService) Update(ctx context.Context, organizationSlug strin
 	if err != nil {
 		return nil, resp, err
 	}
+
+	if resp.StatusCode == 202 {
+		if alert.TaskUUID == nil {
+			return nil, resp, errors.New("missing task uuid")
+		}
+		// We just received a reference to an async task, we need to check another endpoint to retrieve the metric alert we created
+		return s.getMetricAlertFromMetricAlertTaskDetail(ctx, organizationSlug, projectSlug, *alert.TaskUUID)
+	}
+
 	return alert, resp, nil
+}
+
+func (s *MetricAlertsService) getMetricAlertFromMetricAlertTaskDetail(ctx context.Context, organizationSlug string, projectSlug string, taskUUID string) (*MetricAlert, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/alert-rule-task/%v/", organizationSlug, projectSlug, taskUUID)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var resp *Response
+	for i := 0; i < 5; i++ {
+		time.Sleep(5 * time.Second)
+
+		taskDetail := new(MetricAlertTaskDetail)
+		resp, err := s.client.Do(ctx, req, taskDetail)
+		if err != nil {
+			return nil, resp, err
+		}
+
+		if resp.StatusCode == 404 {
+			return nil, resp, fmt.Errorf("cannot find metric alert creation task with UUID %v", taskUUID)
+		}
+		if taskDetail.Status != nil && taskDetail.AlertRule != nil {
+			if *taskDetail.Status == "success" {
+				return taskDetail.AlertRule, resp, err
+			} else if *taskDetail.Status == "failed" {
+				if taskDetail != nil {
+					return taskDetail.AlertRule, resp, errors.New(*taskDetail.Error)
+				}
+
+				return taskDetail.AlertRule, resp, errors.New("error while running the metric alert creation task")
+			}
+		}
+	}
+	return nil, resp, errors.New("getting the status of the metric alert creation from Sentry took too long")
 }
 
 // Delete an Alert Rule.

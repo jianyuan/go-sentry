@@ -22,7 +22,7 @@ func TestProjectOwnershipsService_Get(t *testing.T) {
 			"dateCreated": "2021-11-18T13:09:16.819818Z",
 			"lastUpdated": "2022-03-01T14:00:31.317734Z",
 			"isActive": true,
-			"autoAssignment": true,
+			"autoAssignment": "Auto Assign to Issue Owner",
 			"codeownersAutoSync": null
 		}`)
 	})
@@ -35,7 +35,7 @@ func TestProjectOwnershipsService_Get(t *testing.T) {
 		Raw:                "# assign issues to the product team, no matter the area\nurl:https://example.com/areas/*/*/products/* #product-team",
 		FallThrough:        false,
 		IsActive:           true,
-		AutoAssignment:     true,
+		AutoAssignment:     "Auto Assign to Issue Owner",
 		CodeownersAutoSync: nil,
 		DateCreated:        mustParseTime("2021-11-18T13:09:16.819818Z"),
 		LastUpdated:        mustParseTime("2022-03-01T14:00:31.317734Z"),
@@ -60,7 +60,7 @@ func TestProjectOwnershipsService_Update(t *testing.T) {
 			"dateCreated": "2021-11-18T13:09:16.819818Z",
 			"lastUpdated": "2022-03-01T14:00:31.317734Z",
 			"isActive": true,
-			"autoAssignment": true,
+			"autoAssignment": "Auto Assign to Issue Owner",
 			"codeownersAutoSync": null
 		}`)
 	})
@@ -75,7 +75,7 @@ func TestProjectOwnershipsService_Update(t *testing.T) {
 		Raw:                "# assign issues to the product team, no matter the area\nurl:https://example.com/areas/*/*/products/* #product-team",
 		FallThrough:        false,
 		IsActive:           true,
-		AutoAssignment:     true,
+		AutoAssignment:     "Auto Assign to Issue Owner",
 		CodeownersAutoSync: nil,
 		DateCreated:        mustParseTime("2021-11-18T13:09:16.819818Z"),
 		LastUpdated:        mustParseTime("2022-03-01T14:00:31.317734Z"),
