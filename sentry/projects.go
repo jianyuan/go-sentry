@@ -41,7 +41,6 @@ type Project struct {
 	DataScrubber         bool     `json:"dataScrubber"`
 	DataScrubberDefaults bool     `json:"dataScrubberDefaults"`
 	FingerprintingRules  string   `json:"fingerprintingRules"`
-	GroupingEnhancements string   `json:"groupingEnhancements"`
 	SafeFields           []string `json:"safeFields"`
 	SensitiveFields      []string `json:"sensitiveFields"`
 	SubjectTemplate      string   `json:"subjectTemplate"`

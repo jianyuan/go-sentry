@@ -421,7 +421,6 @@ func TestProjectsService_Get(t *testing.T) {
 		DataScrubber:         true,
 		DataScrubberDefaults: true,
 		FingerprintingRules:  "fingerprinting rule",
-		GroupingEnhancements: "pump-station grouping enhancement rule",
 		SafeFields:           []string{},
 		SensitiveFields:      []string{},
 		SubjectTemplate:      "$shortID - $title",
