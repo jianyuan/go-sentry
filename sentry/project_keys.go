@@ -54,9 +54,15 @@ type ProjectKey struct {
 // https://docs.sentry.io/api/projects/
 type ProjectKeysService service
 
+type ListProjectKeysParams struct {
+	ListCursorParams
+
+	Status *string `url:"status,omitempty"`
+}
+
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
-func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListCursorParams) ([]*ProjectKey, *Response, error) {
+func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListProjectKeysParams) ([]*ProjectKey, *Response, error) {
 	u := fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug)
 	u, err := addQuery(u, params)
 	if err != nil {
@@ -74,6 +80,23 @@ func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, 
 		return nil, resp, err
 	}
 	return projectKeys, resp, nil
+}
+
+// Get details of a client key.
+// https://docs.sentry.io/api/projects/retrieve-a-client-key/
+func (s *ProjectKeysService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*ProjectKey, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/keys/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	projectKey := new(ProjectKey)
+	resp, err := s.client.Do(ctx, req, projectKey)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectKey, resp, nil
 }
 
 // CreateProjectKeyParams are the parameters for ProjectKeyService.Create.
