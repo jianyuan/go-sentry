@@ -20,22 +20,33 @@ type ProjectKeyDSN struct {
 	CSP      string `json:"csp"`
 	Security string `json:"security"`
 	Minidump string `json:"minidump"`
+	NEL      string `json:"nel"`
+	Unreal   string `json:"unreal"`
 	CDN      string `json:"cdn"`
+	Crons    string `json:"crons"`
+}
+
+type ProjectKeyDynamicSDKLoaderOptions struct {
+	HasReplay      bool `json:"hasReplay"`
+	HasPerformance bool `json:"hasPerformance"`
+	HasDebugFiles  bool `json:"hasDebug"`
 }
 
 // ProjectKey represents a client key bound to a project.
 // https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project_key.py
 type ProjectKey struct {
-	ID          string               `json:"id"`
-	Name        string               `json:"name"`
-	Label       string               `json:"label"`
-	Public      string               `json:"public"`
-	Secret      string               `json:"secret"`
-	ProjectID   json.Number          `json:"projectId"`
-	IsActive    bool                 `json:"isActive"`
-	RateLimit   *ProjectKeyRateLimit `json:"rateLimit"`
-	DSN         ProjectKeyDSN        `json:"dsn"`
-	DateCreated time.Time            `json:"dateCreated"`
+	ID                      string                            `json:"id"`
+	Name                    string                            `json:"name"`
+	Label                   string                            `json:"label"`
+	Public                  string                            `json:"public"`
+	Secret                  string                            `json:"secret"`
+	ProjectID               json.Number                       `json:"projectId"`
+	IsActive                bool                              `json:"isActive"`
+	RateLimit               *ProjectKeyRateLimit              `json:"rateLimit"`
+	DSN                     ProjectKeyDSN                     `json:"dsn"`
+	BrowserSDKVersion       string                            `json:"browserSdkVersion"`
+	DateCreated             time.Time                         `json:"dateCreated"`
+	DynamicSDKLoaderOptions ProjectKeyDynamicSDKLoaderOptions `json:"dynamicSdkLoaderOptions"`
 }
 
 // ProjectKeysService provides methods for accessing Sentry project
