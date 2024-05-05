@@ -54,6 +54,7 @@ type Client struct {
 	OrganizationCodeMappings  *OrganizationCodeMappingsService
 	OrganizationIntegrations  *OrganizationIntegrationsService
 	OrganizationMembers       *OrganizationMembersService
+	OrganizationProjects      *OrganizationProjectsService
 	OrganizationRepositories  *OrganizationRepositoriesService
 	Organizations             *OrganizationsService
 	ProjectFilters            *ProjectFiltersService
@@ -95,6 +96,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.OrganizationCodeMappings = (*OrganizationCodeMappingsService)(&c.common)
 	c.OrganizationIntegrations = (*OrganizationIntegrationsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
+	c.OrganizationProjects = (*OrganizationProjectsService)(&c.common)
 	c.OrganizationRepositories = (*OrganizationRepositoriesService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
 	c.ProjectFilters = (*ProjectFiltersService)(&c.common)

@@ -94,9 +94,6 @@ type ProjectsService service
 
 type ListProjectsParams struct {
 	ListCursorParams
-
-	Options string `url:"options,omitempty"`
-	Query   string `url:"query,omitempty"`
 }
 
 // List projects available.
