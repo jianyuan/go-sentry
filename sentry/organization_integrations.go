@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -17,7 +18,7 @@ type OrganizationIntegrationProvider struct {
 }
 
 // IntegrationConfigData for defining integration-specific configuration data.
-type IntegrationConfigData map[string]interface{}
+type IntegrationConfigData map[string]json.RawMessage
 
 // OrganizationIntegration represents an integration added for the organization.
 // https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/serializers/models/integration.py#L93
@@ -33,11 +34,11 @@ type OrganizationIntegration struct {
 	Provider    OrganizationIntegrationProvider `json:"provider"`
 
 	// https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/serializers/models/integration.py#L138
-	ConfigData                    *IntegrationConfigData `json:"configData"`
-	ExternalId                    string                 `json:"externalId"`
-	OrganizationId                int                    `json:"organizationId"`
-	OrganizationIntegrationStatus string                 `json:"organizationIntegrationStatus"`
-	GracePeriodEnd                *time.Time             `json:"gracePeriodEnd"`
+	ConfigData                    json.RawMessage `json:"configData"`
+	ExternalId                    string          `json:"externalId"`
+	OrganizationId                int             `json:"organizationId"`
+	OrganizationIntegrationStatus string          `json:"organizationIntegrationStatus"`
+	GracePeriodEnd                *time.Time      `json:"gracePeriodEnd"`
 }
 
 // OrganizationIntegrationsService provides methods for accessing Sentry organization integrations API endpoints.
@@ -88,7 +89,7 @@ func (s *OrganizationIntegrationsService) Get(ctx context.Context, organizationS
 	return integration, resp, nil
 }
 
-type UpdateConfigOrganizationIntegrationsParams = IntegrationConfigData
+type UpdateConfigOrganizationIntegrationsParams = json.RawMessage
 
 // UpdateConfig - update configData for organization integration.
 // https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/integrations/organization_integrations/details.py#L94-L102

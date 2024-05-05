@@ -81,7 +81,7 @@ func TestOrganizationIntegrationsService_List(t *testing.T) {
 					"stacktrace-link",
 				},
 			},
-			ConfigData:                    &IntegrationConfigData{},
+			ConfigData:                    json.RawMessage("{}"),
 			ExternalId:                    "87654321",
 			OrganizationId:                2,
 			OrganizationIntegrationStatus: "active",
@@ -181,15 +181,15 @@ func TestOrganizationIntegrationsService_Get(t *testing.T) {
 				"incident-management",
 			},
 		},
-		ConfigData: &IntegrationConfigData{
-			"service_table": []interface{}{
-				map[string]interface{}{
-					"service":         "testing123",
-					"integration_key": "abc123xyz",
-					"id":              json.Number("22222"),
-				},
-			},
-		},
+		ConfigData: json.RawMessage(`{
+			"service_table": [
+			  {
+				"service": "testing123",
+				"integration_key": "abc123xyz",
+				"id": 22222
+			  }
+			]
+		  }`),
 		ExternalId:                    "999999",
 		OrganizationId:                2,
 		OrganizationIntegrationStatus: "active",
@@ -207,20 +207,20 @@ func TestOrganizationIntegrationsService_UpdateConfig(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 	})
 
-	updateConfigOrganizationIntegrationsParams := UpdateConfigOrganizationIntegrationsParams{
-		"service_table": []interface{}{
-			map[string]interface{}{
-				"service":         "testing123",
+	updateConfigOrganizationIntegrationsParams := UpdateConfigOrganizationIntegrationsParams(`{
+		"service_table": [
+			{
+				"service": "testing123",
 				"integration_key": "abc123xyz",
-				"id":              json.Number("22222"),
+				"id": 22222
 			},
-			map[string]interface{}{
-				"service":         "testing456",
+			{
+				"service": "testing456",
 				"integration_key": "efg456lmn",
-				"id":              "",
-			},
-		},
-	}
+				"id": ""
+			}
+		]
+	}`)
 	ctx := context.Background()
 	resp, err := client.OrganizationIntegrations.UpdateConfig(ctx, "the-interstellar-jurisdiction", "456789", &updateConfigOrganizationIntegrationsParams)
 	assert.NoError(t, err)
