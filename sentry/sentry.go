@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -55,6 +54,7 @@ type Client struct {
 	OrganizationCodeMappings  *OrganizationCodeMappingsService
 	OrganizationIntegrations  *OrganizationIntegrationsService
 	OrganizationMembers       *OrganizationMembersService
+	OrganizationProjects      *OrganizationProjectsService
 	OrganizationRepositories  *OrganizationRepositoriesService
 	Organizations             *OrganizationsService
 	ProjectFilters            *ProjectFilterService
@@ -96,6 +96,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.OrganizationCodeMappings = (*OrganizationCodeMappingsService)(&c.common)
 	c.OrganizationIntegrations = (*OrganizationIntegrationsService)(&c.common)
 	c.OrganizationMembers = (*OrganizationMembersService)(&c.common)
+	c.OrganizationProjects = (*OrganizationProjectsService)(&c.common)
 	c.OrganizationRepositories = (*OrganizationRepositoriesService)(&c.common)
 	c.Organizations = (*OrganizationsService)(&c.common)
 	c.ProjectFilters = (*ProjectFilterService)(&c.common)
@@ -357,7 +358,7 @@ func CheckResponse(r *http.Response) error {
 	}
 
 	errorResponse := &ErrorResponse{Response: r}
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err == nil && data != nil {
 		apiError := new(APIError)
 		json.Unmarshal(data, apiError)
@@ -368,7 +369,7 @@ func CheckResponse(r *http.Response) error {
 		}
 	}
 	// Re-populate error response body.
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+	r.Body = io.NopCloser(bytes.NewBuffer(data))
 
 	switch {
 	case r.StatusCode == http.StatusTooManyRequests &&

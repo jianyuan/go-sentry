@@ -93,9 +93,13 @@ type ProjectSummaryTeam struct {
 // https://docs.sentry.io/api/projects/
 type ProjectsService service
 
+type ListProjectsParams struct {
+	ListCursorParams
+}
+
 // List projects available.
 // https://docs.sentry.io/api/projects/list-your-projects/
-func (s *ProjectsService) List(ctx context.Context, params *ListCursorParams) ([]*Project, *Response, error) {
+func (s *ProjectsService) List(ctx context.Context, params *ListProjectsParams) ([]*Project, *Response, error) {
 	u := "0/projects/"
 	u, err := addQuery(u, params)
 	if err != nil {

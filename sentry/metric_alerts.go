@@ -20,6 +20,7 @@ type MetricAlert struct {
 	TimeWindow       *float64              `json:"timeWindow,omitempty"`
 	ThresholdType    *int                  `json:"thresholdType,omitempty"`
 	ResolveThreshold *float64              `json:"resolveThreshold,omitempty"`
+	ComparisonDelta  *float64              `json:"comparisonDelta,omitempty"`
 	Triggers         []*MetricAlertTrigger `json:"triggers,omitempty"`
 	Projects         []string              `json:"projects,omitempty"`
 	Owner            *string               `json:"owner,omitempty"`

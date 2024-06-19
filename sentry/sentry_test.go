@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -272,7 +272,7 @@ func TestCheckResponse(t *testing.T) {
 			res := &http.Response{
 				Request:    &http.Request{},
 				StatusCode: http.StatusBadRequest,
-				Body:       ioutil.NopCloser(strings.NewReader(tc.body)),
+				Body:       io.NopCloser(strings.NewReader(tc.body)),
 			}
 
 			err := CheckResponse(res)
@@ -313,7 +313,7 @@ func TestCheckResponse_rateLimit(t *testing.T) {
 				Request:    &http.Request{},
 				StatusCode: http.StatusTooManyRequests,
 				Header:     http.Header{},
-				Body:       ioutil.NopCloser(strings.NewReader(`{"detail": "Rate limit exceeded"}`)),
+				Body:       io.NopCloser(strings.NewReader(`{"detail": "Rate limit exceeded"}`)),
 			}
 			tc.addHeaders(res)
 

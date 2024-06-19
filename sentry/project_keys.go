@@ -20,22 +20,33 @@ type ProjectKeyDSN struct {
 	CSP      string `json:"csp"`
 	Security string `json:"security"`
 	Minidump string `json:"minidump"`
+	NEL      string `json:"nel"`
+	Unreal   string `json:"unreal"`
 	CDN      string `json:"cdn"`
+	Crons    string `json:"crons"`
+}
+
+type ProjectKeyDynamicSDKLoaderOptions struct {
+	HasReplay      bool `json:"hasReplay"`
+	HasPerformance bool `json:"hasPerformance"`
+	HasDebugFiles  bool `json:"hasDebug"`
 }
 
 // ProjectKey represents a client key bound to a project.
 // https://github.com/getsentry/sentry/blob/9.0.0/src/sentry/api/serializers/models/project_key.py
 type ProjectKey struct {
-	ID          string               `json:"id"`
-	Name        string               `json:"name"`
-	Label       string               `json:"label"`
-	Public      string               `json:"public"`
-	Secret      string               `json:"secret"`
-	ProjectID   json.Number          `json:"projectId"`
-	IsActive    bool                 `json:"isActive"`
-	RateLimit   *ProjectKeyRateLimit `json:"rateLimit"`
-	DSN         ProjectKeyDSN        `json:"dsn"`
-	DateCreated time.Time            `json:"dateCreated"`
+	ID                      string                            `json:"id"`
+	Name                    string                            `json:"name"`
+	Label                   string                            `json:"label"`
+	Public                  string                            `json:"public"`
+	Secret                  string                            `json:"secret"`
+	ProjectID               json.Number                       `json:"projectId"`
+	IsActive                bool                              `json:"isActive"`
+	RateLimit               *ProjectKeyRateLimit              `json:"rateLimit"`
+	DSN                     ProjectKeyDSN                     `json:"dsn"`
+	BrowserSDKVersion       string                            `json:"browserSdkVersion"`
+	DateCreated             time.Time                         `json:"dateCreated"`
+	DynamicSDKLoaderOptions ProjectKeyDynamicSDKLoaderOptions `json:"dynamicSdkLoaderOptions"`
 }
 
 // ProjectKeysService provides methods for accessing Sentry project
@@ -43,9 +54,15 @@ type ProjectKey struct {
 // https://docs.sentry.io/api/projects/
 type ProjectKeysService service
 
+type ListProjectKeysParams struct {
+	ListCursorParams
+
+	Status *string `url:"status,omitempty"`
+}
+
 // List client keys bound to a project.
 // https://docs.sentry.io/api/projects/get-project-keys/
-func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListCursorParams) ([]*ProjectKey, *Response, error) {
+func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, projectSlug string, params *ListProjectKeysParams) ([]*ProjectKey, *Response, error) {
 	u := fmt.Sprintf("0/projects/%v/%v/keys/", organizationSlug, projectSlug)
 	u, err := addQuery(u, params)
 	if err != nil {
@@ -63,6 +80,23 @@ func (s *ProjectKeysService) List(ctx context.Context, organizationSlug string, 
 		return nil, resp, err
 	}
 	return projectKeys, resp, nil
+}
+
+// Get details of a client key.
+// https://docs.sentry.io/api/projects/retrieve-a-client-key/
+func (s *ProjectKeysService) Get(ctx context.Context, organizationSlug string, projectSlug string, id string) (*ProjectKey, *Response, error) {
+	u := fmt.Sprintf("0/projects/%v/%v/keys/%v/", organizationSlug, projectSlug, id)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	projectKey := new(ProjectKey)
+	resp, err := s.client.Do(ctx, req, projectKey)
+	if err != nil {
+		return nil, resp, err
+	}
+	return projectKey, resp, nil
 }
 
 // CreateProjectKeyParams are the parameters for ProjectKeyService.Create.
