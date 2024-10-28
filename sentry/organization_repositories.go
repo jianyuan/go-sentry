@@ -26,13 +26,13 @@ type OrganizationRepository struct {
 }
 
 // OrganizationRepositoriesService provides methods for accessing Sentry organization repositories API endpoints.
-// Paths: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/urls.py#L1385-L1394
-// Endpoints: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/organization_repositories.py
-// Endpoints: https://github.com/getsentry/sentry/blob/22.7.0/src/sentry/api/endpoints/organization_repository_details.py
+// Endpoints: https://github.com/getsentry/sentry/blob/24.10.0/src/sentry/integrations/api/endpoints/organization_repositories.py
+// Endpoints: https://github.com/getsentry/sentry/blob/24.10.0/src/sentry/integrations/api/endpoints/organization_repository_details.py
 type OrganizationRepositoriesService service
 
 type ListOrganizationRepositoriesParams struct {
 	ListCursorParams
+	IntegrationId string `url:"integration_id,omitempty"`
 	// omitting status defaults to only active.
 	// sending empty string shows everything, which is a more reasonable default.
 	Status string `url:"status"`
