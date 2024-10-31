@@ -170,8 +170,8 @@ type UpdateProjectParams struct {
 	ResolveAge           *int                   `json:"resolveAge,omitempty"`
 	Options              map[string]interface{} `json:"options,omitempty"`
 	AllowedDomains       []string               `json:"allowedDomains,omitempty"`
-	FingerprintingRules  string                 `json:"fingerprintingRules,omitempty"`
-	GroupingEnhancements string                 `json:"groupingEnhancements,omitempty"`
+	FingerprintingRules  *string                `json:"fingerprintingRules,omitempty"`
+	GroupingEnhancements *string                `json:"groupingEnhancements,omitempty"`
 }
 
 // Update various attributes and configurable settings for a given project.
