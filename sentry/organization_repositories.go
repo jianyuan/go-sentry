@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -22,7 +23,8 @@ type OrganizationRepository struct {
 	Status        string                         `json:"status"`
 	DateCreated   time.Time                      `json:"dateCreated"`
 	IntegrationId string                         `json:"integrationId"`
-	ExternalSlug  string                         `json:"externalSlug"`
+	ExternalSlug  json.RawMessage                `json:"externalSlug"`
+	ExternalId    string                         `json:"externalId"`
 }
 
 // OrganizationRepositoriesService provides methods for accessing Sentry organization repositories API endpoints.

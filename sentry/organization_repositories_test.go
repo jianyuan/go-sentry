@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -29,7 +30,8 @@ func TestOrganizationRepositoriesService_List(t *testing.T) {
 				"status": "active",
 				"dateCreated": "2022-08-15T06:31:49.817916Z",
 				"integrationId": "123456",
-				"externalSlug": "aht4davchml6srhh6mvthluoscl2lzmi"
+				"externalSlug": "aht4davchml6srhh6mvthluoscl2lzmi",
+				"externalId": "123456"
 			}
 		]`)
 	})
@@ -54,7 +56,8 @@ func TestOrganizationRepositoriesService_List(t *testing.T) {
 			Status:        "active",
 			DateCreated:   mustParseTime("2022-08-15T06:31:49.817916Z"),
 			IntegrationId: "123456",
-			ExternalSlug:  "aht4davchml6srhh6mvthluoscl2lzmi",
+			ExternalSlug:  json.RawMessage(`"aht4davchml6srhh6mvthluoscl2lzmi"`),
+			ExternalId:    "123456",
 		},
 	}
 	assert.Equal(t, expected, repos)
@@ -79,7 +82,8 @@ func TestOrganizationRepositoriesService_Create(t *testing.T) {
 			"status": "active",
 			"dateCreated": "2022-08-15T06:31:49.817916Z",
 			"integrationId": "123456",
-			"externalSlug": "aht4davchml6srhh6mvthluoscl2lzmi"
+			"externalSlug": "aht4davchml6srhh6mvthluoscl2lzmi",
+			"externalId": "123456"
 		}`)
 	})
 
@@ -102,7 +106,8 @@ func TestOrganizationRepositoriesService_Create(t *testing.T) {
 		Status:        "active",
 		DateCreated:   mustParseTime("2022-08-15T06:31:49.817916Z"),
 		IntegrationId: "123456",
-		ExternalSlug:  "aht4davchml6srhh6mvthluoscl2lzmi",
+		ExternalSlug:  json.RawMessage(`"aht4davchml6srhh6mvthluoscl2lzmi"`),
+		ExternalId:    "123456",
 	}
 	assert.Equal(t, expected, repo)
 }
@@ -128,7 +133,8 @@ func TestOrganizationRepositoriesService_Delete(t *testing.T) {
 			"status": "pending_deletion",
 			"dateCreated": "2022-08-15T06:31:49.817916Z",
 			"integrationId": "123456",
-			"externalSlug": "aht4davchml6srhh6mvthluoscl2lzmi"
+			"externalSlug": "aht4davchml6srhh6mvthluoscl2lzmi",
+			"externalId": "123456"
 		}`)
 	})
 
@@ -146,7 +152,8 @@ func TestOrganizationRepositoriesService_Delete(t *testing.T) {
 		Status:        "pending_deletion",
 		DateCreated:   mustParseTime("2022-08-15T06:31:49.817916Z"),
 		IntegrationId: "123456",
-		ExternalSlug:  "aht4davchml6srhh6mvthluoscl2lzmi",
+		ExternalSlug:  json.RawMessage(`"aht4davchml6srhh6mvthluoscl2lzmi"`),
+		ExternalId:    "123456",
 	}
 	assert.Equal(t, expected, repo)
 }
