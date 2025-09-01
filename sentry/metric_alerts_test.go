@@ -270,44 +270,41 @@ func TestMetricAlertsService_CreateWithAsyncTask(t *testing.T) {
 	mux.HandleFunc("/api/0/projects/the-interstellar-jurisdiction/pump-station/alert-rules/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
 		assertPostJSONValue(t, map[string]interface{}{
-			"id":               "12345",
 			"name":             "pump-station-alert",
 			"environment":      "production",
 			"dataset":          "transactions",
-			"eventTypes":       []string{"transaction"},
+			"eventTypes":       []interface{}{"transaction"},
 			"query":            "http.url:http://service/unreadmessages",
 			"aggregate":        "p50(transaction.duration)",
-			"timeWindow":       10,
-			"thresholdType":    0,
-			"resolveThreshold": 0,
-			"triggers": []map[string]interface{}{
-				{
-					"actions": []map[string]interface{}{
-						{
+			"timeWindow":       json.Number("10"),
+			"thresholdType":    json.Number("0"),
+			"resolveThreshold": json.Number("0"),
+			"triggers": []interface{}{
+				map[string]interface{}{
+					"actions": []interface{}{
+						map[string]interface{}{
 							"alertRuleTriggerId": "56789",
 							"dateCreated":        "2022-04-15T15:06:01.087054Z",
 							"desc":               "Send a Slack notification to #alert-rule-alerts",
 							"id":                 "12389",
 							"inputChannelId":     "C0XXXFKLXXX",
-							"integrationId":      111,
-							"sentryAppId":        nil,
+							"integrationId":      json.Number("123"),
 							"targetIdentifier":   "#alert-rule-alerts",
 							"targetType":         "specific",
 							"type":               "slack",
 						},
 					},
 					"alertRuleId":      "12345",
-					"alertThreshold":   10000,
+					"alertThreshold":   json.Number("55501"),
 					"dateCreated":      "2022-04-15T15:06:01.079598Z",
 					"id":               "56789",
 					"label":            "critical",
-					"resolveThreshold": 0,
-					"thresholdType":    0,
+					"resolveThreshold": json.Number("100"),
+					"thresholdType":    json.Number("0"),
 				},
 			},
-			"projects":    []string{"pump-station"},
-			"owner":       "pump-station:12345",
-			"dateCreated": "2022-04-15T15:06:01.05618Z",
+			"projects": []interface{}{"pump-station"},
+			"owner":    "pump-station:12345",
 		}, r)
 
 		w.WriteHeader(http.StatusAccepted)
@@ -324,6 +321,7 @@ func TestMetricAlertsService_CreateWithAsyncTask(t *testing.T) {
 		TimeWindow:       Float64(10.0),
 		ThresholdType:    Int(0),
 		ResolveThreshold: Float64(0),
+		EventTypes:       []string{"transaction"},
 		Triggers: []*MetricAlertTrigger{
 			{
 				ID:               String("56789"),
