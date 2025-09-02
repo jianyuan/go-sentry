@@ -350,18 +350,18 @@ func TestIssueAlertsService_Create(t *testing.T) {
 		assertPostJSONValue(t, map[string]interface{}{
 			"actionMatch": "all",
 			"environment": "production",
-			"frequency":   30,
+			"frequency":   json.Number("30"),
 			"name":        "Notify errors",
-			"conditions": []map[string]interface{}{
-				{
+			"conditions": []interface{}{
+				map[string]interface{}{
 					"interval": "1h",
 					"name":     "The issue is seen more than 10 times in 1h",
-					"value":    10,
+					"value":    json.Number("10"),
 					"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 				},
 			},
-			"actions": []map[string]interface{}{
-				{
+			"actions": []interface{}{
+				map[string]interface{}{
 					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
 					"tags":       "environment",
@@ -501,18 +501,18 @@ func TestIssueAlertsService_CreateWithAsyncTask(t *testing.T) {
 		assertPostJSONValue(t, map[string]interface{}{
 			"actionMatch": "all",
 			"environment": "production",
-			"frequency":   30,
+			"frequency":   json.Number("30"),
 			"name":        "Notify errors",
-			"conditions": []map[string]interface{}{
-				{
+			"conditions": []interface{}{
+				map[string]interface{}{
 					"interval": "1h",
 					"name":     "The issue is seen more than 10 times in 1h",
-					"value":    10,
+					"value":    json.Number("10"),
 					"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 				},
 			},
-			"actions": []map[string]interface{}{
-				{
+			"actions": []interface{}{
+				map[string]interface{}{
 					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
 					"tags":       "environment",
@@ -642,15 +642,15 @@ func TestIssueAlertsService_Update(t *testing.T) {
 			"frequency":   json.Number("30"),
 			"name":        "Notify errors",
 			"dateCreated": "2019-08-24T18:12:16.321Z",
-			"conditions": []map[string]interface{}{
-				{
+			"conditions": []interface{}{
+				map[string]interface{}{
 					"id":       "sentry.rules.conditions.event_frequency.EventFrequencyCondition",
 					"value":    json.Number("500"),
 					"interval": "1h",
 				},
 			},
-			"actions": []map[string]interface{}{
-				{
+			"actions": []interface{}{
+				map[string]interface{}{
 					"id":         "sentry.integrations.slack.notify_action.SlackNotifyServiceAction",
 					"name":       "Send a notification to the Dummy Slack workspace to #dummy-channel and show tags [environment] in notification",
 					"tags":       "environment",
@@ -659,13 +659,13 @@ func TestIssueAlertsService_Update(t *testing.T) {
 					"workspace":  "1234",
 				},
 			},
-			"filters": []map[string]interface{}{
-				{
+			"filters": []interface{}{
+				map[string]interface{}{
 					"id":    "sentry.rules.filters.issue_occurrences.IssueOccurrencesFilter",
 					"name":  "The issue has happened at least 4 times",
 					"value": json.Number("4"),
 				},
-				{
+				map[string]interface{}{
 					"attribute": "message",
 					"id":        "sentry.rules.filters.event_attribute.EventAttributeFilter",
 					"match":     "eq",

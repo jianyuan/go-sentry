@@ -75,7 +75,7 @@ func assertPostJSONValue(t *testing.T, expected interface{}, req *http.Request) 
 
 	err := d.Decode(&actual)
 	assert.NoError(t, err)
-	assert.ObjectsAreEqualValues(expected, actual)
+	assert.EqualValues(t, expected, actual)
 }
 
 func mustParseTime(value string) time.Time {

@@ -6,12 +6,25 @@ import (
 	"time"
 )
 
+// Permission represents a dashboard permissions.
+type Permission struct {
+	IsEditableByEveryone *bool  `json:"isEditableByEveryone,omitempty"`
+	TeamsWithEditAccess  []*int `json:"teamsWithEditAccess,omitempty"`
+}
+
 // Dashboard represents a Dashboard.
 type Dashboard struct {
-	ID          *string            `json:"id,omitempty"`
-	Title       *string            `json:"title,omitempty"`
-	DateCreated *time.Time         `json:"dateCreated,omitempty"`
-	Widgets     []*DashboardWidget `json:"widgets,omitempty"`
+	ID           *string            `json:"id,omitempty"`
+	Title        *string            `json:"title,omitempty"`
+	DateCreated  *time.Time         `json:"dateCreated,omitempty"`
+	Widgets      []*DashboardWidget `json:"widgets,omitempty"`
+	Projects     []*int             `json:"projects,omitempty"`
+	Environments []*string          `json:"environments,omitempty"`
+	Period       *string            `json:"period,omitempty"`
+	Start        *string            `json:"start,omitempty"`
+	End          *string            `json:"end,omitempty"`
+	Permissions  *Permission        `json:"permissions,omitempty"`
+	IsFavorited  *bool              `json:"is_favorited,omitempty"`
 }
 
 // DashboardsService provides methods for accessing Sentry dashboard API endpoints.
