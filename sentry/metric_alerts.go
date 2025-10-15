@@ -59,7 +59,7 @@ type MetricAlertTriggerAction struct {
 	TargetIdentifier   *Int64OrString `json:"targetIdentifier,omitempty"`
 	InputChannelID     *string        `json:"inputChannelId,omitempty"`
 	IntegrationID      *int           `json:"integrationId,omitempty"`
-	SentryAppID        *int        `json:"sentryAppId,omitempty"`
+	SentryAppID        *int           `json:"sentryAppId,omitempty"`
 	DateCreated        *time.Time     `json:"dateCreated,omitempty"`
 	Description        *string        `json:"desc,omitempty"`
 }
