@@ -2,6 +2,7 @@ package sentry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -146,8 +147,13 @@ func TestDashboardsService_Create(t *testing.T) {
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/dashboards/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "POST", r)
 		assertPostJSONValue(t, map[string]interface{}{
-			"title":   "General",
-			"widgets": map[string]interface{}{},
+			"title": "General",
+			"permissions": map[string]interface{}{
+				"isEditableByEveryone": true,
+				"teamsWithEditAccess":  []interface{}{json.Number("3"), json.Number("4")},
+			},
+			"projects": []interface{}{json.Number("1"), json.Number("2")},
+			"period":   "14d",
 		}, r)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -155,13 +161,25 @@ func TestDashboardsService_Create(t *testing.T) {
 			"id": "12072",
 			"title": "General",
 			"dateCreated": "2022-06-07T16:48:26.255520Z",
-			"widgets": []
+			"widgets": [],
+            "permissions": {
+                "isEditableByEveryone": true,
+                "teamsWithEditAccess": [3, 4]
+            },
+            "projects": [1, 2],
+            "period": "14d"
 		}`)
 	})
 
 	params := &Dashboard{
 		Title:   String("General"),
 		Widgets: []*DashboardWidget{},
+		Permissions: &Permission{
+			IsEditableByEveryone: Bool(true),
+			TeamsWithEditAccess:  []*int{Int(3), Int(4)},
+		},
+		Projects: []*int{Int(1), Int(2)},
+		Period:   String("14d"),
 	}
 	ctx := context.Background()
 	dashboard, _, err := client.Dashboards.Create(ctx, "the-interstellar-jurisdiction", params)
@@ -171,6 +189,12 @@ func TestDashboardsService_Create(t *testing.T) {
 		Title:       String("General"),
 		DateCreated: Time(mustParseTime("2022-06-07T16:48:26.255520Z")),
 		Widgets:     []*DashboardWidget{},
+		Projects:    []*int{Int(1), Int(2)},
+		Permissions: &Permission{
+			IsEditableByEveryone: Bool(true),
+			TeamsWithEditAccess:  []*int{Int(3), Int(4)},
+		},
+		Period: String("14d"),
 	}
 	assert.Equal(t, expected, dashboard)
 	assert.NoError(t, err)
@@ -183,9 +207,10 @@ func TestDashboardsService_Update(t *testing.T) {
 	mux.HandleFunc("/api/0/organizations/the-interstellar-jurisdiction/dashboards/12072/", func(w http.ResponseWriter, r *http.Request) {
 		assertMethod(t, "PUT", r)
 		assertPostJSONValue(t, map[string]interface{}{
-			"id":      "12072",
-			"title":   "General",
-			"widgets": map[string]interface{}{},
+			"id":       "12072",
+			"title":    "General",
+			"projects": []interface{}{json.Number("1"), json.Number("2")},
+			"period":   "14d",
 		}, r)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -193,14 +218,18 @@ func TestDashboardsService_Update(t *testing.T) {
 			"id": "12072",
 			"title": "General",
 			"dateCreated": "2022-06-07T16:48:26.255520Z",
-			"widgets": []
+			"widgets": [],
+            "projects": [1, 2],
+            "period": "14d"
 		}`)
 	})
 
 	params := &Dashboard{
-		ID:      String("12072"),
-		Title:   String("General"),
-		Widgets: []*DashboardWidget{},
+		ID:       String("12072"),
+		Title:    String("General"),
+		Widgets:  []*DashboardWidget{},
+		Projects: []*int{Int(1), Int(2)},
+		Period:   String("14d"),
 	}
 	ctx := context.Background()
 	dashboard, _, err := client.Dashboards.Update(ctx, "the-interstellar-jurisdiction", "12072", params)
@@ -210,6 +239,8 @@ func TestDashboardsService_Update(t *testing.T) {
 		Title:       String("General"),
 		DateCreated: Time(mustParseTime("2022-06-07T16:48:26.255520Z")),
 		Widgets:     []*DashboardWidget{},
+		Projects:    []*int{Int(1), Int(2)},
+		Period:      String("14d"),
 	}
 	assert.Equal(t, expected, dashboard)
 	assert.NoError(t, err)
